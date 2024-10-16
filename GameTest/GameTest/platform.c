@@ -89,14 +89,14 @@ void verticalhitbox(int coord_index, struct platform* plt) {
 				(plt->platcoords[coord_index + 1].y + 10) - (plt->platcoords[coord_index].y - 10)
 			};
 		}
-		else {																		// if next coordy < current coordy
+		else {																		// if next coordy < current coordy 
 			plt->blocks[coord_index] = (struct platblocks){
 				plt->platcoords[coord_index].x - 10,
 				plt->platcoords[coord_index].x + 10,
-				plt->platcoords[coord_index].y + 10,
 				plt->platcoords[coord_index + 1].y - 10,
+				plt->platcoords[coord_index].y + 10,
 				20,
-				(plt->platcoords[coord_index + 1].y - 10) - (plt->platcoords[coord_index].y + 10)
+				(plt->platcoords[coord_index].y + 10) - (plt->platcoords[coord_index+1].y - 10)
 			};
 
 		}

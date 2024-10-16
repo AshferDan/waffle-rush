@@ -182,7 +182,9 @@ void Game_Update(void)
 
 	}
 
-	printf("plat[1]block[4] x1 %f, x2 %f, y1 %f, y2 %f\n", Platform[1].blocks[4].x1, Platform[1].blocks[4].x2, Platform[1].blocks[4].y1, Platform[1].blocks[4].y2);
+	if (collision(Platform[1].blocks[4], p)) {
+		CP_Graphics_DrawRect(50,50,50,50);
+	}
 
 	for (int i = 0; i < Platform[1].numcoords; i++) {
 		if (collision(Platform[1].blocks[i], p)) {
