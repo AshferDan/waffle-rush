@@ -19,15 +19,12 @@ float width, height; //window width/height
 float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
 CP_Font text;
 
-
 struct Player p; //player p
 
-int platcount = 8;
-struct platform Platforms[8];
-
-struct platform2 Platformtest[1];
 
 int movestate; //0 = platformer, 1 = platform
+
+
 
 void Game_Init(void)
 {
@@ -43,7 +40,7 @@ void Game_Init(void)
 	red = CP_Color_Create(200, 50, 50, 255); //red
 	green = CP_Color_Create(50, 200, 50, 255); //green
 	hpcol = CP_Color_Create(255, 150, 150, 255); //hp colour
-	
+
 	// initialize base speed
 	speed = 400;
 
@@ -52,8 +49,8 @@ void Game_Init(void)
 
 	// initialize player
 	// size
-	p.width = 50;
-	p.height = 50;
+	p.width = 30;
+	p.height = 30;
 	// position
 	p.x = 700;
 	p.y = 200;
@@ -66,76 +63,58 @@ void Game_Init(void)
 	p.color = CP_Color_Create(150, 150, 200, 255);
 
 
-	Platforms[0] = (struct platform){ 550, 550 + 300, 400, 400 + 25, 300, 25 };
-	Platforms[1] = (struct platform){ 1000, 1000 + 150, 400, 400 + 200, 150, 200 };
-	Platforms[2] = (struct platform){ 525, 525 + 25, 400, 400 + 400, 25, 400 };
-	Platforms[3] = (struct platform){ 550, 550 + 150, 775, 775 + 25, 150, 25 };
-	Platforms[4] = (struct platform){ 700, 700 + 25, 600, 600 + 200, 25, 200 };
-	Platforms[5] = (struct platform){ 725, 725 + 125, 600, 600 + 25, 125, 25 };
-	Platforms[6] = (struct platform){ 850, 850 + 25, 400, 400 + 225, 25, 225 };
 
-	// first platform
-	Platformtest[0].numcoords = 6;
-	Platformtest[0].platcoords[0] = (struct coords){ 50, 300 };
-	Platformtest[0].platcoords[1] = (struct coords){ 400, 300 };
-	Platformtest[0].platcoords[2] = (struct coords){ 400, 450 };
-	Platformtest[0].platcoords[3] = (struct coords){ 450, 450 };
-	Platformtest[0].platcoords[4] = (struct coords){ 450, 600 };
-	Platformtest[0].platcoords[5] = (struct coords){ 50, 600 };
-	for (int i = 0; i < Platformtest[0].numcoords; i++) {
-		
-		if (i % 2 == 0 && i < Platformtest[0].numcoords-1) { //horizontal
+	int numplats = 2;
 
-			if (Platformtest[0].platcoords[i + 1].x > Platformtest[0].platcoords[i].x) {
-				Platformtest[0].blocks[i] = (struct platblocks){
-					Platformtest[0].platcoords[i].x + 10,
-					Platformtest[0].platcoords[i + 1].x - 10,
-					Platformtest[0].platcoords[i].y - 10,
-					Platformtest[0].platcoords[i].y + 10,
-					(Platformtest[0].platcoords[i + 1].x - 10) - (Platformtest[0].platcoords[i].x + 10),
-					20
-				};
-			}
-			else {
-				Platformtest[0].blocks[i] = (struct platblocks){
-					Platformtest[0].platcoords[i + 1].x + 10,
-					Platformtest[0].platcoords[i].x - 10,
-					Platformtest[0].platcoords[i].y - 10,
-					Platformtest[0].platcoords[i].y + 10,
-					(Platformtest[0].platcoords[i].x - 10) - (Platformtest[0].platcoords[i + 1].x + 10),
-					20
-				};
-			}
-			//printf("Platcoord [%d] x1 %f, x2 %f, y1 %f, y2 %f, w %f, h %f\n", i, Platformtest[0].blocks[i].x1, Platformtest[0].blocks[i].x2, Platformtest[0].blocks[i].y1, Platformtest[0].blocks[i].y2, Platformtest[0].blocks[i].w, Platformtest[0].blocks[i].h);
-		}
-		else if (i != Platformtest[0].numcoords-1) { //vertical
-			Platformtest[0].blocks[i] = (struct platblocks){
-				Platformtest[0].platcoords[i].x-10,
-				Platformtest[0].platcoords[i].x+10,
-				Platformtest[0].platcoords[i].y - 10,
-				Platformtest[0].platcoords[i + 1].y+10,
-				20,
-				(Platformtest[0].platcoords[i + 1].y+10) - (Platformtest[0].platcoords[i].y-10)
-			};
-			//printf("Platcoord [%d] x1 %f, x2 %f, y1 %f, y2 %f, w %f, h %f\n", i, Platformtest[0].blocks[i].x1, Platformtest[0].blocks[i].x2, Platformtest[0].blocks[i].y1, Platformtest[0].blocks[i].y2, Platformtest[0].blocks[i].w, Platformtest[0].blocks[i].h);
-		}
-		else {
-			Platformtest[0].blocks[i] = (struct platblocks){
-			Platformtest[0].platcoords[0].x - 10,
-			Platformtest[0].platcoords[i].x + 10,
-			Platformtest[0].platcoords[0].y - 10,
-			Platformtest[0].platcoords[i].y + 10,
-			20,
-			(Platformtest[0].platcoords[i].y + 10) - (Platformtest[0].platcoords[0].y-10)
-			};
-			//printf("FINAL Platcoord [%d] x1 %f, x2 %f, y1 %f, y2 %f, w %f, h %f\n", i, Platformtest[0].blocks[i].x1, Platformtest[0].blocks[i].x2, Platformtest[0].blocks[i].y1, Platformtest[0].blocks[i].y2, Platformtest[0].blocks[i].w, Platformtest[0].blocks[i].h);
-		}
+	// platform 0
+	Platform[0].numcoords = 6;
+
+	platcoord(0, 0, 50, 300);
+	platcoord(0, 1, 400, 300);
+	platcoord(0, 2, 400, 450);
+	platcoord(0, 3, 450, 450);
+	platcoord(0, 4, 450, 600);
+	platcoord(0, 5, 50, 600);
+
+	// platform 1
+	Platform[1].numcoords = 8;
+
+	platcoord(1, 0, 550, 400);
+	platcoord(1, 1, 750, 400);
+	platcoord(1, 2, 750, 500);
+	platcoord(1, 3, 850, 500);
+	platcoord(1, 4, 850, 400);
+	platcoord(1, 5, 1050, 400);
+	platcoord(1, 6, 1050, 650);
+	platcoord(1, 7, 550, 650);
+
+
+	/*for (int plat = 0; plat < numplats; plat++) {
+		printf("plat %d, numplats %d, numcoords %d\n", plat, numplats, Platform[plat].numcoords);
+
+		hitbox(plat, Platform[plat].numcoords, &Platform[plat]);
+	}*/
+
+
+	for (int i = 0; i < Platform[0].numcoords; i++) {
 		
+		if (i % 2 == 0 && i < Platform[0].numcoords-1) { //horizontal & not last coord
+			horizontalhitbox(i, &Platform[0]);
+		}
+		else  { //vertical
+			verticalhitbox(i, &Platform[0]);
+		}
 	}
 
-	
+	for (int i = 0; i < Platform[1].numcoords; i++) {
+		if (i % 2 == 0 && i < Platform[1].numcoords - 1) { //horizontal & not last coord
+			horizontalhitbox(i, &Platform[1]);
+		}
+		else { //vertical
+			verticalhitbox(i, &Platform[1]);
+		}
+	}
 
-	// second platform
 	
 
 
@@ -182,47 +161,48 @@ void Game_Update(void)
 	p.y += p.movey * dt;
 	
 
-	for (int i = 0; i < platcount; i++) {
-		if (collision(Platforms[i], p)) {
-		int hv = collisionwhere(Platforms[i], p);
-		
-		if (hv == 2) {
-			if (p.x < Platforms[i].x2 && p.x + p.width > Platforms[i].x1) {
-				
-				p.y = fixcollidey(Platforms[i], p);
-				if ((p.y + p.height) == Platforms[i].y1) {
-					if (CP_Input_KeyTriggered(KEY_SPACE)) { p.movey = -speed; };
-				}
-				if (p.y < Platforms[i].y1 && p.movey > 0 || p.y > Platforms[i].y1 && p.movey < 0) { p.movey = 0; }
 
-			}
-		}else p.x = fixcollidex(Platforms[i], p);
-		}
-
-	}
-
-	for (int i = 0; i < Platformtest[0].numcoords; i++) {
-		if (collisiontest(Platformtest[0].blocks[i], p)) {
-			int hv = collisionwheretest(Platformtest[0].blocks[i], p);
+	for (int i = 0; i < Platform[0].numcoords; i++) {
+		if (collision(Platform[0].blocks[i], p)) {
+			int hv = collision_direction(Platform[0].blocks[i], p);
 
 			if (hv == 2) {
-				if (p.x < Platformtest[0].blocks[i].x2 && p.x + p.width > Platformtest[0].blocks[i].x1) {
+				if (p.x < Platform[0].blocks[i].x2 && p.x + p.width > Platform[0].blocks[i].x1) {
 
-					p.y = fixcollideytest(Platformtest[0].blocks[i], p);
-					if ((p.y + p.height) == Platformtest[0].blocks[i].y1) {
+					p.y = fix_collide_y(Platform[0].blocks[i], p);
+					if ((p.y + p.height) == Platform[0].blocks[i].y1) {
 						if (CP_Input_KeyTriggered(KEY_SPACE)) { p.movey = -speed; };
 					}
-					if (p.y < Platformtest[0].blocks[i].y1 && p.movey > 0 || p.y > Platformtest[0].blocks[i].y1 && p.movey < 0) { p.movey = 0; }
+					if (p.y < Platform[0].blocks[i].y1 && p.movey > 0 || p.y > Platform[0].blocks[i].y1 && p.movey < 0) { p.movey = 0; }
 
 				}
 			}
-			else p.x = fixcollidextest(Platformtest[0].blocks[i], p);
+			else p.x = fix_collide_x(Platform[0].blocks[i], p);
 		}
 
 	}
 
+	printf("plat[1]block[4] x1 %f, x2 %f, y1 %f, y2 %f\n", Platform[1].blocks[4].x1, Platform[1].blocks[4].x2, Platform[1].blocks[4].y1, Platform[1].blocks[4].y2);
 
+	for (int i = 0; i < Platform[1].numcoords; i++) {
+		if (collision(Platform[1].blocks[i], p)) {
+			int hv = collision_direction(Platform[1].blocks[i], p);
 
+			if (hv == 2) {
+				if (p.x < Platform[1].blocks[i].x2 && p.x + p.width > Platform[1].blocks[i].x1) {
+
+					p.y = fix_collide_y(Platform[1].blocks[i], p);
+					if ((p.y + p.height) == Platform[1].blocks[i].y1) {
+						if (CP_Input_KeyTriggered(KEY_SPACE)) { p.movey = -speed; };
+					}
+					if (p.y < Platform[1].blocks[i].y1 && p.movey > 0 || p.y > Platform[1].blocks[i].y1 && p.movey < 0) { p.movey = 0; }
+
+				}
+			}
+			else p.x = fix_collide_x(Platform[1].blocks[i], p);
+		}
+
+	}
 #pragma endregion
 
 	//HP		----------------------------------------------/
@@ -236,32 +216,23 @@ void Game_Update(void)
 	// RENDER	----------------------------------------------/
 #pragma region RENDER
 
-	// Platforms
-	for (int i = 0; i < platcount; i++) {
-		CP_Graphics_DrawRect(Platforms[i].x1, Platforms[i].y1, Platforms[i].width, Platforms[i].height);
-	}
-
-
-	/*CP_Graphics_BeginShape();
-	CP_Graphics_AddVertex(50, 400);
-	CP_Graphics_AddVertex(400, 400);
-	CP_Graphics_AddVertex(400, 450);
-	CP_Graphics_AddVertex(450, 450);
-	CP_Graphics_AddVertex(450, 500);
-	CP_Graphics_AddVertex(50, 500);
-	CP_Graphics_EndShape();*/
+	
 
 	
 
-	//for (int i = 0; i <= Platformtest[0].numcoords - 1; i++) {
-	//	CP_Graphics_DrawRect(Platformtest[0].blocks[i].x1, Platformtest[0].blocks[i].y1, Platformtest[0].blocks[i].w, Platformtest[0].blocks[i].h);
-	//}
-
-	CP_Graphics_BeginShape();
-	for (int i = 0; i <= Platformtest[0].numcoords - 1; i++) {
-		CP_Graphics_AddVertex(Platformtest[0].platcoords[i].x, Platformtest[0].platcoords[i].y);
+	for (int i = 0; i <= Platform[0].numcoords - 1; i++) {
+		CP_Graphics_DrawRect(Platform[0].blocks[i].x1, Platform[0].blocks[i].y1, Platform[0].blocks[i].w, Platform[0].blocks[i].h);
 	}
-	CP_Graphics_EndShape();
+
+	for (int i = 0; i <= Platform[1].numcoords - 1; i++) {
+		CP_Graphics_DrawRect(Platform[1].blocks[i].x1, Platform[1].blocks[i].y1, Platform[1].blocks[i].w, Platform[1].blocks[i].h);
+	}
+
+	/*CP_Graphics_BeginShape();
+	for (int i = 0; i <= Platform[0].numcoords - 1; i++) {
+		CP_Graphics_AddVertex(Platform[0].platcoords[i].x, Platform[0].platcoords[i].y);
+	}
+	CP_Graphics_EndShape();*/
 
 	// Player
 	CP_Settings_Fill(p.color);

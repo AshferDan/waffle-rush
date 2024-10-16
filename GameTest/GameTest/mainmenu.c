@@ -22,8 +22,8 @@ void Main_Menu_Init(void)
 void Main_Menu_Update(void)
 {
 	//assign window width and height
-	float width = CP_System_GetWindowWidth();
-	float height = CP_System_GetWindowHeight();
+	int width = CP_System_GetWindowWidth();
+	int height = CP_System_GetWindowHeight();
 
 	//track pointer
 	float mouseX = CP_Input_GetMouseX();
