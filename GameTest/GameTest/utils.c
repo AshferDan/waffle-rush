@@ -1,0 +1,118 @@
+//---------------------------------------------------------
+// file:	utils.c
+// author:	TAN JUN QUAN
+// email:	t.junquan@digipen.edu
+//
+// brief:	Compilation of utility functions used throughout
+//			the assignment
+//
+// Copyright © 2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
+
+#pragma once
+#include "utils.h"
+
+//check if a position is within a rectangle
+//
+// area_center_x - position x center of rectangle
+// area_center_y - position y center of rectangle
+// area_width - width of rectangle
+// area_height - height of rectangle
+// click_x - position x to be checked
+// click_y - position y to be checked
+//
+int IsAreaClicked(float area_center_x, float area_center_y, float area_width, float area_height, float click_x, float click_y) {
+	if (click_x > (area_center_x - area_width / 2) && click_x < (area_center_x + area_width / 2) &&
+		click_y >(area_center_y - area_height / 2) && click_y < (area_center_y + area_height / 2)) {
+		return 1;
+	}
+	return 0;
+}
+
+//check if a position is within a circle
+//
+// circle_center_x - position x center of circle
+// circle_center_y - position y center of circle
+// diameter - width of rectangle
+// click_x - position x to be checked
+// click_y - position y to be checked
+//
+int IsCircleClicked(float circle_center_x, float circle_center_y, float diameter, float click_x, float click_y)
+{
+	if ((click_y - circle_center_y) * (click_y - circle_center_y) + (click_x - circle_center_x) * (click_x - circle_center_x) < (diameter / 2) * (diameter / 2)) {
+		return 1;
+	}
+	return 0;
+}
+
+//check if two circles are intersecting
+// 
+// c1_x, c1_y - circle 1 position x and y
+// c2_x, c2_y - circle 2 position x and y
+// c1_r, c2_r - radius of circle 1 and 2
+//
+int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c2_y, float r2)
+{
+	CP_Vector distance = CP_Vector_Set(c2_x - c1_x, c2_y - c1_y);
+	if (CP_Vector_DotProduct(distance, distance) < (r1 + r2)*(r1+r2)) {
+		return 1;
+	}
+	return 0;
+}
+
+// create red box with black text
+// pos_x - position x center of box
+// pos_y - position y center of box
+// size_x - width of box
+// size_y - height of box
+//
+void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const char* text) {
+	CP_Settings_RectMode(CP_POSITION_CENTER);
+	CP_Settings_Fill(CP_Color_Create(200, 60, 60, 255));
+	CP_Graphics_DrawRect(pos_x, pos_y, size_x, size_y);
+	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
+	CP_Settings_TextSize(150);
+	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+	CP_Font_DrawText(text, pos_x, pos_y);
+}
+
+// draw full hp bar
+// pos_x1, pos_y1 - position of top left corner
+// pos_x2, pos_y2 - position of bottom right corner
+// hp - current health
+// maxhp - max health
+//
+void DrawHPBar(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp, float maxhp) {
+	// assign total width, height, and width of health bar
+	float width, height, hpwidth;
+	//width and height of total bar
+	width = pos_x2 - pos_x1;
+	height = pos_y2 - pos_y1;
+	//width of current hp
+	hpwidth = width * hp / maxhp;
+	// draw the rectangle
+	CP_Graphics_DrawRect(pos_x1, pos_y1, hpwidth, height);
+}
+// draw segmented hp bar
+// pos_x1, pos_y1 - position of top left corner
+// pos_x2, pos_y2 - position of bottom right corner
+// hp - current health
+// maxhp - max health
+//
+void DrawHPBar2(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp, float maxhp) {
+	//array of hp in 10% chunks
+	int hpbar[10] = {0, maxhp / 10, 2 * maxhp / 10, 3 * maxhp / 10, 4 * maxhp / 10, 5 * maxhp / 10, 6 * maxhp / 10, 7 * maxhp / 10, 8 * maxhp / 10 , 9 * maxhp / 10}; //array 10% blocks
+	//size of full bar
+	float width = pos_x2 - pos_x1;
+	float height = pos_y2 - pos_y1;
+	//segment width and interval
+	float segmentwidth = width / 10;
+	float segmentinterval = 15;
+	//for loop to check hp 10% chunks
+	for (int i = 0; i < 10; ++i) {
+		if (hp > (hpbar[i])+maxhp/20) { //if hp>10% interval, draw 10% chunk
+			CP_Graphics_DrawRect(pos_x1 + (i * (segmentwidth + segmentinterval/10)), pos_y1 + 100, segmentwidth - segmentinterval, height);
+		}
+
+	}
+}
