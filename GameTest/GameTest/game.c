@@ -19,12 +19,8 @@ float width, height; //window width/height
 float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
 CP_Font text;
 
-struct Player p; //player p
 
-
-int movestate; //0 = platformer, 1 = platform
-
-
+int numplats = 2;
 
 void Game_Init(void)
 {
@@ -63,8 +59,7 @@ void Game_Init(void)
 	p.color = CP_Color_Create(150, 150, 200, 255);
 
 
-
-	int numplats = 2;
+	// NOTE: TO CHANGE PLATCOORDS TO READ FROM TEXT
 
 	// platform 0
 	Platform[0].numcoords = 6;
@@ -89,34 +84,10 @@ void Game_Init(void)
 	platcoord(1, 7, 550, 650);
 
 
-	/*for (int plat = 0; plat < numplats; plat++) {
-		printf("plat %d, numplats %d, numcoords %d\n", plat, numplats, Platform[plat].numcoords);
-
-		hitbox(plat, Platform[plat].numcoords, &Platform[plat]);
-	}*/
-
-
-	for (int i = 0; i < Platform[0].numcoords; i++) {
-		
-		if (i % 2 == 0 && i < Platform[0].numcoords-1) { //horizontal & not last coord
-			horizontalhitbox(i, &Platform[0]);
-		}
-		else  { //vertical
-			verticalhitbox(i, &Platform[0]);
-		}
+	// initialize all platform hitboxes
+	for (int plat_index = 0; plat_index < numplats; plat_index++) {
+		hitbox(plat_index, Platform[plat_index].numcoords, &Platform[plat_index]);
 	}
-
-	for (int i = 0; i < Platform[1].numcoords; i++) {
-		if (i % 2 == 0 && i < Platform[1].numcoords - 1) { //horizontal & not last coord
-			horizontalhitbox(i, &Platform[1]);
-		}
-		else { //vertical
-			verticalhitbox(i, &Platform[1]);
-		}
-	}
-
-	
-
 
 	//healthbar position
 	hpx1 = width / 10; hpx2 = 9 * width / 10;
@@ -133,21 +104,36 @@ void Game_Update(void)
 
 	// MOVEMENT ----------------------------------------------/
 #pragma region Movement
-
+	// change movestate, teleport up/down
+	// 0 is platformer, 1 is inplatform
+	// NOTE: TO ADD TRANSITION PHASE
 	if (CP_Input_KeyTriggered(KEY_E)) {
 		if (movestate == 0) { p.y += 100; }
 		else p.y -= 100;
-		movestate = (movestate==0) ? 1 : 0;
+		movestate = (movestate == 0) ? 1 : 0;
 	}
 
-	// change when key pressed
-	if (movestate == 0) {
+	// conditional switch
+	if (CP_Input_KeyTriggered(KEY_F)) {
+		if (movestate == 0 && p.onplatform == 1 && p.withinx == 1) { 
+			p.y += 100;
+			movestate = 1;
+		}
+		else if (movestate == 1) { //missing condition
+			p.y -= 100;
+			movestate = 0;
+		}
+	}
+
+	// different movement logics
+	if (movestate == 0) { // platformer
 		p.movex = 0; p.movey += 10;
-		if (CP_Input_KeyDown(KEY_W)) { p.movey = -speed; }; //temp
+		if (CP_Input_KeyDown(KEY_W)) { p.movey = -speed; }; //temp fly
+		if (CP_Input_KeyTriggered(KEY_SPACE) && p.onplatform == 1) { p.movey = -speed; } // jump!
 		if (CP_Input_KeyDown(KEY_A)) { p.movex = -speed; };
 		if (CP_Input_KeyDown(KEY_D)) { p.movex = speed; };
 	}
-	if (movestate == 1) {
+	if (movestate == 1) { // top down/inside platform
 		p.movex = 0; p.movey = 0;
 		if (CP_Input_KeyDown(KEY_W)) { p.movey = -speed; };
 		if (CP_Input_KeyDown(KEY_A)) { p.movex = -speed; };
@@ -159,55 +145,17 @@ void Game_Update(void)
 	// position update
 	p.x += p.movex * dt;
 	p.y += p.movey * dt;
-	
 
-
-	for (int i = 0; i < Platform[0].numcoords; i++) {
-		if (collision(Platform[0].blocks[i], p)) {
-			int hv = collision_direction(Platform[0].blocks[i], p);
-
-			if (hv == 2) {
-				if (p.x < Platform[0].blocks[i].x2 && p.x + p.width > Platform[0].blocks[i].x1) {
-
-					p.y = fix_collide_y(Platform[0].blocks[i], p);
-					if ((p.y + p.height) == Platform[0].blocks[i].y1) {
-						if (CP_Input_KeyTriggered(KEY_SPACE)) { p.movey = -speed; };
-					}
-					if (p.y < Platform[0].blocks[i].y1 && p.movey > 0 || p.y > Platform[0].blocks[i].y1 && p.movey < 0) { p.movey = 0; }
-
-				}
-			}
-			else p.x = fix_collide_x(Platform[0].blocks[i], p);
-		}
-
+	p.onplatform = 0;
+	p.withinx = 0;
+	// collision against platforms
+	for (int plat_index = 0; plat_index < numplats; plat_index++) {
+		CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &p, p);
 	}
 
-	if (collision(Platform[1].blocks[4], p)) {
-		CP_Graphics_DrawRect(50,50,50,50);
-	}
-
-	for (int i = 0; i < Platform[1].numcoords; i++) {
-		if (collision(Platform[1].blocks[i], p)) {
-			int hv = collision_direction(Platform[1].blocks[i], p);
-
-			if (hv == 2) {
-				if (p.x < Platform[1].blocks[i].x2 && p.x + p.width > Platform[1].blocks[i].x1) {
-
-					p.y = fix_collide_y(Platform[1].blocks[i], p);
-					if ((p.y + p.height) == Platform[1].blocks[i].y1) {
-						if (CP_Input_KeyTriggered(KEY_SPACE)) { p.movey = -speed; };
-					}
-					if (p.y < Platform[1].blocks[i].y1 && p.movey > 0 || p.y > Platform[1].blocks[i].y1 && p.movey < 0) { p.movey = 0; }
-
-				}
-			}
-			else p.x = fix_collide_x(Platform[1].blocks[i], p);
-		}
-
-	}
 #pragma endregion
 
-	//HP		----------------------------------------------/
+	// HP		----------------------------------------------/
 #pragma region HP
 
 	// hp clamp
@@ -218,23 +166,29 @@ void Game_Update(void)
 	// RENDER	----------------------------------------------/
 #pragma region RENDER
 
-	
+	// DRAW HITBOXES
 
-	
-
-	for (int i = 0; i <= Platform[0].numcoords - 1; i++) {
+	/*for (int i = 0; i <= Platform[0].numcoords - 1; i++) {
 		CP_Graphics_DrawRect(Platform[0].blocks[i].x1, Platform[0].blocks[i].y1, Platform[0].blocks[i].w, Platform[0].blocks[i].h);
 	}
 
 	for (int i = 0; i <= Platform[1].numcoords - 1; i++) {
 		CP_Graphics_DrawRect(Platform[1].blocks[i].x1, Platform[1].blocks[i].y1, Platform[1].blocks[i].w, Platform[1].blocks[i].h);
-	}
+	}*/
 
-	/*CP_Graphics_BeginShape();
+
+	// DRAW PLATFORM SHAPE (NOTE: STREAMLINE SOON)
+	CP_Graphics_BeginShape();
 	for (int i = 0; i <= Platform[0].numcoords - 1; i++) {
 		CP_Graphics_AddVertex(Platform[0].platcoords[i].x, Platform[0].platcoords[i].y);
 	}
-	CP_Graphics_EndShape();*/
+	CP_Graphics_EndShape();
+
+	CP_Graphics_BeginShape();
+	for (int i = 0; i <= Platform[1].numcoords - 1; i++) {
+		CP_Graphics_AddVertex(Platform[1].platcoords[i].x, Platform[1].platcoords[i].y);
+	}
+	CP_Graphics_EndShape();
 
 	// Player
 	CP_Settings_Fill(p.color);
