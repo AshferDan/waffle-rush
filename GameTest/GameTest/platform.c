@@ -7,7 +7,8 @@ void platcoord(int plat_index, int coord_index, float x, float y) {
 	Platform[plat_index].platcoords[coord_index] = (struct coords){ x,y };
 }
 
-// HITBOX LOGIC		----/
+	// HITBOX LOGIC
+	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hitboxes
 
 // determines platform horizontal hitboxes, used in hitbox function below
@@ -88,11 +89,12 @@ void hitbox(int plat_index, int numplatcoords, struct platform* plt) {
 		}
 	}
 }
-//------------------------------------------------------------/
+
 #pragma endregion
 
 
-// COLLISION LOGIC	----/
+	// COLLISION LOGIC
+	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Collision and repositions
 
 // am i colliding
@@ -180,5 +182,12 @@ void CollPlatforms(int plat_index, int numplatcoords, struct platform plt, struc
 		}// end if collision check
 	}
 }
-//------------------------------------------------------------/
 #pragma endregion
+
+void DrawPlatform(int plat_index) {
+	CP_Graphics_BeginShape();
+	for (int i = 0; i <= Platform[plat_index].numcoords - 1; i++) {
+		CP_Graphics_AddVertex(Platform[plat_index].platcoords[i].x, Platform[plat_index].platcoords[i].y);
+	}
+	CP_Graphics_EndShape();
+}

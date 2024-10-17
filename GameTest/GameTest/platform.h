@@ -59,7 +59,6 @@ void platcoord(int plat_index, int coord_index, float x, float y);
 void horizontalhitbox(int coord_index, struct platform* plt);
 void verticalhitbox(int coord_index, struct platform* plt);
 void hitbox(int plat_index, int numplatcoords, struct platform* plt);
-//------------------------------------------------------------/
 #pragma endregion
 
 // COLLISION LOGIC (see platform.c)
@@ -73,5 +72,6 @@ float fix_collide_x(struct platblocks plt, struct Player p);
 float fix_collide_y(struct platblocks plt, struct Player p);
 
 void CollPlatforms(int plat_index, int numplatcoords, struct platform plt, struct Player* p, struct Player ply);
-//------------------------------------------------------------/
 #pragma endregion 
+
+void DrawPlatform(int plat_index);

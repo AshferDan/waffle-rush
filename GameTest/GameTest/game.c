@@ -19,7 +19,6 @@ float width, height; //window width/height
 float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
 CP_Font text;
 
-
 int numplats = 2;
 
 void Game_Init(void)
@@ -58,36 +57,33 @@ void Game_Init(void)
 	// color
 	p.color = CP_Color_Create(150, 150, 200, 255);
 
+	// PLATFORMS INITIALIZATION
+	/*---------------------------------------------------------------------------------------------------*/
+#pragma region Initialize Platform
 
-	// NOTE: TO CHANGE PLATCOORDS TO READ FROM TEXT
+	FILE* file = fopen("Assets/coordinates.txt", "r");
+	int pindex = 0; int pcindex = 0;
+	int test = 0;
+	while (pindex < numplats) {
+		int x, y;
+		fscanf_s(file, "%d", &Platform[pindex].numcoords);
 
-	// platform 0
-	Platform[0].numcoords = 6;
-
-	platcoord(0, 0, 50, 300);
-	platcoord(0, 1, 400, 300);
-	platcoord(0, 2, 400, 450);
-	platcoord(0, 3, 450, 450);
-	platcoord(0, 4, 450, 600);
-	platcoord(0, 5, 50, 600);
-
-	// platform 1
-	Platform[1].numcoords = 8;
-
-	platcoord(1, 0, 550, 400);
-	platcoord(1, 1, 750, 400);
-	platcoord(1, 2, 750, 500);
-	platcoord(1, 3, 850, 500);
-	platcoord(1, 4, 850, 400);
-	platcoord(1, 5, 1050, 400);
-	platcoord(1, 6, 1050, 650);
-	platcoord(1, 7, 550, 650);
-
+		while (pcindex < Platform[pindex].numcoords) {
+			fscanf_s(file, "%d %d", &x, &y);
+			platcoord(pindex, pcindex, x, y);
+			pcindex++;
+		}
+		pcindex = 0;
+		pindex++;
+	}
+	fclose(file);
 
 	// initialize all platform hitboxes
 	for (int plat_index = 0; plat_index < numplats; plat_index++) {
 		hitbox(plat_index, Platform[plat_index].numcoords, &Platform[plat_index]);
 	}
+
+#pragma endregion
 
 	//healthbar position
 	hpx1 = width / 10; hpx2 = 9 * width / 10;
@@ -102,7 +98,8 @@ void Game_Update(void)
 	// getdt
 	float dt = CP_System_GetDt();
 
-	// MOVEMENT ----------------------------------------------/
+	// MOVEMENT 
+	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Movement
 	// change movestate, teleport up/down
 	// 0 is platformer, 1 is inplatform
@@ -146,6 +143,7 @@ void Game_Update(void)
 	p.x += p.movex * dt;
 	p.y += p.movey * dt;
 
+	// reset checks for jumping and entering
 	p.onplatform = 0;
 	p.withinx = 0;
 	// collision against platforms
@@ -155,7 +153,8 @@ void Game_Update(void)
 
 #pragma endregion
 
-	// HP		----------------------------------------------/
+	// HP
+	/*---------------------------------------------------------------------------------------------------*/
 #pragma region HP
 
 	// hp clamp
@@ -163,37 +162,18 @@ void Game_Update(void)
 	if (p.hp > 100) { p.hp = 100; };
 #pragma endregion
 
-	// RENDER	----------------------------------------------/
+	// RENDER
+	/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
 
-	// DRAW HITBOXES
-
-	/*for (int i = 0; i <= Platform[0].numcoords - 1; i++) {
-		CP_Graphics_DrawRect(Platform[0].blocks[i].x1, Platform[0].blocks[i].y1, Platform[0].blocks[i].w, Platform[0].blocks[i].h);
+	// DRAW PLATFORMS
+	for (int i = 0; i < numplats; i++) {
+		DrawPlatform(i);
 	}
-
-	for (int i = 0; i <= Platform[1].numcoords - 1; i++) {
-		CP_Graphics_DrawRect(Platform[1].blocks[i].x1, Platform[1].blocks[i].y1, Platform[1].blocks[i].w, Platform[1].blocks[i].h);
-	}*/
-
-
-	// DRAW PLATFORM SHAPE (NOTE: STREAMLINE SOON)
-	CP_Graphics_BeginShape();
-	for (int i = 0; i <= Platform[0].numcoords - 1; i++) {
-		CP_Graphics_AddVertex(Platform[0].platcoords[i].x, Platform[0].platcoords[i].y);
-	}
-	CP_Graphics_EndShape();
-
-	CP_Graphics_BeginShape();
-	for (int i = 0; i <= Platform[1].numcoords - 1; i++) {
-		CP_Graphics_AddVertex(Platform[1].platcoords[i].x, Platform[1].platcoords[i].y);
-	}
-	CP_Graphics_EndShape();
 
 	// Player
 	CP_Settings_Fill(p.color);
 	CP_Graphics_DrawRect(p.x - 10, p.y - 10, p.width + 20, p.height + 20);
-//	CP_Graphics_DrawRect(p.x, p.y, p.width, p.height);
 
 	// Health Bars
 	// Graphics settings
