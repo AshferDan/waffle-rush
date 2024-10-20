@@ -45,6 +45,17 @@ void Main_Menu_Update(void)
 		}
 	}
 
+	//level 1 button
+	TextBoxCreate(3*width / 4, height / 3, 150, 150, "1");
+	int L1Click = IsAreaClicked(3 * width / 4, height / 3, 150, 150, mouseX, mouseY); //if mouse is over button
+	if (L1Click) {
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
+		CP_Graphics_DrawRect(3 * width / 4, height / 3, 150, 150);
+		if (CP_Input_MouseClicked()) { //if LMB1 pressed
+			CP_Engine_SetNextGameState(L1_Init, L1_Update, L1_Exit); //go to game
+		}
+	}
+
 	//draw exit button
 	TextBoxCreate(width / 2, 2 * height / 3, 500, 150, "EXIT");
 	int ExitClick = IsAreaClicked(width / 2, 2 * height / 3, 500, 150, mouseX, mouseY); //if mouse is over button

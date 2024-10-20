@@ -30,6 +30,9 @@
     <ClCompile Include="platform.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Level1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainmenu.h">
@@ -44,9 +47,15 @@
     <ClInclude Include="platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Level1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\Assets\coordinates.txt">
+    <Text Include="..\Assets\Level1.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\Assets\Base.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

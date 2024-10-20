@@ -161,11 +161,16 @@ void CollPlatforms(int plat_index, int numplatcoords, struct platform plt, struc
 					p->y = fix_collide_y(Platform[plat_index].blocks[coord_index], ply);
 
 					// if player on platform
-					if ((p->y + ply.height) == Platform[plat_index].blocks[coord_index].y1) {
-						p->onplatform = 1; // on platform!
-						if (ply.x >= Platform[plat_index].blocks[coord_index].x1 && ply.x + ply.width <= Platform[plat_index].blocks[coord_index].x2) {
-							p->withinx = 1;
+
+					if (ply.x >= Platform[plat_index].blocks[coord_index].x1 && ply.x + ply.width <= Platform[plat_index].blocks[coord_index].x2) {
+						p->withinx = 1; // on platform!
+						if (p->y == Platform[plat_index].blocks[coord_index].y2 && p->y <= Platform[plat_index].blocks[coord_index].y2 + 50) {
+							p->leaveplatform = 1;
 						}
+					}
+
+					if ((p->y + ply.height) == Platform[plat_index].blocks[coord_index].y1) {
+						p->onplatform = 1;
 					}
 					// two conditions to set player vertical velocity 0:
 					// 1) if player is on top of platform and travelling downwards

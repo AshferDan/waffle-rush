@@ -61,7 +61,7 @@ void Game_Init(void)
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
 
-	FILE* file = fopen("Assets/coordinates.txt", "r");
+	FILE* file = fopen("Assets/Base.txt", "r");
 	int pindex = 0; int pcindex = 0;
 	int test = 0;
 	while (pindex < numplats) {
@@ -112,12 +112,12 @@ void Game_Update(void)
 
 	// conditional switch
 	if (CP_Input_KeyTriggered(KEY_F)) {
-		if (movestate == 0 && p.onplatform == 1 && p.withinx == 1) { 
-			p.y += 100;
+		if (movestate == 0 && p.onplatform == 1 && p.withinx == 1) {
+			p.y += 80;
 			movestate = 1;
 		}
-		else if (movestate == 1) { //missing condition
-			p.y -= 100;
+		else if (movestate == 1 && p.y > 200 && p.leaveplatform == 1) {
+			p.y -= 80;
 			movestate = 0;
 		}
 	}
@@ -146,9 +146,25 @@ void Game_Update(void)
 	// reset checks for jumping and entering
 	p.onplatform = 0;
 	p.withinx = 0;
+	p.leaveplatform = 0;
 	// collision against platforms
 	for (int plat_index = 0; plat_index < numplats; plat_index++) {
 		CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &p, p);
+	}
+	// window clamps
+	if (p.x < 0) {
+		p.x = 0;
+	}
+	if (p.x + p.width > width) {
+		p.x = width - p.width;
+	}
+	if (p.y < 0) {
+		p.y = 0;
+		p.movey = 0;
+	}
+	if (p.y + p.height > height) {
+		p.y = height - p.height;
+		p.movey = 0;
 	}
 
 #pragma endregion
@@ -166,7 +182,7 @@ void Game_Update(void)
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
 
-	// DRAW PLATFORMS
+	// Platforms
 	for (int i = 0; i < numplats; i++) {
 		DrawPlatform(i);
 	}

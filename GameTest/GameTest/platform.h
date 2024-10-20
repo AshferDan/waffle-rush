@@ -44,6 +44,7 @@ struct Player {
 	float speed;
 	int onplatform;
 	int withinx;
+	int leaveplatform;
 	CP_Color color; //color
 };
 
