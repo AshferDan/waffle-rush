@@ -44,18 +44,18 @@ void L1_Init(void)
 
 	// initialize player
 	// size
-	p.width = 30;
-	p.height = 30;
+	player.width = 30;
+	player.height = 30;
 	// position
-	p.x = 150;
-	p.y = 200;
+	player.x = 150;
+	player.y = 200;
 	// movement
-	p.movex = 0;
-	p.movey = 0;
+	player.movex = 0;
+	player.movey = 0;
 	// health
-	p.hp = 100;
+	player.hp = 100;
 	// color
-	p.color = CP_Color_Create(150, 150, 200, 255);
+	player.color = CP_Color_Create(150, 150, 200, 255);
 
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------*/
@@ -105,60 +105,45 @@ void L1_Update(void)
 	// 0 is platformer, 1 is inplatform
 	// NOTE: TO ADD TRANSITION PHASE
 	if (CP_Input_KeyTriggered(KEY_E)) {
-		if (movestate == 0 && p.onplatform == 1 && p.withinx == 1) {
-			p.y += 80;
-			movestate = 1;
-		}
-		else if (movestate == 1 && p.y > 200 && p.leaveplatform == 1) {
-			p.y -= 80;
-			movestate = 0;
-		}
+		movestate = movestate_set(&player, movestate);
 	}
 
-
-	// different movement logics
-	if (movestate == 0) { // platformer
-		p.movex = 0; p.movey += 10;
-		//if (CP_Input_KeyDown(KEY_W)) { p.movey = -speed; }; //temp fly
-		if (CP_Input_KeyTriggered(KEY_SPACE) && p.onplatform == 1) { p.movey = -speed; } // jump!
-		if (CP_Input_KeyDown(KEY_A)) { p.movex = -speed; };
-		if (CP_Input_KeyDown(KEY_D)) { p.movex = speed; };
-	}
-	if (movestate == 1) { // top down/inside platform
-		p.movex = 0; p.movey = 0;
-		if (CP_Input_KeyDown(KEY_W)) { p.movey = -speed; };
-		if (CP_Input_KeyDown(KEY_A)) { p.movex = -speed; };
-		if (CP_Input_KeyDown(KEY_S)) { p.movey = speed; };
-		if (CP_Input_KeyDown(KEY_D)) { p.movex = speed; };
-	}
-
+	// Movement logic
+	movement(&player, movestate, speed);
 
 	// position update
-	p.x += p.movex * dt;
-	p.y += p.movey * dt;
+	player.x += player.movex * dt;
+	player.y += player.movey * dt;
 
 	// reset checks for jumping and entering
-	p.onplatform = 0;
-	p.withinx = 0;
-	p.leaveplatform = 0;
+	player.onplatform = 0;
+	player.withinx = 0;
+	player.leaveplatform = 0;
 	// collision against platforms
 	for (int plat_index = 0; plat_index < numplats1; plat_index++) {
-		CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &p, p);
+		CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &player, player);
 	}
 	// window clamps
-	if (p.x < 0) {
-		p.x = 0;
+	if (player.x < 0) {
+		player.x = 0;
 	}
-	if (p.x + p.width > width) {
-		p.x = width - p.width;
+	if (player.x + player.width > width) {
+		player.x = width - player.width;
 	}
-	if (p.y < 0) {
-		p.y = 0;
-		p.movey = 0;
+	if (player.y < 0) {
+		player.y = 0;
+		player.movey = 0;
 	}
-	if (p.y + p.height > height) {
-		p.y = height - p.height;
-		p.movey = 0;
+	if (player.y + player.height > height) {
+		player.y = height - player.height;
+		player.movey = 0;
+	}
+	// reset with R
+	if (CP_Input_KeyDown(KEY_R)) {
+		player.x = 150;
+		player.y = 200;
+		movestate = 0;
+		player.movey = 0;
 	}
 
 #pragma endregion
@@ -168,8 +153,8 @@ void L1_Update(void)
 #pragma region HP
 
 	// hp clamp
-	if (p.hp < 0) { p.hp = 0; };
-	if (p.hp > 100) { p.hp = 100; };
+	if (player.hp < 0) { player.hp = 0; };
+	if (player.hp > 100) { player.hp = 100; };
 #pragma endregion
 
 	// RENDER
@@ -185,14 +170,14 @@ void L1_Update(void)
 	CP_Settings_Fill(green);
 	CP_Graphics_DrawRect(1520, 250, 50, 50);
 
-	if (AreSquaresIntersecting(p.x,p.y,p.height,p.width,1520,250,50,50)) {
+	if (AreSquaresIntersecting(player.x,player.y,player.height,player.width,1520,250,50,50)) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
 		CP_Font_DrawText("Yippie!", 1300, 50);
 	}
 
 	// Player
-	CP_Settings_Fill(p.color);
-	CP_Graphics_DrawRect(p.x - 10, p.y - 10, p.width + 20, p.height + 20);
+	CP_Settings_Fill(player.color);
+	CP_Graphics_DrawRect(player.x - 10, player.y - 10, player.width + 20, player.height + 20);
 
 	// Health Bars
 	// Graphics settings

@@ -7,6 +7,48 @@ void platform_coordinates(int plat_index, int coord_index, float x, float y) {
 	Platform[plat_index].platcoords[coord_index] = (coords){ x,y };
 }
 
+// MOVEMENT AND MOVESTATE LOGIC
+#pragma region Movement and movestate
+int movestate_set(Player *p, int movestate) {
+	// 3 conditions to allow phasing into platform
+	// movestate == 0 : platformer
+	// p->onplatform == 1 : on platform
+	// p->withinx == 1 : within x of platform
+	if (movestate == 0 && p->onplatform == 1 && p->withinx == 1) {
+		p->y += 80;
+		return 1;
+	}
+	// 3 conditions to allow exiting platform
+	// movestate == 1 : topdown
+	// p->y > 200 : player will not bust above the window of screen
+	// p->leaveplatform == 1 : player is touching top edge of the platform
+	else if (movestate == 1 && p->y > 200 && p->leaveplatform == 1) {
+		p->y -= 80;
+		return 0;
+	}
+	return movestate;
+}
+
+void movement(Player* p, int movestate, float speed) {
+	if (movestate == 0) { // platformer
+		p->movex = 0; p->movey += 10;
+		//if (CP_Input_KeyDown(KEY_W)) { p->movey = -speed; }; //temp fly
+		if (CP_Input_KeyTriggered(KEY_SPACE) && p->onplatform == 1) { p->movey = -speed; } // jump!
+		if (CP_Input_KeyDown(KEY_A)) { p->movex = -speed; };
+		if (CP_Input_KeyDown(KEY_D)) { p->movex = speed; };
+	}
+	if (movestate == 1) { // top down/inside platform
+		p->movex = 0; p->movey = 0;
+		if (CP_Input_KeyDown(KEY_W)) { p->movey = -speed; };
+		if (CP_Input_KeyDown(KEY_A)) { p->movex = -speed; };
+		if (CP_Input_KeyDown(KEY_S)) { p->movey = speed; };
+		if (CP_Input_KeyDown(KEY_D)) { p->movex = speed; };
+	}
+}
+
+#pragma endregion
+
+
 // HITBOX LOGIC
 /*---------------------------------------------------------------------------------------------------*/
 #pragma region Hitboxes

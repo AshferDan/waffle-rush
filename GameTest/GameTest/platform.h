@@ -8,6 +8,9 @@
 // Platformer globals
 int movestate; //0 = platformer, 1 = platform
 
+
+// STRUCTS --------------------------------------------
+#pragma region Structs
 // Platform Struct
 #pragma region Platform structs
 
@@ -48,12 +51,25 @@ typedef struct Player {
 	CP_Color color; //color
 } Player;
 
-struct Player p; //player p
+struct Player player; //player p
 #pragma endregion
 
+#pragma endregion
+
+
+
+// FUNCTIONS --------------------------------------------
+#pragma region Functions
 // assign platform coordinates (NOTE: to change to read from text file)
 void platform_coordinates(int plat_index, int coord_index, float x, float y);
 
+// MOVEMENT AND MOVESTATE LOGIC
+#pragma region Movement and movestate
+// set movestate
+int movestate_set(Player* p, int movestate);
+// platformer and in platform movements
+void movement(Player* p, int movestate, float speed);
+#pragma endregion
 
 // HITBOX LOGIC (see platform.c)
 #pragma region Hitboxes
@@ -75,4 +91,6 @@ float fix_collide_y(platblocks plt, Player p);
 void CollPlatforms(int plat_index, int numplatcoords, platform plt, Player* p, Player ply);
 #pragma endregion 
 
+// draw platforms
 void DrawPlatform(int plat_index);
+#pragma endregion
