@@ -60,6 +60,24 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 	return 0;
 }
 
+// check if two squares are intersecting
+//
+// s1_x, s1_y, s1_w, s1_h - square 1 posx, posy, width, height
+// s2_x, s2_y, s2_w, s2_h - square 2 posx, posy, width, height
+//
+int AreSquaresIntersecting(float s1_x, float s1_y, float s1_w, float s1_h, float s2_x, float s2_y, float s2_w, float s2_h) {
+	float s1_cx = s1_x + s1_w / 2; // square 1 center x
+	float s1_cy = s1_y + s1_h / 2; // square 1 center y
+	float s2_cx = s2_x + s2_w / 2; // square 2 center x
+	float s2_cy = s2_y + s2_h / 2; // square 2 center y
+	float widthtouch = s1_w / 2 + s2_w / 2;
+	float heighttouch = s1_h / 2 + s2_h / 2;
+	if (abs(s2_cx - s1_cx) <= widthtouch && (abs(s2_cy - s1_cy) <= heighttouch)) {
+		return 1;
+	}
+	return 0;
+}
+
 // create red box with black text
 // pos_x - position x center of box
 // pos_y - position y center of box

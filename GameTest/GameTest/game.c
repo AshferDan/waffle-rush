@@ -70,7 +70,7 @@ void Game_Init(void)
 
 		while (pcindex < Platform[pindex].numcoords) {
 			fscanf_s(file, "%d %d", &x, &y);
-			platcoord(pindex, pcindex, x, y);
+			platform_coordinates(pindex, pcindex, x, y);
 			pcindex++;
 		}
 		pcindex = 0;
@@ -152,20 +152,17 @@ void Game_Update(void)
 		CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &p, p);
 	}
 	// window clamps
-	if (p.x < 0) {
+	p.x = CP_Math_ClampFloat(p.x, 0, width - p.width);
+	/*if (p.x < 0) {
 		p.x = 0;
 	}
 	if (p.x + p.width > width) {
 		p.x = width - p.width;
-	}
-	if (p.y < 0) {
-		p.y = 0;
+	}*/
+	if (p.y + p.height > height || p.y<0) {
 		p.movey = 0;
 	}
-	if (p.y + p.height > height) {
-		p.y = height - p.height;
-		p.movey = 0;
-	}
+	p.y = CP_Math_ClampFloat(p.y, 0, height - p.height);
 
 #pragma endregion
 

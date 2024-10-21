@@ -12,28 +12,28 @@ int movestate; //0 = platformer, 1 = platform
 #pragma region Platform structs
 
 // coordinate struct
-struct coords {
+typedef struct coords {
 	float x, y;
-};
+} coords;
 // platform hitbox struct
-struct platblocks {
+typedef struct platblocks {
 	float x1, x2, y1, y2, w, h;
-};
+} platblocks;
 
 // platform struct
-struct platform {
+typedef struct platform {
 	int numcoords;
-	struct coords platcoords[max_coords];
-	struct platblocks blocks[max_coords];
-};
+	coords platcoords[max_coords];
+	platblocks blocks[max_coords];
+} platform;
 
-struct platform Platform[max_platforms];
+platform Platform[max_platforms];
 
 #pragma endregion
 
 
 // make player struct
-struct Player {
+typedef struct Player {
 	float x; //posx
 	float y; //posy
 	float movex; //movex
@@ -46,33 +46,32 @@ struct Player {
 	int withinx;
 	int leaveplatform;
 	CP_Color color; //color
-};
+} Player;
 
 struct Player p; //player p
 
 // assign platform coordinates (NOTE: to change to read from text file)
-void platcoord(int plat_index, int coord_index, float x, float y);
+void platform_coordinates(int plat_index, int coord_index, float x, float y);
 
 
 // HITBOX LOGIC (see platform.c)
 #pragma region Hitboxes
-
-void horizontalhitbox(int coord_index, struct platform* plt);
-void verticalhitbox(int coord_index, struct platform* plt);
-void hitbox(int plat_index, int numplatcoords, struct platform* plt);
+void horizontalhitbox(int coord_index, platform* plt);
+void verticalhitbox(int coord_index, platform* plt);
+void hitbox(int plat_index, int numplatcoords, platform* plt);
 #pragma endregion
 
 // COLLISION LOGIC (see platform.c)
 #pragma region Collision
 
-int collision(struct platblocks plt, struct Player p);
+int collision(platblocks plt, Player p);
 
-int collision_direction(struct platblocks plt, struct Player p);
+int collision_direction(platblocks plt, Player p);
 
-float fix_collide_x(struct platblocks plt, struct Player p);
-float fix_collide_y(struct platblocks plt, struct Player p);
+float fix_collide_x(platblocks plt, Player p);
+float fix_collide_y(platblocks plt, Player p);
 
-void CollPlatforms(int plat_index, int numplatcoords, struct platform plt, struct Player* p, struct Player ply);
+void CollPlatforms(int plat_index, int numplatcoords, platform plt, Player* p, Player ply);
 #pragma endregion 
 
 void DrawPlatform(int plat_index);

@@ -70,7 +70,7 @@ void L1_Init(void)
 
 		while (pcindex < Platform[pindex].numcoords) {
 			fscanf_s(file, "%d %d", &x, &y);
-			platcoord(pindex, pcindex, x, y);
+			platform_coordinates(pindex, pcindex, x, y);
 			pcindex++;
 		}
 		pcindex = 0;
@@ -191,7 +191,7 @@ void L1_Update(void)
 	CP_Settings_Fill(green);
 	CP_Graphics_DrawRect(1520, 250, 50, 50);
 
-	if (((p.x >= 1500) && (p.x + p.width <= 1600)) && ((p.y >= 250 && p.y + p.height <= 300))) {
+	if (AreSquaresIntersecting(p.x,p.y,p.height,p.width,1520,250,50,50)) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
 		CP_Font_DrawText("Yippie!", 1300, 50);
 	}
