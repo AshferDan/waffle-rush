@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "game.h"
 #include "Level1.h"
+#include "LevelSelect.h"
 
 void Main_Menu_Init(void);
 void Main_Menu_Update(void);

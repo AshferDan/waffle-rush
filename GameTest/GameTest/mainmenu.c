@@ -41,7 +41,7 @@ void Main_Menu_Update(void)
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 		CP_Graphics_DrawRect(width / 2, height / 3, 500, 150);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
-			CP_Engine_SetNextGameState(Game_Init, Game_Update, Game_Exit); //go to game
+			CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit); //go to game
 		}
 	}
 
