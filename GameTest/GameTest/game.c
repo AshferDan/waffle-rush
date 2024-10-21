@@ -118,7 +118,7 @@ void Game_Update(void)
 	// different movement logics
 	if (movestate == 0) { // platformer
 		p.movex = 0; p.movey += 10;
-		if (CP_Input_KeyDown(KEY_W)) { p.movey = -speed; }; //temp fly
+		//if (CP_Input_KeyDown(KEY_W)) { p.movey = -speed; }; //temp fly
 		if (CP_Input_KeyTriggered(KEY_SPACE) && p.onplatform == 1) { p.movey = -speed; } // jump!
 		if (CP_Input_KeyDown(KEY_A)) { p.movex = -speed; };
 		if (CP_Input_KeyDown(KEY_D)) { p.movex = speed; };

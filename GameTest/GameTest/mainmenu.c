@@ -45,14 +45,14 @@ void Main_Menu_Update(void)
 		}
 	}
 
-	//level 1 button
-	TextBoxCreate(3*width / 4, height / 3, 150, 150, "1");
-	int L1Click = IsAreaClicked(3 * width / 4, height / 3, 150, 150, mouseX, mouseY); //if mouse is over button
-	if (L1Click) {
+	//test level button
+	TextBoxCreate(3*width / 4, height / 3, 150, 150, "T");
+	int TestClick = IsAreaClicked(3 * width / 4, height / 3, 150, 150, mouseX, mouseY); //if mouse is over button
+	if (TestClick) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 		CP_Graphics_DrawRect(3 * width / 4, height / 3, 150, 150);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
-			CP_Engine_SetNextGameState(L1_Init, L1_Update, L1_Exit); //go to game
+			CP_Engine_SetNextGameState(Game_Init, Game_Update, Game_Exit); //go to test stage
 		}
 	}
 
