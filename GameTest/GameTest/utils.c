@@ -12,7 +12,7 @@
 #pragma once
 #include "utils.h"
 
-//check if a position is within a rectangle
+// check if a position is within a rectangle
 //
 // area_center_x - position x center of rectangle
 // area_center_y - position y center of rectangle
@@ -79,6 +79,7 @@ int AreSquaresIntersecting(float s1_x, float s1_y, float s1_w, float s1_h, float
 }
 
 // create red box with black text
+// 
 // pos_x - position x center of box
 // pos_y - position y center of box
 // size_x - width of box
@@ -95,6 +96,7 @@ void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const c
 }
 
 // draw full hp bar
+// 
 // pos_x1, pos_y1 - position of top left corner
 // pos_x2, pos_y2 - position of bottom right corner
 // hp - current health
@@ -112,6 +114,7 @@ void DrawHPBar(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp,
 	CP_Graphics_DrawRect(pos_x1, pos_y1, hpwidth, height);
 }
 // draw segmented hp bar
+// 
 // pos_x1, pos_y1 - position of top left corner
 // pos_x2, pos_y2 - position of bottom right corner
 // hp - current health

@@ -5,10 +5,10 @@
 #define max_coords 16
 #define max_platforms 20
 
-
+// Platformer globals
 int movestate; //0 = platformer, 1 = platform
 
-
+// Platform Struct
 #pragma region Platform structs
 
 // coordinate struct
@@ -31,8 +31,8 @@ platform Platform[max_platforms];
 
 #pragma endregion
 
-
-// make player struct
+// Player Struct
+#pragma region Player Struct
 typedef struct Player {
 	float x; //posx
 	float y; //posy
@@ -49,6 +49,7 @@ typedef struct Player {
 } Player;
 
 struct Player p; //player p
+#pragma endregion
 
 // assign platform coordinates (NOTE: to change to read from text file)
 void platform_coordinates(int plat_index, int coord_index, float x, float y);
