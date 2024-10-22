@@ -94,6 +94,9 @@ void Game_Init(void)
 	//healthbar position
 	hpx1 = width / 10; hpx2 = 9 * width / 10;
 	hpy1 = 50; hpy2 = 100;
+	// Corner drawing
+	CP_Settings_RectMode(CP_POSITION_CORNER);
+	CP_Settings_ImageMode(CP_POSITION_CORNER);
 }
 
 
@@ -208,12 +211,11 @@ void Game_Update(void)
 	// Player
 	// CP_Settings_Fill(player.color);
 	// CP_Graphics_DrawRect(player.x - 10, player.y - 10, player.width + 20, player.height + 20);
-	CP_Image_Draw(player_sprite, player.x + 15, player.y + 15, player.width + 20, player.height + 20, 255);
+	CP_Image_Draw(player_sprite, player.x -10, player.y -10, player.width + 20, player.height + 20, 255);
 
 	// Health Bars
 	// Graphics settings
 	CP_Settings_Fill(hpcol); 
-	CP_Settings_RectMode(CP_POSITION_CORNER);
 
 #pragma endregion
 
