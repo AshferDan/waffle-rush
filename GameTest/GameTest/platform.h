@@ -7,6 +7,7 @@
 
 // Platformer globals
 int movestate; //0 = platformer, 1 = platform
+float switchtime;
 
 
 // STRUCTS --------------------------------------------
@@ -67,9 +68,9 @@ void platform_coordinates(int plat_index, int coord_index, float x, float y);
 #pragma region Movement and movestate
 // set movestate
 int movestate_set(Player* p, int movestate);
-int movestate_set2(Player* ply, int movestate, float* switchtime);
+int start_transition(Player* ply, int movestate);
 
-end_transition(Player* ply, float dt, float switchtime, int movestate);
+//end_transition(Player* ply, float dt, int movestate);
 // platformer and in platform movements
 void movement(Player* p, int movestate, float speed);
 #pragma endregion

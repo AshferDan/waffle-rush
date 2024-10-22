@@ -24,8 +24,6 @@ CP_Image player_sprite;
 hazard traps[100];
 int numplats = 2;
 
-float switchtime = 1;
-
 void Game_Init(void)
 {
 	// load font
@@ -49,6 +47,9 @@ void Game_Init(void)
 
 	// initialize movestate
 	movestate = 0;
+
+	// initialize switchtime
+	switchtime = 1;
 
 	// initialize player
 	// size
@@ -141,7 +142,7 @@ void Game_Update(void)
 			movestate = 3;
 			switchtime = 0;
 		}*/
-		movestate = start_transition(&player, movestate, &switchtime);
+		movestate = start_transition(&player, movestate);
 		if (movestate == 2 || movestate == 3) {
 			switchtime = 0;
 		}
@@ -233,10 +234,6 @@ void Game_Update(void)
 	// CP_Graphics_DrawRect(player.x - 10, player.y - 10, player.width + 20, player.height + 20);
 	CP_Image_Draw(player_sprite, player.x -10, player.y -10, player.width + 20, player.height + 20, 255);
 
-	// Health Bars
-	// Graphics settings
-	CP_Settings_Fill(hpcol); 
-
 #pragma endregion
 
 	// Back to main menu
@@ -250,5 +247,6 @@ void Game_Update(void)
 
 void Game_Exit(void)
 {
+	CP_Image_Free(player_sprite);
 
 }

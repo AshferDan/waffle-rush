@@ -18,6 +18,7 @@ float speed; //speed
 float width, height; //window width/height
 float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
 CP_Font text;
+CP_Image player_sprite;
 
 int numplats1 = 4;
 
@@ -25,6 +26,9 @@ void L1_Init(void)
 {
 	// load font
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
+
+	// load player sprite
+	player_sprite = CP_Image_Load("Assets/Waffle_Player.png");
 
 	// get window size
 	width = CP_System_GetWindowWidth();
@@ -41,6 +45,9 @@ void L1_Init(void)
 
 	// initialize movestate
 	movestate = 0;
+
+	// initialize switchtime
+	switchtime = 1;
 
 	// initialize player
 	// size
@@ -93,6 +100,10 @@ void L1_Init(void)
 	//healthbar position
 	hpx1 = width / 10; hpx2 = 9 * width / 10;
 	hpy1 = 50; hpy2 = 100;
+
+	// Corner drawing
+	CP_Settings_RectMode(CP_POSITION_CORNER);
+	CP_Settings_ImageMode(CP_POSITION_CORNER);
 }
 
 
@@ -106,11 +117,42 @@ void L1_Update(void)
 	// MOVEMENT 
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Movement
-	// change movestate, teleport up/down
-	// 0 is platformer, 1 is inplatform
-	// NOTE: TO ADD TRANSITION PHASE
+		// change movestate, teleport up/down
+	// 0 is platformer, 1 is inplatform, 2 is 0>1, 3 is 1>0
+
 	if (CP_Input_KeyTriggered(KEY_E)) {
-		movestate = movestate_set(&player, movestate);
+		/*if (movestate == 0 && player.onplatform == 1 && player.withinx == 1) {
+			movestate=2;
+			switchtime = 0;
+		}
+		else if (movestate == 1 && player.y > 200 && player.leaveplatform == 1) {
+			movestate = 3;
+			switchtime = 0;
+		}*/
+		movestate = start_transition(&player, movestate);
+		if (movestate == 2 || movestate == 3) {
+			switchtime = 0;
+		}
+	}
+
+
+	//movestate = end_transition(&player, dt, switchtime, movestate);
+	if (switchtime < 1) {
+		if ((movestate == 2 && switchtime < 0.5) || (movestate == 3 && switchtime >= 0.5)) {
+			player.movey += 800 * dt;
+		}
+		if ((movestate == 3 && switchtime < 0.5) || (movestate == 2 && switchtime >= 0.5)) {
+			player.movey -= 800 * dt;
+		}
+		switchtime += 2 * dt;
+	}
+	if (switchtime >= 1) {
+		if (movestate == 2) {
+			movestate = 1;
+		}
+		if (movestate == 3) {
+			movestate = 0;
+		}
 	}
 
 	// Movement logic
@@ -125,8 +167,10 @@ void L1_Update(void)
 	player.withinx = 0;
 	player.leaveplatform = 0;
 	// collision against platforms
-	for (int plat_index = 0; plat_index < numplats1; plat_index++) {
-		CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &player, player);
+	if (movestate == 1 || movestate == 0) {
+		for (int plat_index = 0; plat_index < numplats1; plat_index++) {
+			CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &player, player);
+		}
 	}
 	// window clamps
 	if (player.x < 0) {
@@ -167,6 +211,7 @@ void L1_Update(void)
 #pragma region RENDER
 
 	// Platforms
+	CP_Settings_Fill(hpcol);
 	for (int i = 0; i < numplats1; i++) {
 		DrawPlatform(i);
 	}
@@ -181,13 +226,9 @@ void L1_Update(void)
 	}
 
 	// Player
-	CP_Settings_Fill(player.color);
-	CP_Graphics_DrawRect(player.x - 10, player.y - 10, player.width + 20, player.height + 20);
-
-	// Health Bars
-	// Graphics settings
-	CP_Settings_Fill(hpcol); 
-	CP_Settings_RectMode(CP_POSITION_CORNER);
+	// CP_Settings_Fill(player.color);
+	// CP_Graphics_DrawRect(player.x - 10, player.y - 10, player.width + 20, player.height + 20);
+	CP_Image_Draw(player_sprite, player.x - 10, player.y - 10, player.width + 20, player.height + 20, 255);
 
 #pragma endregion
 
@@ -197,5 +238,7 @@ void L1_Update(void)
 
 void L1_Exit(void)
 {
+
+	CP_Image_Free(player_sprite);
 
 }

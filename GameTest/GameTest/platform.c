@@ -29,38 +29,36 @@ int movestate_set(Player *p, int movestate) {
 	return movestate;
 }
 
-int start_transition(Player* ply, int movestate, float *switchtime) {
+int start_transition(Player* ply, int movestate) {
 	if (movestate == 0 && ply->onplatform == 1 && ply->withinx == 1) {
 		movestate = 2;
-		switchtime = 0;
 	}
 	else if (movestate == 1 && ply->y > 200 && ply->leaveplatform == 1) {
 		movestate = 3;
-		switchtime = 0;
 	}
 	return movestate;
 }
 
-int end_transition(Player* ply, float dt, float switchtime, int movestate) {
-	if (switchtime < 1) {
-		if ((movestate == 2 && switchtime < 0.5) || (movestate == 3 && switchtime >= 0.5)) {
-			ply->movey += 800 * dt;
-		}
-		if ((movestate == 3 && switchtime < 0.5) || (movestate == 2 && switchtime >= 0.5)) {
-			ply->movey -= 800 * dt;
-		}
-		switchtime += 2 * dt;
-	}
-	if (switchtime >= 1) {
-		if (movestate == 2) {
-			movestate = 1;
-		}
-		if (movestate == 3) {
-			movestate = 0;
-		}
-	}
-	return movestate;
-}
+//int end_transition(Player* ply, float dt, int movestate) {
+//	if (switchtime < 1) {
+//		if ((movestate == 2 && switchtime < 0.5) || (movestate == 3 && switchtime >= 0.5)) {
+//			ply->movey += 800 * dt;
+//		}
+//		if ((movestate == 3 && switchtime < 0.5) || (movestate == 2 && switchtime >= 0.5)) {
+//			ply->movey -= 800 * dt;
+//		}
+//		switchtime += 2 * dt;
+//	}
+//	if (switchtime >= 1) {
+//		if (movestate == 2) {
+//			movestate = 1;
+//		}
+//		if (movestate == 3) {
+//			movestate = 0;
+//		}
+//	}
+//	return movestate;
+//}
 
 void movement(Player* p, int movestate, float speed) {
 	if (movestate == 0) { // platformer
