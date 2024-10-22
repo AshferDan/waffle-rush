@@ -12,6 +12,7 @@
 //---------------------------------------------------------
 
 #include "Level1.h"
+#include "hazard.h"
 
 CP_Color bg, red, green, hpcol; //colors
 float speed; //speed
@@ -19,6 +20,8 @@ float width, height; //window width/height
 float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
 CP_Font text;
 CP_Image player_sprite;
+hazard traps[100];
+int numberoftraps;
 
 int numplats1 = 4;
 
@@ -97,10 +100,22 @@ void L1_Init(void)
 
 #pragma endregion
 
-	//healthbar position
-	hpx1 = width / 10; hpx2 = 9 * width / 10;
-	hpy1 = 50; hpy2 = 100;
+	//HAZARDS
+	/*-----------------------------------------------------------------------------------------------------------*/
+#pragma region Hazard
+	FILE* file2 = fopen("Assets/Level1hazard.txt", "r");
+	fscanf_s(file2, "%d", &numberoftraps);
 
+	for (int i = 0; i < numberoftraps; ++i) {
+		int j=0;
+		for (; j < 3; ++j) {
+			fscanf_s(file2, "%d %d", &traps[i].x[j], &traps[i].y[j]);
+		}
+		fscanf_s(file2, "%d", &traps[i].type);
+	}
+
+	fclose(file2);
+#pragma endregion
 	// Corner drawing
 	CP_Settings_RectMode(CP_POSITION_CORNER);
 	CP_Settings_ImageMode(CP_POSITION_CORNER);
@@ -230,6 +245,12 @@ void L1_Update(void)
 	// CP_Settings_Fill(player.color);
 	// CP_Graphics_DrawRect(player.x - 10, player.y - 10, player.width + 20, player.height + 20);
 	CP_Image_Draw(player_sprite, player.x - 10, player.y - 10, player.width + 20, player.height + 20, 255);
+
+	//HAZARD DRAWING
+	for (int i = 0; i < numberoftraps; ++i) {
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
+		CP_Graphics_DrawTriangle(traps[i].x[0], traps[i].y[0], traps[i].x[1], traps[i].y[1], traps[i].x[2], traps[i].y[2]);
+	}
 
 #pragma endregion
 

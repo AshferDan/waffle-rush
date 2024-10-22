@@ -32,9 +32,11 @@ int movestate_set(Player *p, int movestate) {
 int start_transition(Player* ply, int movestate) {
 	if (movestate == 0 && ply->onplatform == 1 && ply->withinx == 1) {
 		movestate = 2;
+		ply->movex = 0;
 	}
 	else if (movestate == 1 && ply->y > 200 && ply->leaveplatform == 1) {
 		movestate = 3;
+		ply->movex = 0;
 	}
 	return movestate;
 }

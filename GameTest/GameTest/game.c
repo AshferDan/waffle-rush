@@ -98,10 +98,10 @@ void Game_Init(void)
 	hpx1 = width / 10; hpx2 = 9 * width / 10;
 	hpy1 = 50; hpy2 = 100;
 
-	/*-----------------------------------------------------------------------------------------------------------*/
 	//HAZARDS
-	
-	FILE* file1 = fopen("Assets/Level1hazard.txt", "r");
+	/*-----------------------------------------------------------------------------------------------------------*/
+#pragma region Hazard
+	FILE* file1 = fopen("Assets/testhazard.txt", "r");
 	int numberoftraps;
 	fscanf_s(file1, "%d", &numberoftraps);
 
@@ -111,7 +111,9 @@ void Game_Init(void)
 		}
 		fscanf_s(file1, "%d", &traps[i].type);
 	}
+
 	fclose(file1);
+#pragma endregion
 	// Corner drawing
 	CP_Settings_RectMode(CP_POSITION_CORNER);
 	CP_Settings_ImageMode(CP_POSITION_CORNER);
@@ -192,17 +194,9 @@ void Game_Update(void)
 		player.movey = 0;
 	}
 	player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
-	// reset with R
-	if (CP_Input_KeyDown(KEY_R)) {
-		player.x = 700;
-		player.y = 200;
-		movestate = 0;
-		player.movey = 0;
-	}
-
-	// respawn if player hits the floor
-	if (player.y >= height - player.height) {
-		player.x = 700;
+	// reset with R or touch ground in platform movestate
+	if (CP_Input_KeyDown(KEY_R) || ((player.y >= height - player.height) && movestate == 0)) {
+		player.x = 150;
 		player.y = 200;
 		movestate = 0;
 		player.movey = 0;
@@ -241,7 +235,7 @@ void Game_Update(void)
 
 
 	//HAZARD DRAWING
-	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
+	CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
 	CP_Graphics_DrawTriangle(traps[0].x[0], traps[0].y[0], traps[0].x[1], traps[0].y[1], traps[0].x[2], traps[0].y[2]);
 }
 
