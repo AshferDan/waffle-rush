@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.c" />
+    <ClCompile Include="hazard.c" />
     <ClCompile Include="Level1.c" />
     <ClCompile Include="LevelSelect.c" />
     <ClCompile Include="main.c" />
@@ -21,6 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
+    <ClInclude Include="hazard.h" />
     <ClInclude Include="Level1.h" />
     <ClInclude Include="LevelSelect.h" />
     <ClInclude Include="platform.h" />
