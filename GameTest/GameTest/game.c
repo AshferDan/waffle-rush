@@ -105,30 +105,32 @@ void Game_Update(void)
 #pragma region Movement
 	// change movestate, teleport up/down
 	// 0 is platformer, 1 is inplatform, 2 is 0>1, 3 is 1>0
-	// NOTE: TO ADD TRANSITION PHASE
-	if (CP_Input_KeyTriggered(KEY_E)) {
-		movestate = movestate_set(&player, movestate);
-	}
 
-	if (CP_Input_KeyTriggered(KEY_F)) {
-		if (movestate == 0 && player.onplatform == 1 && player.withinx == 1) {
+	if (CP_Input_KeyTriggered(KEY_E)) {
+		/*if (movestate == 0 && player.onplatform == 1 && player.withinx == 1) {
 			movestate=2;
 			switchtime = 0;
 		}
 		else if (movestate == 1 && player.y > 200 && player.leaveplatform == 1) {
 			movestate = 3;
 			switchtime = 0;
+		}*/
+		movestate = start_transition(&player, movestate, &switchtime);
+		if (movestate == 2 || movestate == 3) {
+			switchtime = 0;
 		}
 	}
 
+
+	//movestate = end_transition(&player, dt, switchtime, movestate);
 	if (switchtime < 1) {
 		if ((movestate == 2 && switchtime < 0.5) || (movestate == 3 && switchtime >= 0.5)) {
-			player.movey += 200 * dt;
+			player.movey += 800 * dt;
 		}
 		if ((movestate == 3 && switchtime < 0.5) || (movestate == 2 && switchtime >=0.5)) {
-			player.movey -= 200 * dt;
+			player.movey -= 800 * dt;
 		}
-		switchtime += dt;
+		switchtime += 2*dt;
 	}
 	if (switchtime >= 1) {
 		if (movestate == 2) {
