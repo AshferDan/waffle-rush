@@ -1,5 +1,6 @@
 #pragma once
 #include "utils.h"
+#include "hazard.h"
 
 
 #define max_coords 16

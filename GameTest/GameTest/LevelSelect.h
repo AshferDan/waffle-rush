@@ -9,10 +9,8 @@
 //---------------------------------------------------------
 
 #pragma once
-#include "utils.h"
 #include "game.h"
 #include "Level1.h"
-#include "mainmenu.h"
 
 // leevl struct
 typedef struct Level {
