@@ -29,6 +29,14 @@ int IsAreaClicked(float area_center_x, float area_center_y, float area_width, fl
 	return 0;
 }
 
+int IsAreaCornerClicked(float area_corner_x, float area_corner_y, float area_width, float area_height, float click_x, float click_y) {
+	if (click_x > (area_corner_x - area_width / 2) && click_x < (area_corner_x + area_width / 2) &&
+		click_y >(area_corner_y - area_height / 2) && click_y < (area_corner_y + area_height / 2)) {
+		return 1;
+	}
+	return 0;
+}
+
 //check if a position is within a circle
 //
 // circle_center_x - position x center of circle
@@ -76,6 +84,10 @@ int AreSquaresIntersecting(float s1_x, float s1_y, float s1_w, float s1_h, float
 		return 1;
 	}
 	return 0;
+}
+
+int IsTriangleClicked(float tri_x1, float tri_y1, float tri_x2, float tri_y2, float tri_x3, float tri_y3, float click_x, float click_y) {
+
 }
 
 // create red box with black text
@@ -138,9 +150,12 @@ void DrawHPBar2(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp
 	}
 }
 
-int squarecollidetriangle (float squarex, float squarey, float squarewidth, float squareheight, float tri1x,float tri1y, float tri2x, float tri2y, float tri3x, float tri3y) {
-	if ((IsAreaClicked(squarex + 0.5 * squarewidth, squarey + 0.5 * squareheight, squarewidth, squareheight, tri1x, tri1y))||((IsAreaClicked(squarex + 0.5 * squarewidth, squarey + 0.5 * squareheight, squarewidth, squareheight, tri2x, tri2y))|| (IsAreaClicked(squarex + 0.5 * squarewidth, squarey + 0.5 * squareheight, squarewidth, squareheight, tri3x, tri3y)))) {
+int SquareTriangleCollide (float squarex, float squarey, float squarewidth, float squareheight, float tri1x,float tri1y, float tri2x, float tri2y, float tri3x, float tri3y) {
+	// is Triangle corner in square?
+	if ((IsAreaCornerClicked(squarex, squarey, squarewidth, squareheight, tri1x, tri1y))|| (IsAreaCornerClicked(squarex, squarey, squarewidth, squareheight, tri2x, tri2y))|| (IsAreaCornerClicked(squarex, squarey, squarewidth, squareheight, tri3x, tri3y))) {
 		return 1;
 	}
+
+
 	return 0;
 }

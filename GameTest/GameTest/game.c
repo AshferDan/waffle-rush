@@ -153,12 +153,12 @@ void Game_Update(void)
 	//movestate = end_transition(&player, dt, switchtime, movestate);
 	if (switchtime < 1) {
 		if ((movestate == 2 && switchtime < 0.5) || (movestate == 3 && switchtime >= 0.5)) {
-			player.movey += 800 * dt;
+			player.movey += 800 / 60;
 		}
 		if ((movestate == 3 && switchtime < 0.5) || (movestate == 2 && switchtime >=0.5)) {
-			player.movey -= 800 * dt;
+			player.movey -= 800 / 60;
 		}
-		switchtime += 2*dt;
+		switchtime += 1.0f/30.0f;
 	}
 	if (switchtime >= 1) {
 		if (movestate == 2) {
