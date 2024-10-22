@@ -120,7 +120,7 @@ void L1_Update(void)
 		// change movestate, teleport up/down
 	// 0 is platformer, 1 is inplatform, 2 is 0>1, 3 is 1>0
 
-	if (CP_Input_KeyTriggered(KEY_E)) {
+	if (CP_Input_KeyTriggered(KEY_E)&&(movestate==1 || movestate==0)) {
 		/*if (movestate == 0 && player.onplatform == 1 && player.withinx == 1) {
 			movestate=2;
 			switchtime = 0;
