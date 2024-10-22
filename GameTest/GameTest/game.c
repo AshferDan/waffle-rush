@@ -12,6 +12,7 @@
 //---------------------------------------------------------
 
 #include "game.h"
+#include "hazard.h"
 
 CP_Color bg, red, green, hpcol; //colors
 float speed; //speed
@@ -19,6 +20,7 @@ float width, height; //window width/height
 float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
 CP_Font text;
 
+hazard traps[100];
 int numplats = 2;
 
 void Game_Init(void)
@@ -88,7 +90,24 @@ void Game_Init(void)
 	//healthbar position
 	hpx1 = width / 10; hpx2 = 9 * width / 10;
 	hpy1 = 50; hpy2 = 100;
+
+	/*-----------------------------------------------------------------------------------------------------------*/
+	//HAZARDS
+	
+	FILE* file1 = fopen("Assets/Level1hazard.txt", "r");
+	int numberoftraps;
+	fscanf_s(file1, "%d", &numberoftraps);
+
+	for (int i = 0; i < numberoftraps; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			fscanf_s(file1, "%d %d", &traps[i].x[j], &traps[i].y[j]);
+		}
+		fscanf_s(file1, "%d", &traps[i].type);
+	}
+	fclose(file1);
 }
+
+
 
 
 void Game_Update(void)
@@ -153,6 +172,7 @@ void Game_Update(void)
 #pragma region RENDER
 
 	// Platforms
+	CP_Settings_Fill(hpcol);
 	for (int i = 0; i < numplats; i++) {
 		DrawPlatform(i);
 	}
@@ -170,6 +190,11 @@ void Game_Update(void)
 
 	// Back to main menu
 	if (CP_Input_KeyDown(KEY_Q)) { CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit); };
+
+
+	//HAZARD DRAWING
+	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
+	CP_Graphics_DrawTriangle(traps[0].x[0], traps[0].y[0], traps[0].x[1], traps[0].y[1], traps[0].x[2], traps[0].y[2]);
 }
 
 void Game_Exit(void)

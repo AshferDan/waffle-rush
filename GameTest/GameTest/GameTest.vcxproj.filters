@@ -36,6 +36,9 @@
     <ClCompile Include="LevelSelect.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="hazard.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainmenu.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LevelSelect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hazard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
