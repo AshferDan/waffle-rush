@@ -15,7 +15,7 @@
 #include "mainmenu.h"
 
 // leevl struct
-typedef struct {
+typedef struct Level {
 	int level_no;
 	int isUnlocked;
 	int isCleared;

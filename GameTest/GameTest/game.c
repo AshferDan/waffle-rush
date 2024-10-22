@@ -21,6 +21,8 @@ CP_Font text;
 
 int numplats = 2;
 
+float switchtime = 1;
+
 void Game_Init(void)
 {
 	// load font
@@ -102,11 +104,41 @@ void Game_Update(void)
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Movement
 	// change movestate, teleport up/down
-	// 0 is platformer, 1 is inplatform
+	// 0 is platformer, 1 is inplatform, 2 is 0>1, 3 is 1>0
 	// NOTE: TO ADD TRANSITION PHASE
 	if (CP_Input_KeyTriggered(KEY_E)) {
 		movestate = movestate_set(&player, movestate);
 	}
+
+	if (CP_Input_KeyTriggered(KEY_F)) {
+		if (movestate == 0 && player.onplatform == 1 && player.withinx == 1) {
+			movestate=2;
+			switchtime = 0;
+		}
+		else if (movestate == 1 && player.y > 200 && player.leaveplatform == 1) {
+			movestate = 3;
+			switchtime = 0;
+		}
+	}
+
+	if (switchtime < 1) {
+		if ((movestate == 2 && switchtime < 0.5) || (movestate == 3 && switchtime >= 0.5)) {
+			player.movey += 200 * dt;
+		}
+		if ((movestate == 3 && switchtime < 0.5) || (movestate == 2 && switchtime >=0.5)) {
+			player.movey -= 200 * dt;
+		}
+		switchtime += dt;
+	}
+	if (switchtime >= 1) {
+		if (movestate == 2) {
+			movestate = 1;
+		}
+		if (movestate == 3) {
+			movestate = 0;
+		}
+	}
+	
 
 	// different movement logics
 	movement(&player, movestate, speed);
@@ -120,8 +152,10 @@ void Game_Update(void)
 	player.withinx = 0;
 	player.leaveplatform = 0;
 	// collision against platforms
-	for (int plat_index = 0; plat_index < numplats; plat_index++) {
-		CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &player, player);
+	if (movestate == 1 || movestate == 0) {
+		for (int plat_index = 0; plat_index < numplats; plat_index++) {
+			CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &player, player);
+		}
 	}
 	// window clamps
 	player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);

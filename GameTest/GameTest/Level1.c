@@ -62,14 +62,19 @@ void L1_Init(void)
 #pragma region Initialize Platform
 
 	FILE* file = fopen("Assets/Level1.txt", "r");
+	// pindex - platform index
+	// pcindex - platform coordinate index
 	int pindex = 0; int pcindex = 0;
-	int test = 0;
 	while (pindex < numplats1) {
+		// coordinate ints to read
 		int x, y;
+		// scan how many coordinates
 		fscanf_s(file, "%d", &Platform[pindex].numcoords);
-
+		// for how many coordinates in platform
 		while (pcindex < Platform[pindex].numcoords) {
+			// scan coordinates
 			fscanf_s(file, "%d %d", &x, &y);
+			// assign coordinates to array
 			platform_coordinates(pindex, pcindex, x, y);
 			pcindex++;
 		}
