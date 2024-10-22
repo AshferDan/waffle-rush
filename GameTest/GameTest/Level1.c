@@ -187,13 +187,14 @@ void L1_Update(void)
 		player.y = height - player.height;
 		player.movey = 0;
 	}
-	// reset with R
-	if (CP_Input_KeyDown(KEY_R)) {
+	// reset with R or touch ground in platform movestate
+	if (CP_Input_KeyDown(KEY_R)|| ((player.y >= height - player.height) && movestate == 0)) {
 		player.x = 150;
 		player.y = 200;
 		movestate = 0;
 		player.movey = 0;
 	}
+	
 
 #pragma endregion
 
