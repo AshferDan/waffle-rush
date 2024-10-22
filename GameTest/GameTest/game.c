@@ -18,6 +18,7 @@ float speed; //speed
 float width, height; //window width/height
 float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
 CP_Font text;
+CP_Image player_sprite;
 
 int numplats = 2;
 
@@ -25,6 +26,9 @@ void Game_Init(void)
 {
 	// load font
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
+
+	// load player sprite
+	player_sprite = CP_Image_Load("Assets/Waffle_Player.png");
 
 	// get window size
 	width = CP_System_GetWindowWidth();
@@ -137,6 +141,14 @@ void Game_Update(void)
 		player.movey = 0;
 	}
 
+	// respawn if player hits the floor
+	if (player.y >= height - player.height) {
+		player.x = 700;
+		player.y = 200;
+		movestate = 0;
+		player.movey = 0;
+	}
+
 #pragma endregion
 
 	// HP
@@ -158,8 +170,9 @@ void Game_Update(void)
 	}
 
 	// Player
-	CP_Settings_Fill(player.color);
-	CP_Graphics_DrawRect(player.x - 10, player.y - 10, player.width + 20, player.height + 20);
+	// CP_Settings_Fill(player.color);
+	// CP_Graphics_DrawRect(player.x - 10, player.y - 10, player.width + 20, player.height + 20);
+	CP_Image_Draw(player_sprite, player.x + 15, player.y + 15, player.width + 20, player.height + 20, 255);
 
 	// Health Bars
 	// Graphics settings
