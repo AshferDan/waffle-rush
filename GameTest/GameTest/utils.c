@@ -137,3 +137,10 @@ void DrawHPBar2(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp
 
 	}
 }
+
+int squarecollidetriangle (float squarex, float squarey, float squarewidth, float squareheight, float tri1x,float tri1y, float tri2x, float tri2y, float tri3x, float tri3y) {
+	if ((IsAreaClicked(squarex + 0.5 * squarewidth, squarey + 0.5 * squareheight, squarewidth, squareheight, tri1x, tri1y))||((IsAreaClicked(squarex + 0.5 * squarewidth, squarey + 0.5 * squareheight, squarewidth, squareheight, tri2x, tri2y))|| (IsAreaClicked(squarex + 0.5 * squarewidth, squarey + 0.5 * squareheight, squarewidth, squareheight, tri3x, tri3y)))) {
+		return 1;
+	}
+	return 0;
+}
