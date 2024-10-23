@@ -52,8 +52,8 @@ void Game_Init(void)
 
 	// initialize player
 	// size
-	player.width = 30;
-	player.height = 30;
+	player.width = 20;
+	player.height = 20;
 	// position
 	player.x = 700;
 	player.y = 200;
@@ -88,7 +88,7 @@ void Game_Init(void)
 
 	// initialize all platform hitboxes
 	for (int plat_index = 0; plat_index < numplats; plat_index++) {
-		hitbox(plat_index, Platform[plat_index].numcoords, &Platform[plat_index]);
+		hitbox_test(plat_index, Platform[plat_index].numcoords, &Platform[plat_index]);
 	}
 
 #pragma endregion
@@ -170,7 +170,7 @@ void Game_Update(void)
 	// collision against platforms
 	if (movestate == InPlat || movestate == OnPlat) {
 		for (int plat_index = 0; plat_index < numplats; plat_index++) {
-			CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &player, player);
+			CollPlatforms_test(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &player, player);
 		}
 	}
 	// window clamps
@@ -216,7 +216,7 @@ void Game_Update(void)
 	// Player
 	// CP_Settings_Fill(player.color);
 	// CP_Graphics_DrawRect(player.x - 10, player.y - 10, player.width + 20, player.height + 20);
-	CP_Image_Draw(player_sprite, player.x -10, player.y -10, player.width + 20, player.height + 20, 255);
+	CP_Image_Draw(player_sprite, player.x -15, player.y -15, player.width + 30, player.height + 30, 255);
 
 #pragma endregion
 

@@ -124,6 +124,87 @@ void hitbox(int plat_index, int numplatcoords, platform* plt) {
 		}
 	}
 }
+
+// assigns platform horizontal hitboxes, used in hitbox function below
+void horizontalhitbox_test(int coord_index, platform* plt) {
+	if (plt->platcoords[coord_index + 1].x > plt->platcoords[coord_index].x) {		// if next coordx > current coordx
+		plt->blocks[coord_index] = (platblocks){
+			plt->platcoords[coord_index].x + 15,
+			plt->platcoords[coord_index + 1].x - 15,
+			plt->platcoords[coord_index].y - 15,
+			plt->platcoords[coord_index].y + 15,
+			(plt->platcoords[coord_index + 1].x - 15) - (plt->platcoords[coord_index].x + 15),
+			30
+		};
+	}
+	else {																			// if next coordx < current coordx
+		plt->blocks[coord_index] = (platblocks){
+			plt->platcoords[coord_index + 1].x + 15,
+			plt->platcoords[coord_index].x - 15,
+			plt->platcoords[coord_index].y - 15,
+			plt->platcoords[coord_index].y + 15,
+			(plt->platcoords[coord_index].x - 15) - (plt->platcoords[coord_index + 1].x + 15),
+			30
+		};
+	}
+}
+
+// assigns platform vertical hitboxes, used in hitbox function below
+void verticalhitbox_test(int coord_index, platform* plt) {
+	if (coord_index != plt->numcoords - 1) {										// if not last coord
+		if (plt->platcoords[coord_index + 1].y > plt->platcoords[coord_index].y) {	// if next coordy > current coordy
+			plt->blocks[coord_index] = (platblocks){
+				plt->platcoords[coord_index].x - 15,
+				plt->platcoords[coord_index].x + 15,
+				plt->platcoords[coord_index].y - 15,
+				plt->platcoords[coord_index + 1].y + 15,
+				30,
+				(plt->platcoords[coord_index + 1].y + 15) - (plt->platcoords[coord_index].y - 15)
+			};
+		}
+		else {																		// if next coordy < current coordy 
+			plt->blocks[coord_index] = (platblocks){
+				plt->platcoords[coord_index].x - 15,
+				plt->platcoords[coord_index].x + 15,
+				plt->platcoords[coord_index + 1].y - 15,
+				plt->platcoords[coord_index].y + 15,
+				30,
+				(plt->platcoords[coord_index].y + 15) - (plt->platcoords[coord_index + 1].y - 15)
+			};
+
+		}
+	}
+	else {																			// if last coord
+		plt->blocks[coord_index] = (platblocks){
+		plt->platcoords[0].x - 15,
+		plt->platcoords[coord_index].x + 15,
+		plt->platcoords[0].y - 15,
+		plt->platcoords[coord_index].y + 15,
+		30,
+		(plt->platcoords[coord_index].y + 15) - (plt->platcoords[0].y - 15)
+		};
+	}
+}
+
+//---------------------------------------------------------
+// determines all hitboxes of platforms, use in a loop with number of total platforms per level
+// e.g :
+//		for (int plat_index = 0; plat_index < numplats; plat_index++) {
+//			hitbox(plat_index, Platform[plat_index].numcoords, &Platform[plat_index]);
+//		}
+//---------------------------------------------------------
+void hitbox_test(int plat_index, int numplatcoords, platform* plt) {
+
+	for (int coord_index = 0; coord_index < Platform[plat_index].numcoords; coord_index++) {
+		if (coord_index % 2 == 0 && coord_index < Platform[plat_index].numcoords - 1) { //horizontal & not last coord
+			horizontalhitbox_test(coord_index, &Platform[plat_index]);
+		}
+		else { //vertical
+			verticalhitbox_test(coord_index, &Platform[plat_index]);
+		}
+	}
+}
+
 #pragma endregion
 
 
@@ -151,6 +232,25 @@ int collision_direction(platblocks plt, Player p) {
 	float rightcoll = plt.x2 - p.x;
 	float topcoll = py2 - plt.y1;
 	float botcoll = plt.y2 - p.y;
+
+	// return lower value for horizontal/vertical
+	float horizontal = (leftcoll < rightcoll) ? leftcoll : rightcoll;
+	float vertical = (topcoll < botcoll) ? topcoll : botcoll;
+
+	// horizontal = 1, vertical = 2
+	return (horizontal < vertical) ? 1 : 2;
+}
+
+int collision_direction_test(platblocks plt, Player p) {
+
+	// assign player center xy coordinates
+	float px = (p.x + p.width/2);
+	float py = (p.y + p.height/2);
+	// how much the player goes into the platform
+	float leftcoll = px - plt.x1;
+	float rightcoll = plt.x2 - px;
+	float topcoll = py - plt.y1;
+	float botcoll = plt.y2 - py;
 
 	// return lower value for horizontal/vertical
 	float horizontal = (leftcoll < rightcoll) ? leftcoll : rightcoll;
@@ -199,6 +299,46 @@ void CollPlatforms(int plat_index, int numplatcoords, platform plt, Player* pply
 						pply->withinx = 1;
 						// check player touching top surface of platform to exit
 						if (pply->y == Platform[plat_index].blocks[coord_index].y2 && pply->y <= Platform[plat_index].blocks[coord_index].y2 + 50) {
+							pply->leaveplatform = 1;
+						}
+					}
+
+					if ((pply->y + ply.height) == Platform[plat_index].blocks[coord_index].y1) {
+						pply->onplatform = 1; // on platform!
+					}
+					//---------------------------------------------------------
+					// two conditions to set player vertical velocity 0:
+					// 1) if player is on top of platform and travelling downwards
+					// 2) if player bumps bottom of platform and travelling upwards
+					//---------------------------------------------------------
+					if (ply.y < Platform[plat_index].blocks[coord_index].y1 && ply.movey > 0 || ply.y > Platform[plat_index].blocks[coord_index].y1 && ply.movey < 0) { pply->movey = 0; }
+
+					// end if player within x coords of platform
+				}
+				// end if colliding vertically
+			}
+			// if player is outside x coords of platform
+			// aka player is colliding from the sides
+			else pply->x = fix_collide_x(Platform[plat_index].blocks[coord_index], ply);
+		}// end if collision check
+	}
+}
+void CollPlatforms_test(int plat_index, int numplatcoords, platform plt, Player* pply, Player ply) {
+	// iterate through number of coordinates
+	for (int coord_index = 0; coord_index < Platform[plat_index].numcoords; coord_index++) {
+		// check for collision
+		if (collision(Platform[plat_index].blocks[coord_index], ply)) {
+			// check if collision is from vertical and not horizontal
+			if (collision_direction_test(Platform[plat_index].blocks[coord_index], ply) == 2) { // if colliding vertically
+				if (ply.x < Platform[plat_index].blocks[coord_index].x2 && ply.x + ply.width > Platform[plat_index].blocks[coord_index].x1) {  // if player within x coords of platform 
+
+					pply->y = fix_collide_y(Platform[plat_index].blocks[coord_index], ply);
+
+					// check player within X corners of platform
+					if (ply.x >= Platform[plat_index].blocks[coord_index].x1 && ply.x + ply.width <= Platform[plat_index].blocks[coord_index].x2) {
+						pply->withinx = 1;
+						// check player touching top surface of platform to exit
+						if (pply->y == Platform[plat_index].blocks[coord_index].y2) {
 							pply->leaveplatform = 1;
 						}
 					}

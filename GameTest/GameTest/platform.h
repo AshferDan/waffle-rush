@@ -87,6 +87,10 @@ void movement(Player* p, MoveState movestate, float speed);
 void horizontalhitbox(int coord_index, platform* plt);
 void verticalhitbox(int coord_index, platform* plt);
 void hitbox(int plat_index, int numplatcoords, platform* plt);
+
+void horizontalhitbox_test(int coord_index, platform* plt);
+void verticalhitbox_test(int coord_index, platform* plt);
+void hitbox_test(int plat_index, int numplatcoords, platform* plt);
 #pragma endregion
 
 // COLLISION LOGIC (see platform.c)
@@ -96,10 +100,13 @@ int collision(platblocks plt, Player p);
 
 int collision_direction(platblocks plt, Player p);
 
+int collision_direction_test(platblocks plt, Player p);
+
 float fix_collide_x(platblocks plt, Player p);
 float fix_collide_y(platblocks plt, Player p);
 
 void CollPlatforms(int plat_index, int numplatcoords, platform plt, Player* p, Player ply);
+void CollPlatforms_test(int plat_index, int numplatcoords, platform plt, Player* p, Player ply);
 #pragma endregion 
 
 // draw platforms
