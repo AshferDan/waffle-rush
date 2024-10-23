@@ -70,14 +70,19 @@ void Game_Init(void)
 #pragma region Initialize Platform
 
 	FILE* file = fopen("Assets/Base.txt", "r");
+	// pindex - platform index
+	// pcindex - platform coordinate index
 	int pindex = 0; int pcindex = 0;
-	int test = 0;
 	while (pindex < numplats) {
+		// coordinate ints to read
 		int x, y;
+		// scan how many coordinates
 		fscanf_s(file, "%d", &Platform[pindex].numcoords);
-
+		// for how many coordinates in platform
 		while (pcindex < Platform[pindex].numcoords) {
+			// scan coordinates
 			fscanf_s(file, "%d %d", &x, &y);
+			// assign coordinates to array
 			platform_coordinates(pindex, pcindex, x, y);
 			pcindex++;
 		}
@@ -88,14 +93,10 @@ void Game_Init(void)
 
 	// initialize all platform hitboxes
 	for (int plat_index = 0; plat_index < numplats; plat_index++) {
-		hitbox_test(plat_index, Platform[plat_index].numcoords, &Platform[plat_index]);
+		hitbox(plat_index, Platform[plat_index].numcoords, &Platform[plat_index]);
 	}
 
 #pragma endregion
-
-	//healthbar position
-	hpx1 = width / 10; hpx2 = 9 * width / 10;
-	hpy1 = 50; hpy2 = 100;
 
 	//HAZARDS
 	/*-----------------------------------------------------------------------------------------------------------*/
@@ -128,22 +129,24 @@ void Game_Update(void)
 	// MOVEMENT 
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Movement
-	// change movestate, teleport up/down
-	// 0 is platformer, 1 is inplatform, 2 is 0>1, 3 is 1>0
-
+	// change movestate
+	// OnPlat - on platform
+	// InPlat - inside platform
+	// EnterPlat - from OnPlat to InPlat
+	// ExitPlat - from InPlat to OnPlat
 	if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
 		movestate = start_transition(&player, movestate);
 		if (movestate == EnterPlat || movestate == ExitPlat) {
 			switchtime = 0;
 		}
 	}
-
+	// Transition animation
 	if (switchtime < 1) {
-		if ((movestate == EnterPlat && switchtime < 0.5) || (movestate == ExitPlat && switchtime >= 0.5)) {
-			player.movey += 800 / 60;
+		if ((movestate == EnterPlat && switchtime < 0.5f) || (movestate == ExitPlat && switchtime >= 0.5f)) {
+			player.movey += 800.0f / 60.0f;
 		}
-		if ((movestate == ExitPlat && switchtime < 0.5) || (movestate == EnterPlat && switchtime >= 0.5)) {
-			player.movey -= 800 / 60;
+		if ((movestate == ExitPlat && switchtime < 0.5f) || (movestate == EnterPlat && switchtime >= 0.5f)) {
+			player.movey -= 800.0f / 60.0f;
 		}
 		switchtime += 1.0f / 30.0f;
 	}
@@ -170,7 +173,7 @@ void Game_Update(void)
 	// collision against platforms
 	if (movestate == InPlat || movestate == OnPlat) {
 		for (int plat_index = 0; plat_index < numplats; plat_index++) {
-			CollPlatforms_test(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &player, player);
+			CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &player, player);
 		}
 	}
 	// window clamps

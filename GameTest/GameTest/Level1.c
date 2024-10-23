@@ -54,8 +54,8 @@ void L1_Init(void)
 
 	// initialize player
 	// size
-	player.width = 30;
-	player.height = 30;
+	player.width = 20;
+	player.height = 20;
 	// position
 	player.x = 150;
 	player.y = 200;
@@ -132,22 +132,24 @@ void L1_Update(void)
 	// MOVEMENT 
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Movement
-		// change movestate, teleport up/down
-	// 0 is platformer, 1 is inplatform, 2 is 0>1, 3 is 1>0
-
+	// change movestate
+	// OnPlat - on platform
+	// InPlat - inside platform
+	// EnterPlat - from OnPlat to InPlat
+	// ExitPlat - from InPlat to OnPlat
 	if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
 		movestate = start_transition(&player, movestate);
 		if (movestate == EnterPlat || movestate == ExitPlat) {
 			switchtime = 0;
 		}
 	}
-
+	// Transition animation
 	if (switchtime < 1) {
-		if ((movestate == EnterPlat && switchtime < 0.5) || (movestate == ExitPlat && switchtime >= 0.5)) {
-			player.movey += 800 / 60;
+		if ((movestate == EnterPlat && switchtime < 0.5f) || (movestate == ExitPlat && switchtime >= 0.5f)) {
+			player.movey += 800.0f / 60.0f;
 		}
-		if ((movestate == ExitPlat && switchtime < 0.5) || (movestate == EnterPlat && switchtime >= 0.5)) {
-			player.movey -= 800 / 60;
+		if ((movestate == ExitPlat && switchtime < 0.5f) || (movestate == EnterPlat && switchtime >= 0.5f)) {
+			player.movey -= 800.0f / 60.0f;
 		}
 		switchtime += 1.0f / 30.0f;
 	}
@@ -192,7 +194,6 @@ void L1_Update(void)
 		player.movey = 0;
 	}
 	
-
 #pragma endregion
 
 	// HP
@@ -230,7 +231,7 @@ void L1_Update(void)
 	}
 
 	// Player
-	CP_Image_Draw(player_sprite, player.x - 10, player.y - 10, player.width + 20, player.height + 20, 255);
+	CP_Image_Draw(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, 255);
 
 #pragma endregion
 
