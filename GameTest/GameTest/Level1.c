@@ -164,7 +164,6 @@ void L1_Update(void)
 
 	// different movement logics
 	movement(&player, movestate, speed);
-
 	// position update
 	player.x += player.movex * dt;
 	player.y += player.movey * dt;

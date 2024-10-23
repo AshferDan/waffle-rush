@@ -19,7 +19,10 @@ int start_transition(Player* ply, MoveState movestate) {
 
 void movement(Player* p, MoveState movestate, float speed) {
 	if (movestate == OnPlat) { // platformer
-		p->movex = 0; p->movey += 10;
+		p->movex = 0; 
+		if (p->movey < 550) {
+			p->movey += 10;
+		}
 		//if (CP_Input_KeyDown(KEY_W)) { pply->movey = -speed; }; //temp fly
 		if (CP_Input_KeyTriggered(KEY_SPACE) && p->onplatform == 1) { p->movey = -speed; } // jump!
 		if (CP_Input_KeyDown(KEY_A)) { p->movex = -speed; };
