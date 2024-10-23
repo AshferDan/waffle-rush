@@ -98,8 +98,6 @@ float switchtime;
 		// if player and platform hitbox collides
 		int collision(platblocks plt, Player p);
 
-		//int collision_direction_old(platblocks plt, Player p);
-
 		int collision_direction(platblocks plt, Player p);
 
 		float fix_collide_x(platblocks plt, Player p);
