@@ -17,6 +17,7 @@ void Main_Menu_Init(void)
 	//load font
 	exo = CP_Font_Load("Assets/Exo2-Regular.ttf");
 	CP_Font_Set(exo);
+	CP_Settings_TextSize(150);
 }
 
 void Main_Menu_Update(void)

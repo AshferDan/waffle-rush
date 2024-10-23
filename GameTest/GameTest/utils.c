@@ -102,7 +102,6 @@ void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const c
 	CP_Settings_Fill(CP_Color_Create(200, 60, 60, 255));
 	CP_Graphics_DrawRect(pos_x, pos_y, size_x, size_y);
 	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
-	CP_Settings_TextSize(150);
 	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
 	CP_Font_DrawText(text, pos_x, pos_y);
 }

@@ -18,6 +18,7 @@ void LSelect_Init(void)
 	exo = CP_Font_Load("Assets/Exo2-Regular.ttf");
 	CP_Font_Set(exo);
 
+	CP_Settings_TextSize(150);
 	// level struct (to implement later)
 
 	//levels[0].level_no = 1;
