@@ -42,7 +42,7 @@ void Game_Init(void)
 	hpcol = CP_Color_Create(255, 150, 150, 255); //hp colour
 
 	// initialize base speed
-	speed = 400;
+	speed = 600;
 
 	// initialize movestate
 	movestate = OnPlat;
@@ -160,7 +160,45 @@ void Game_Update(void)
 	}
 
 	// different movement logics
-	movement(&player, movestate, speed);
+	//movement(&player, movestate, speed);
+	if (movestate == OnPlat) { // platformer
+
+		/*if (!(CP_Input_KeyDown(KEY_A)) && player.movex < 0) {
+			player.movex += 50.f;
+		}
+
+		if (!(CP_Input_KeyDown(KEY_D)) && player.movex > 0) {
+			player.movex -= 50.f;
+		}*/
+		if (player.movey < 550) {
+			player.movey += 25;
+		}
+		//if (CP_Input_KeyDown(KEY_W)) { pply->movey = -speed; }; //temp fly
+		if (CP_Input_KeyTriggered(KEY_SPACE) && player.onplatform == 1) {
+			player.movey = -speed;
+		} // jump!
+		if (CP_Input_KeyDown(KEY_A) && (player.movex > -speed)) {
+			player.movex -= 50.f;
+		} else if ((player.movex < 100.f) && !(CP_Input_KeyDown(KEY_A))) {
+			player.movex += 50.f;
+		};
+		if (CP_Input_KeyDown(KEY_D) && (player.movex < speed)) {
+			player.movex += 50.f;
+		} else if ((player.movex > 100.f) && !(CP_Input_KeyDown(KEY_D))) {
+			player.movex -= 50.f;
+		};
+		if ((!((CP_Input_KeyDown(KEY_A)) || (CP_Input_KeyDown(KEY_D))) && (player.movex <= 100.f && player.movex >= -100.f))) {
+			player.movex = 0;
+		}
+	}
+	if (movestate == InPlat) { // inside platform
+		player.movex = 0; player.movey = 0;
+		if (CP_Input_KeyDown(KEY_W)) { player.movey = -speed; };
+		if (CP_Input_KeyDown(KEY_A)) { player.movex = -speed; };
+		if (CP_Input_KeyDown(KEY_S)) { player.movey = speed; };
+		if (CP_Input_KeyDown(KEY_D)) { player.movex = speed; };
+	}
+	printf("movex %f, movey %f, keydown A && movex <0 %d\n", player.movex, player.movey, player.movex>-speed);
 
 	// position update
 	player.x += player.movex * dt;

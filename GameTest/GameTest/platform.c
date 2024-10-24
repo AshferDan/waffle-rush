@@ -24,9 +24,15 @@ void movement(Player* p, MoveState movestate, float speed) {
 			p->movey += 10;
 		}
 		//if (CP_Input_KeyDown(KEY_W)) { pply->movey = -speed; }; //temp fly
-		if (CP_Input_KeyTriggered(KEY_SPACE) && p->onplatform == 1) { p->movey = -speed; } // jump!
-		if (CP_Input_KeyDown(KEY_A)) { p->movex = -speed; };
-		if (CP_Input_KeyDown(KEY_D)) { p->movex = speed; };
+		if (CP_Input_KeyTriggered(KEY_SPACE) && p->onplatform == 1) { 
+			p->movey = -speed; 
+		} // jump!
+		if (CP_Input_KeyDown(KEY_A) && (p->movex > -speed)) {
+			p->movex = -speed; 
+		};
+		if (CP_Input_KeyDown(KEY_D)) {
+			p->movex = speed; 
+		};
 	}
 	if (movestate == InPlat) { // inside platform
 		p->movex = 0; p->movey = 0;
@@ -161,17 +167,37 @@ void movement(Player* p, MoveState movestate, float speed) {
 		return (pxw >= plt.x1 && p.x <= pltx2 && pyh >= plt.y1 && p.y <= plty2);
 	}
 
+
 	// checks if collision is vertical or horizontal
+	//int collision_direction(platblocks plt, Player p) {
+
+	//	// assign player center xy coordinates
+	//	float px = (p.x + p.width/2);
+	//	float py = (p.y + p.height/2);
+	//	// how much the player goes into the platform
+	//	float leftcoll = (px - plt.x1);
+	//	float rightcoll = (plt.x2 - px);
+	//	float topcoll = (py - plt.y1);
+	//	float botcoll = (plt.y2 - py);
+
+	//	// return lower value for horizontal/vertical
+	//	float horizontal = (leftcoll < rightcoll) ? leftcoll : rightcoll;
+	//	float vertical = (topcoll < botcoll) ? topcoll : botcoll;
+
+	//	// horizontal = 1, vertical = 2
+	//	return (horizontal < vertical) ? 1 : 2;
+	//}
+
 	int collision_direction(platblocks plt, Player p) {
 
 		// assign player center xy coordinates
-		float px = (p.x + p.width/2);
-		float py = (p.y + p.height/2);
+		float px = (p.x + p.width / 2);
+		float py = (p.y + p.height / 2);
 		// how much the player goes into the platform
-		float leftcoll = (px - plt.x1);
-		float rightcoll = (plt.x2 - px);
-		float topcoll = (py - plt.y1);
-		float botcoll = (plt.y2 - py);
+		float leftcoll = (abs)((px + p.width/2) - plt.x1);
+		float rightcoll = (abs)((px - p.width) - plt.x2);
+		float topcoll = (abs)((py + p.height/2) - plt.y1);
+		float botcoll = (abs)(plt.y2 - (py - p.height/2));
 
 		// return lower value for horizontal/vertical
 		float horizontal = (leftcoll < rightcoll) ? leftcoll : rightcoll;
