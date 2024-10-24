@@ -68,6 +68,10 @@ void movement(Player* p, MoveState movestate, float speed) {
 		Platform[plat_index].platcoords[coord_index] = (coords){ x,y };
 	}
 
+	void platform_onblocks(int plat_index, int block_index, float x1, float y1, float x2, float y2) {
+		Platform[plat_index].onblocks[block_index] = (platblocks){ x1-15, x2+15, y1-15, y2+15, (x2+15) - (x1-15), (y2+15) - (y1-15) };
+	}
+
 	/*void platblock_coordinates(int plat_index, int block_index, platform* plt, float x, float y) {
 		plt[plat_index].onblocks[block_index]->x1 = x;
 	}*/
@@ -272,6 +276,9 @@ void movement(Player* p, MoveState movestate, float speed) {
 				// aka player is colliding from the sides
 				else 
 					pply->x = fix_collide_x(Platform[plat_index].inblocks[coord_index], ply);
+				if (collision_direction(Platform[plat_index].inblocks[coord_index], ply) == 1) {
+					pply->movex = 0;
+				}
 			}// end if collision check
 		}
 	}
@@ -287,12 +294,8 @@ void movement(Player* p, MoveState movestate, float speed) {
 						pply->y = fix_collide_y(Platform[plat_index].onblocks[block_index], ply);
 
 						// check player within X corners of platform
-						if (ply.x >= Platform[plat_index].onblocks[block_index].x1 && ply.x + ply.width <= Platform[plat_index].onblocks[block_index].x2) {
+						if (ply.x >= Platform[plat_index].onblocks[block_index].x1+30 && ply.x + ply.width <= Platform[plat_index].onblocks[block_index].x2-30) {
 							pply->withinx = 1;
-							// check player touching top surface of platform to exit
-							if (pply->y == Platform[plat_index].onblocks[block_index].y2) {
-								pply->leaveplatform = 1;
-							}
 						}
 
 						if ((pply->y + ply.height) == Platform[plat_index].onblocks[block_index].y1) {
@@ -311,8 +314,11 @@ void movement(Player* p, MoveState movestate, float speed) {
 				}
 				// if player is outside x coords of platform
 				// aka player is colliding from the sides
-				else
-					pply->x = fix_collide_x(Platform[plat_index].onblocks[block_index], ply);
+				else pply->x = fix_collide_x(Platform[plat_index].onblocks[block_index], ply);
+				if (collision_direction(Platform[plat_index].onblocks[block_index], ply) == 1) {
+					pply->movex = 0;
+				}
+				
 			}// end if collision check
 		}
 	}

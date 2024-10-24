@@ -18,6 +18,8 @@ MoveState movestate;
 
 float switchtime;
 
+int numplats;
+
 
 // STRUCTS --------------------------------------------
 #pragma region Structs
@@ -93,8 +95,8 @@ float switchtime;
 	#pragma region Hitboxes
 		// assign platform coordinates
 		void platform_coordinates(int plat_index, int coord_index, float x, float y);
-		// assign platblock coordinates
-		void platblock_coordinates(int plat_index, int coord_index, float x, float y);
+		// assign onblock coordinates
+		void platform_onblocks(int plat_index, int block_index, float x1, float y1, float x2, float y2);
 		// initialize horizontal hitbox
 		void horizontalhitbox(int coord_index, platform* plt);
 		// initialize vertical hitbox

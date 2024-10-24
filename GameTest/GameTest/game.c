@@ -21,7 +21,6 @@ CP_Font text;
 CP_Image player_sprite;
 
 hazard traps[100];
-int numplats = 2;
 
 void Game_Init(void)
 {
@@ -68,6 +67,7 @@ void Game_Init(void)
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
+	numplats = 2;
 
 	FILE* file = fopen("Assets/Base.txt", "r");
 	// pindex - platform index
@@ -91,12 +91,14 @@ void Game_Init(void)
 		while (pcindex < Platform[pindex].numblocks) {
 			int x1, y1, x2, y2;
 			fscanf_s(file, "%d %d %d %d", &x1, &y1, &x2, &y2);
-			Platform[pindex].onblocks[pcindex].x1 = x1-15;
+			/*Platform[pindex].onblocks[pcindex].x1 = x1-15;
 			Platform[pindex].onblocks[pcindex].y1 = y1-15;
 			Platform[pindex].onblocks[pcindex].x2 = x2+15;
 			Platform[pindex].onblocks[pcindex].y2 = y2+15;
 			Platform[pindex].onblocks[pcindex].w = Platform[pindex].onblocks[pcindex].x2 - Platform[pindex].onblocks[pcindex].x1;
 			Platform[pindex].onblocks[pcindex].h = Platform[pindex].onblocks[pcindex].y2 - Platform[pindex].onblocks[pcindex].y1;
+			pcindex++;*/
+			platform_onblocks(pindex, pcindex, x1, y1, x2, y2);
 			pcindex++;
 		}
 		pcindex = 0;
@@ -175,18 +177,11 @@ void Game_Update(void)
 	// different movement logics
 	//movement(&player, movestate, speed);
 	if (movestate == OnPlat) { // platformer
-
-		/*if (!(CP_Input_KeyDown(KEY_A)) && player.movex < 0) {
-			player.movex += 50.f;
-		}
-
-		if (!(CP_Input_KeyDown(KEY_D)) && player.movex > 0) {
-			player.movex -= 50.f;
-		}*/
-		if (player.movey < 550) {
+		
+		if (player.movey < 1000) {
 			player.movey += 25;
 		}
-		//if (CP_Input_KeyDown(KEY_W)) { pply->movey = -speed; }; //temp fly
+		//if (CP_Input_KeyDown(KEY_W)) { player.movey = -speed; }; //temp fly
 		if (CP_Input_KeyTriggered(KEY_SPACE) && player.onplatform == 1) {
 			player.movey = -speed;
 		} // jump!
@@ -222,17 +217,17 @@ void Game_Update(void)
 	player.withinx = 0;
 	player.leaveplatform = 0;
 	// collision against platforms
-	/*if (movestate == OnPlat) {
+	if (movestate == OnPlat) {
 		for (int plat_index = 0; plat_index < numplats; plat_index++) {
 			CollOnPlatforms(plat_index,Platform[plat_index], &player, player);
 		}
-	}*/
+	}
 
-	//else if (movestate == InPlat) {
+	else if (movestate == InPlat) {
 		for (int plat_index = 0; plat_index < numplats; plat_index++) {
 			CollPlatforms(plat_index, Platform[plat_index], &player, player);
 		}
-	//}
+	}
 	// window clamps
 	player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
 	if (player.y + player.height > height || player.y<0) {

@@ -23,8 +23,6 @@ CP_Image player_sprite;
 hazard traps[100];
 int numberoftraps;
 
-int numplats1 = 4;
-
 void L1_Init(void)
 {
 	// load font
@@ -70,22 +68,36 @@ void L1_Init(void)
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
+	numplats = 4;
 
 	FILE* file = fopen("Assets/Level1.txt", "r");
 	// pindex - platform index
 	// pcindex - platform coordinate index
 	int pindex = 0; int pcindex = 0;
-	while (pindex < numplats1) {
+	while (pindex < numplats) {
 		// coordinate ints to read
-		int x, y;
 		// scan how many coordinates
 		fscanf_s(file, "%d", &Platform[pindex].numcoords);
 		// for how many coordinates in platform
 		while (pcindex < Platform[pindex].numcoords) {
+			int x, y;
 			// scan coordinates
 			fscanf_s(file, "%d %d", &x, &y);
 			// assign coordinates to array
 			platform_coordinates(pindex, pcindex, x, y);
+			pcindex++;
+		}
+		pcindex = 0;
+		fscanf_s(file, "%d", &Platform[pindex].numblocks);
+		while (pcindex < Platform[pindex].numblocks) {
+			int x1, y1, x2, y2;
+			fscanf_s(file, "%d %d %d %d", &x1, &y1, &x2, &y2);
+			Platform[pindex].onblocks[pcindex].x1 = x1 - 15;
+			Platform[pindex].onblocks[pcindex].y1 = y1 - 15;
+			Platform[pindex].onblocks[pcindex].x2 = x2 + 15;
+			Platform[pindex].onblocks[pcindex].y2 = y2 + 15;
+			Platform[pindex].onblocks[pcindex].w = Platform[pindex].onblocks[pcindex].x2 - Platform[pindex].onblocks[pcindex].x1;
+			Platform[pindex].onblocks[pcindex].h = Platform[pindex].onblocks[pcindex].y2 - Platform[pindex].onblocks[pcindex].y1;
 			pcindex++;
 		}
 		pcindex = 0;
@@ -94,7 +106,7 @@ void L1_Init(void)
 	fclose(file);
 
 	// initialize all platform hitboxes
-	for (int plat_index = 0; plat_index < numplats1; plat_index++) {
+	for (int plat_index = 0; plat_index < numplats; plat_index++) {
 		hitbox(plat_index, Platform[plat_index].numcoords, &Platform[plat_index]);
 	}
 
@@ -174,7 +186,7 @@ void L1_Update(void)
 	player.leaveplatform = 0;
 	// collision against platforms
 	if (movestate == InPlat || movestate == OnPlat) {
-		for (int plat_index = 0; plat_index < numplats1; plat_index++) {
+		for (int plat_index = 0; plat_index < numplats; plat_index++) {
 			CollPlatforms(plat_index, Platform[plat_index], &player, player);
 		}
 	}
@@ -210,7 +222,7 @@ void L1_Update(void)
 
 	// Platforms
 	CP_Settings_Fill(hpcol);
-	for (int i = 0; i < numplats1; i++) {
+	for (int i = 0; i < numplats; i++) {
 		DrawPlatform(i);
 	}
 
