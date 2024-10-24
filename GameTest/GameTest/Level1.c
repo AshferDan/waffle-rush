@@ -13,7 +13,7 @@
 
 #include "Level1.h"
 
-CP_Color bg, red, green, hpcol; //colors
+CP_Color bg, red, green, hpcol, button_color; //colors
 float speed; //speed
 float width, height; //window width/height
 float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
@@ -93,8 +93,12 @@ void L1_Init(void)
 
 void L1_Update(void)
 {
+	//button color
+	button_color = CP_Color_Create(200, 60, 60, 255);
+
 	// background
 	CP_Graphics_ClearBackground(bg);
+
 	// getdt
 	float dt = CP_System_GetDt();
 
@@ -194,6 +198,49 @@ void L1_Update(void)
 	if (AreSquaresIntersecting(p.x,p.y,p.height,p.width,1520,250,50,50)) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
 		CP_Font_DrawText("Yippie!", 1300, 50);
+	}
+
+#pragma region KBoverlay
+
+	CP_Settings_TextSize(25);
+	TextBoxCreate(100, 50, 25, 25, "W", button_color);
+	if (CP_Input_KeyDown(KEY_W)) {
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 80)); //highlight button
+		CP_Graphics_DrawRect(100,50,25,25);
+	}
+	TextBoxCreate(50, 100, 25, 25, "A", button_color);
+	if (CP_Input_KeyDown(KEY_A)) {
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 80)); //highlight button
+		CP_Graphics_DrawRect(50, 100, 25, 25);
+	}
+	TextBoxCreate(100, 100, 25, 25, "S", button_color);
+	if (CP_Input_KeyDown(KEY_S)) {
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 80)); //highlight button
+		CP_Graphics_DrawRect(100, 100, 25, 25);
+	}
+	TextBoxCreate(150, 100, 25, 25, "D", button_color);
+	if (CP_Input_KeyDown(KEY_D)) {
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 80)); //highlight button
+		CP_Graphics_DrawRect(150, 100, 25, 25);
+	}
+	TextBoxCreate(150, 50, 25, 25, "E", button_color);
+	if (CP_Input_KeyDown(KEY_E)) {
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 80)); //highlight button
+		CP_Graphics_DrawRect(150, 50, 25, 25);
+	}
+	TextBoxCreate(300, 100, 100, 25, "", button_color);
+	if (CP_Input_KeyDown(KEY_SPACE)) {
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 80)); //highlight button
+		CP_Graphics_DrawRect(300, 100, 100, 25);
+	}
+
+#pragma endregion
+
+
+	// HAZARD DRAWING
+	for (int i = 0; i < numberoftraps; ++i) {
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
+		CP_Graphics_DrawTriangle(traps[i].x[0], traps[i].y[0], traps[i].x[1], traps[i].y[1], traps[i].x[2], traps[i].y[2]);
 	}
 
 	// Player

@@ -84,9 +84,9 @@ int AreSquaresIntersecting(float s1_x, float s1_y, float s1_w, float s1_h, float
 // size_x - width of box
 // size_y - height of box
 //
-void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const char* text) {
+void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const char* text, CP_Color color) {
 	CP_Settings_RectMode(CP_POSITION_CENTER);
-	CP_Settings_Fill(CP_Color_Create(200, 60, 60, 255));
+	CP_Settings_Fill(color);
 	CP_Graphics_DrawRect(pos_x, pos_y, size_x, size_y);
 	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
 	CP_Settings_TextSize(150);
