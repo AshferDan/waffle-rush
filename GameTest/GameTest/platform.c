@@ -68,11 +68,14 @@ void movement(Player* p, MoveState movestate, float speed) {
 		Platform[plat_index].platcoords[coord_index] = (coords){ x,y };
 	}
 
+	/*void platblock_coordinates(int plat_index, int block_index, platform* plt, float x, float y) {
+		plt[plat_index].onblocks[block_index]->x1 = x;
+	}*/
 	// assigns platform horizontal hitboxes, used in hitbox function below
 	void horizontalhitbox(int coord_index, platform* plt) {
 		// Left to right
 		if (plt->platcoords[coord_index + 1].x > plt->platcoords[coord_index].x) {		// if next coordx > current coordx
-			plt->blocks[coord_index] = (platblocks){
+			plt->inblocks[coord_index] = (platblocks){
 				plt->platcoords[coord_index].x + 15,
 				plt->platcoords[coord_index + 1].x - 15,
 				plt->platcoords[coord_index].y - 15,
@@ -83,7 +86,7 @@ void movement(Player* p, MoveState movestate, float speed) {
 		}
 		// Right to left
 		else {																			// if next coordx < current coordx
-			plt->blocks[coord_index] = (platblocks){
+			plt->inblocks[coord_index] = (platblocks){
 				plt->platcoords[coord_index + 1].x + 15,
 				plt->platcoords[coord_index].x - 15,
 				plt->platcoords[coord_index].y - 15,
@@ -99,7 +102,7 @@ void movement(Player* p, MoveState movestate, float speed) {
 		// Top to bottom
 		if (coord_index != plt->numcoords - 1) {
 			if (plt->platcoords[coord_index + 1].y > plt->platcoords[coord_index].y) {	
-				plt->blocks[coord_index] = (platblocks){
+				plt->inblocks[coord_index] = (platblocks){
 					plt->platcoords[coord_index].x - 15,
 					plt->platcoords[coord_index].x + 15,
 					plt->platcoords[coord_index].y - 15,
@@ -110,7 +113,7 @@ void movement(Player* p, MoveState movestate, float speed) {
 			}
 		// Bottom to top
 			else {
-				plt->blocks[coord_index] = (platblocks){
+				plt->inblocks[coord_index] = (platblocks){
 					plt->platcoords[coord_index].x - 15,
 					plt->platcoords[coord_index].x + 15,
 					plt->platcoords[coord_index + 1].y - 15,
@@ -123,7 +126,7 @@ void movement(Player* p, MoveState movestate, float speed) {
 		}
 		// Last coordinate
 		else {
-			plt->blocks[coord_index] = (platblocks){
+			plt->inblocks[coord_index] = (platblocks){
 			plt->platcoords[0].x - 15,
 			plt->platcoords[coord_index].x + 15,
 			plt->platcoords[0].y - 15,
@@ -167,7 +170,6 @@ void movement(Player* p, MoveState movestate, float speed) {
 		return (pxw >= plt.x1 && p.x <= pltx2 && pyh >= plt.y1 && p.y <= plty2);
 	}
 
-
 	// checks if collision is vertical or horizontal
 	//int collision_direction(platblocks plt, Player p) {
 
@@ -188,6 +190,7 @@ void movement(Player* p, MoveState movestate, float speed) {
 	//	return (horizontal < vertical) ? 1 : 2;
 	//}
 
+
 	int collision_direction(platblocks plt, Player p) {
 
 		// assign player center xy coordinates
@@ -207,6 +210,7 @@ void movement(Player* p, MoveState movestate, float speed) {
 		return (horizontal < vertical) ? 1 : 2;
 	}
 
+
 	// fix x position
 	float fix_collide_x(platblocks plt, Player p) {
 		if (p.x + p.width / 2 < plt.x1 + plt.w / 2) { // is player left of platform
@@ -217,7 +221,7 @@ void movement(Player* p, MoveState movestate, float speed) {
 
 	// fix y position
 	float fix_collide_y(platblocks plt, Player p) {
-		if (p.y + p.height / 2 < plt.y1) { // is player above platform
+		if (p.y + p.height / 2 < plt.y1+plt.h/2) { // is player above platform
 			return plt.y1 - p.height; // throw up of platform
 		}
 		return plt.y2; // throw bottom of platform
@@ -230,27 +234,27 @@ void movement(Player* p, MoveState movestate, float speed) {
 	//			CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &pply, pply);
 	//		}
 	//---------------------------------------------------------
-	void CollPlatforms(int plat_index, int numplatcoords, platform plt, Player* pply, Player ply) {
+	void CollPlatforms(int plat_index, platform plt, Player* pply, Player ply) {
 		// iterate through number of coordinates
 		for (int coord_index = 0; coord_index < Platform[plat_index].numcoords; coord_index++) {
 			// check for collision
-			if (collision(Platform[plat_index].blocks[coord_index], ply)) {
+			if (collision(Platform[plat_index].inblocks[coord_index], ply)) {
 				// check if collision is from vertical and not horizontal
-				if (collision_direction(Platform[plat_index].blocks[coord_index], ply) == 2) { // if colliding vertically
-					if (ply.x < Platform[plat_index].blocks[coord_index].x2 && ply.x + ply.width > Platform[plat_index].blocks[coord_index].x1) {  // if player within x coords of platform 
+				if (collision_direction(Platform[plat_index].inblocks[coord_index], ply) == 2) { // if colliding vertically
+					if (ply.x < Platform[plat_index].inblocks[coord_index].x2 && ply.x + ply.width > Platform[plat_index].inblocks[coord_index].x1) {  // if player within x coords of platform 
 
-						pply->y = fix_collide_y(Platform[plat_index].blocks[coord_index], ply);
+						pply->y = fix_collide_y(Platform[plat_index].inblocks[coord_index], ply);
 
 						// check player within X corners of platform
-						if (ply.x >= Platform[plat_index].blocks[coord_index].x1 && ply.x + ply.width <= Platform[plat_index].blocks[coord_index].x2) {
+						if (ply.x >= Platform[plat_index].inblocks[coord_index].x1 && ply.x + ply.width <= Platform[plat_index].inblocks[coord_index].x2) {
 							pply->withinx = 1;
 							// check player touching top surface of platform to exit
-							if (pply->y == Platform[plat_index].blocks[coord_index].y2) {
+							if (pply->y == Platform[plat_index].inblocks[coord_index].y2) {
 								pply->leaveplatform = 1;
 							}
 						}
 
-						if ((pply->y + ply.height) == Platform[plat_index].blocks[coord_index].y1) {
+						if ((pply->y + ply.height) == Platform[plat_index].inblocks[coord_index].y1) {
 							pply->onplatform = 1; // on platform!
 						}
 						//---------------------------------------------------------
@@ -258,7 +262,7 @@ void movement(Player* p, MoveState movestate, float speed) {
 						// 1) if player is on top of platform and travelling downwards
 						// 2) if player bumps bottom of platform and travelling upwards
 						//---------------------------------------------------------
-						if (ply.y < Platform[plat_index].blocks[coord_index].y1 && ply.movey > 0 || ply.y > Platform[plat_index].blocks[coord_index].y1 && ply.movey < 0) { pply->movey = 0; }
+						if (ply.y < Platform[plat_index].inblocks[coord_index].y1 && ply.movey > 0 || ply.y > Platform[plat_index].inblocks[coord_index].y1 && ply.movey < 0) { pply->movey = 0; }
 
 						// end if player within x coords of platform
 					}
@@ -266,7 +270,49 @@ void movement(Player* p, MoveState movestate, float speed) {
 				}
 				// if player is outside x coords of platform
 				// aka player is colliding from the sides
-				else pply->x = fix_collide_x(Platform[plat_index].blocks[coord_index], ply);
+				else 
+					pply->x = fix_collide_x(Platform[plat_index].inblocks[coord_index], ply);
+			}// end if collision check
+		}
+	}
+	void CollOnPlatforms(int plat_index, platform plt, Player* pply, Player ply) {
+		// iterate through number of coordinates
+		for (int block_index = 0; block_index < Platform[plat_index].numblocks; block_index++) {
+			// check for collision
+			if (collision(Platform[plat_index].onblocks[block_index], ply)) {
+				// check if collision is from vertical and not horizontal
+				if (collision_direction(Platform[plat_index].onblocks[block_index], ply) == 2) { // if colliding vertically
+					if (ply.x < Platform[plat_index].onblocks[block_index].x2 && ply.x + ply.width > Platform[plat_index].onblocks[block_index].x1) {  // if player within x coords of platform 
+
+						pply->y = fix_collide_y(Platform[plat_index].onblocks[block_index], ply);
+
+						// check player within X corners of platform
+						if (ply.x >= Platform[plat_index].onblocks[block_index].x1 && ply.x + ply.width <= Platform[plat_index].onblocks[block_index].x2) {
+							pply->withinx = 1;
+							// check player touching top surface of platform to exit
+							if (pply->y == Platform[plat_index].onblocks[block_index].y2) {
+								pply->leaveplatform = 1;
+							}
+						}
+
+						if ((pply->y + ply.height) == Platform[plat_index].onblocks[block_index].y1) {
+							pply->onplatform = 1; // on platform!
+						}
+						//---------------------------------------------------------
+						// two conditions to set player vertical velocity 0:
+						// 1) if player is on top of platform and travelling downwards
+						// 2) if player bumps bottom of platform and travelling upwards
+						//---------------------------------------------------------
+						if (ply.y < Platform[plat_index].onblocks[block_index].y1 && ply.movey > 0 || ply.y > Platform[plat_index].onblocks[block_index].y1 && ply.movey < 0) { pply->movey = 0; }
+
+						// end if player within x coords of platform
+					}
+					// end if colliding vertically
+				}
+				// if player is outside x coords of platform
+				// aka player is colliding from the sides
+				else
+					pply->x = fix_collide_x(Platform[plat_index].onblocks[block_index], ply);
 			}// end if collision check
 		}
 	}

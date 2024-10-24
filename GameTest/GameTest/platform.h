@@ -24,25 +24,33 @@ float switchtime;
 
 	// Platform Struct
 	#pragma region Platform Structs
+		// InPlat
 		// coordinate struct
 		typedef struct coords {
 			float x, y;
 		} coords;
+
 		// platform hitbox struct
 		typedef struct platblocks {
 			float x1, x2, y1, y2, w, h;
 		} platblocks;
 
+
 		// platform struct
 		typedef struct platform {
 			int numcoords;
+			int numblocks;
 			coords platcoords[max_coords];
-			platblocks blocks[max_coords];
+			platblocks inblocks[max_coords];
+			platblocks onblocks[max_coords];
 		} platform;
 
 		// platform array
 		platform Platform[max_platforms];
+
+		// coordinate struct
 	#pragma endregion Platform Structs
+
 
 
 	// Player Struct
@@ -85,6 +93,8 @@ float switchtime;
 	#pragma region Hitboxes
 		// assign platform coordinates
 		void platform_coordinates(int plat_index, int coord_index, float x, float y);
+		// assign platblock coordinates
+		void platblock_coordinates(int plat_index, int coord_index, float x, float y);
 		// initialize horizontal hitbox
 		void horizontalhitbox(int coord_index, platform* plt);
 		// initialize vertical hitbox
@@ -103,7 +113,9 @@ float switchtime;
 		float fix_collide_x(platblocks plt, Player p);
 		float fix_collide_y(platblocks plt, Player p);
 
-		void CollPlatforms(int plat_index, int numplatcoords, platform plt, Player* p, Player ply);
+		void CollPlatforms(int plat_index, platform plt, Player* p, Player ply);
+
+		void CollOnPlatforms(int plat_index, platform plt, Player* p, Player ply);
 	#pragma endregion 
 
 	// draw platforms

@@ -75,15 +75,28 @@ void Game_Init(void)
 	int pindex = 0; int pcindex = 0;
 	while (pindex < numplats) {
 		// coordinate ints to read
-		int x, y;
 		// scan how many coordinates
 		fscanf_s(file, "%d", &Platform[pindex].numcoords);
 		// for how many coordinates in platform
 		while (pcindex < Platform[pindex].numcoords) {
+			int x, y;
 			// scan coordinates
 			fscanf_s(file, "%d %d", &x, &y);
 			// assign coordinates to array
 			platform_coordinates(pindex, pcindex, x, y);
+			pcindex++;
+		}
+		pcindex = 0;
+		fscanf_s(file, "%d", &Platform[pindex].numblocks);
+		while (pcindex < Platform[pindex].numblocks) {
+			int x1, y1, x2, y2;
+			fscanf_s(file, "%d %d %d %d", &x1, &y1, &x2, &y2);
+			Platform[pindex].onblocks[pcindex].x1 = x1-15;
+			Platform[pindex].onblocks[pcindex].y1 = y1-15;
+			Platform[pindex].onblocks[pcindex].x2 = x2+15;
+			Platform[pindex].onblocks[pcindex].y2 = y2+15;
+			Platform[pindex].onblocks[pcindex].w = Platform[pindex].onblocks[pcindex].x2 - Platform[pindex].onblocks[pcindex].x1;
+			Platform[pindex].onblocks[pcindex].h = Platform[pindex].onblocks[pcindex].y2 - Platform[pindex].onblocks[pcindex].y1;
 			pcindex++;
 		}
 		pcindex = 0;
@@ -193,12 +206,12 @@ void Game_Update(void)
 	}
 	if (movestate == InPlat) { // inside platform
 		player.movex = 0; player.movey = 0;
-		if (CP_Input_KeyDown(KEY_W)) { player.movey = -speed; };
-		if (CP_Input_KeyDown(KEY_A)) { player.movex = -speed; };
-		if (CP_Input_KeyDown(KEY_S)) { player.movey = speed; };
-		if (CP_Input_KeyDown(KEY_D)) { player.movex = speed; };
+		if (CP_Input_KeyDown(KEY_W)) { player.movey = -speed/2; };
+		if (CP_Input_KeyDown(KEY_A)) { player.movex = -speed/2; };
+		if (CP_Input_KeyDown(KEY_S)) { player.movey = speed/2; };
+		if (CP_Input_KeyDown(KEY_D)) { player.movex = speed/2; };
 	}
-	printf("movex %f, movey %f, keydown A && movex <0 %d\n", player.movex, player.movey, player.movex>-speed);
+	printf("movex %f, movexdt %f, movey %f, moveydt %f\n", player.movex, player.movex * dt, player.movey, player.movey * dt);
 
 	// position update
 	player.x += player.movex * dt;
@@ -209,11 +222,17 @@ void Game_Update(void)
 	player.withinx = 0;
 	player.leaveplatform = 0;
 	// collision against platforms
-	if (movestate == InPlat || movestate == OnPlat) {
+	/*if (movestate == OnPlat) {
 		for (int plat_index = 0; plat_index < numplats; plat_index++) {
-			CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &player, player);
+			CollOnPlatforms(plat_index,Platform[plat_index], &player, player);
 		}
-	}
+	}*/
+
+	//else if (movestate == InPlat) {
+		for (int plat_index = 0; plat_index < numplats; plat_index++) {
+			CollPlatforms(plat_index, Platform[plat_index], &player, player);
+		}
+	//}
 	// window clamps
 	player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
 	if (player.y + player.height > height || player.y<0) {
@@ -249,6 +268,13 @@ void Game_Update(void)
 	for (int i = 0; i < numplats; i++) {
 		DrawPlatform(i);
 	}
+
+	/*for (int i = 0; i < numplats; i++) {
+		for (int j = 0; j < Platform[i].numblocks; j++) {
+			CP_Graphics_DrawRect(Platform[i].onblocks[j].x1, Platform[i].onblocks[j].y1, Platform[i].onblocks[j].w, Platform[i].onblocks[j].h);
+		}
+	}*/
+
 
 	// HAZARD DRAWING
 	CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));

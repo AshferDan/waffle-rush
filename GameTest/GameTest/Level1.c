@@ -175,7 +175,7 @@ void L1_Update(void)
 	// collision against platforms
 	if (movestate == InPlat || movestate == OnPlat) {
 		for (int plat_index = 0; plat_index < numplats1; plat_index++) {
-			CollPlatforms(plat_index, Platform[plat_index].numcoords, Platform[plat_index], &player, player);
+			CollPlatforms(plat_index, Platform[plat_index], &player, player);
 		}
 	}
 	// window clamps
