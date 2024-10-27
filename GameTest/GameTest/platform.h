@@ -16,8 +16,6 @@ typedef enum MoveState {
 
 MoveState movestate;
 
-float switchtime;
-
 int numplats;
 
 
@@ -37,14 +35,42 @@ int numplats;
 			float x1, x2, y1, y2, w, h;
 		} platblocks;
 
-
 		// platform struct
+			//---------------------------------------------------------
+			// Platforms are constructed by two parts: InPlat and OnPlat "hitboxes"
+			// InPlat: The hitboxes are constructed by walls based on coordinates
+				// The first hitbox is always horizontal
+				// For horizontal hitboxes:
+				//	Offset -15 for both left and right
+				//	Offset +15 for both top and bottom
+				// For vertical hitboxes:
+				//	Offset +15 for both left and right
+				//	Offset +15 for both top and bottom
+				// This ensures the collision logic will not have conflicts when corners are touched by the player
+			// OnPlat: The hitboxes are constructed by larger blocks, this is to prevent the
+			//		   higher speed in OnPlat movestate from making the player sink into the platform
+				// The platforms are constructed as a series of vertical blocks
+			// 
+			// Text file format:
+				// Number of platforms in a level (e.g 2)
+					// Number of coordinates for platform (e.g 6)
+						// Coordinate x and y values, starting from a top left point, going in clockwise manner
+					// coord1_x coord1_y
+					// coord2_x coord2_y
+					// ...
+					// coord6_x coord6_y
+					// 
+					// Number of blocks for platform (e.g 2)
+						// Coordinates x1 y1 x2 y2, where x1 y1 is the top left, and x2 y2 is the bottom right
+					// block1_x1 block1_y1 block1_x2 block1_y2
+				// Repeat entering coordinates for all platforms
+			//---------------------------------------------------------
 		typedef struct platform {
-			int numcoords;
-			int numblocks;
-			coords platcoords[max_coords];
-			platblocks inblocks[max_coords];
-			platblocks onblocks[max_coords];
+			int numcoords; // Number of coordinates in a platform
+			int numblocks; // Number of blocks that make up the platform
+			coords platcoords[max_coords]; // Array of coords struct
+			platblocks inblocks[max_coords]; // Wall hitboxes
+			platblocks onblocks[max_coords]; // Big block hitboxes
 		} platform;
 
 		// platform array
@@ -63,9 +89,9 @@ int numplats;
 			float movex; //movex
 			float movey; //movey
 			float hp; //health (NOTE: change to lives)
-			float width;
-			float height;
-			float speed;
+			float width; //width
+			float height; //height
+			float transition_time;
 			int onplatform;
 			int withinx;
 			int leaveplatform;
@@ -86,9 +112,9 @@ int numplats;
 	#pragma region Movement and movestate
 		// set movestate
 		int start_transition(Player* ply, MoveState movestate);
-
+		MoveState transition(Player* ply, MoveState, float dt);
 		// platformer and in platform movements
-		void movement(Player* p, MoveState movestate, float speed);
+		void movement(Player* p, MoveState movestate, float speed, float dt);
 		#pragma endregion
 
 	// HITBOX LOGIC (see platform.c)

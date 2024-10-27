@@ -12,6 +12,7 @@
 #include "cprocessing.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 
 // check if position is within a rectangle

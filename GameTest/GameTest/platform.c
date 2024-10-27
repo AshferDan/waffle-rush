@@ -14,32 +14,85 @@ int start_transition(Player* ply, MoveState movestate) {
 		movestate = ExitPlat;
 		ply->movex = 0;
 	}
+	if (movestate == EnterPlat || movestate == ExitPlat) {
+		ply->transition_time = 0;
+	}
 	return movestate;
 }
 
-void movement(Player* p, MoveState movestate, float speed) {
-	if (movestate == OnPlat) { // platformer
-		p->movex = 0; 
-		if (p->movey < 550) {
-			p->movey += 10;
+MoveState transition(Player* ply, MoveState movestate, float dt) {
+
+	// Alter player y value while transitioning
+	if (ply->transition_time < 1) {
+		// For first half of transition time, increase speed, else reduce speed
+		ply->movey = (ply->transition_time < 0.5f) ? 400 * ply->transition_time : 400.0f - 400 * ply->transition_time;
+
+		// If entering platform, += speed
+		if ((movestate == EnterPlat)) {
+			ply->y += ply->movey * dt;
 		}
-		//if (CP_Input_KeyDown(KEY_W)) { pply->movey = -speed; }; //temp fly
-		if (CP_Input_KeyTriggered(KEY_SPACE) && p->onplatform == 1) { 
-			p->movey = -speed; 
-		} // jump!
-		if (CP_Input_KeyDown(KEY_A) && (p->movex > -speed)) {
-			p->movex = -speed; 
+		// If exiting platform, -= speed
+		if ((movestate == ExitPlat)) {
+			ply->y -= ply->movey * dt;
+		}
+		// Update transit timer such that timer completes in 0.5s
+		ply->transition_time += 2 * dt;
+	}
+
+	// End of transitioning, return movestate to continue movement
+	if (ply->transition_time >= 1) {
+		if (movestate == EnterPlat) {
+			return InPlat;
+		}
+		if (movestate == ExitPlat) {
+			return OnPlat;
+		}
+	}
+	return movestate;
+}
+
+void movement(Player* ply, MoveState movestate, float speed, float dt) {
+	float accel = 3000.0f;
+	if (movestate == OnPlat) { // platformer
+
+		// Gravity and terminal velocity
+		if (ply->movey < 1000.0f) {
+			ply->movey += 1800.0f * dt;
+		}
+		// jump!
+		if (CP_Input_KeyTriggered(KEY_SPACE) && ply->onplatform == 1) {
+			ply->movey = -speed;
+		}
+		// left
+		if (CP_Input_KeyDown(KEY_A) && (ply->movex > -speed)) {
+			ply->movex -= accel * dt;
+		}
+		else if ((ply->movex < 100.f) && !(CP_Input_KeyDown(KEY_A))) {
+			ply->movex += accel * dt;
 		};
-		if (CP_Input_KeyDown(KEY_D)) {
-			p->movex = speed; 
+		// right
+		if (CP_Input_KeyDown(KEY_D) && (ply->movex < speed)) {
+			ply->movex += accel * dt;
+		}
+		else if ((ply->movex > 100.f) && !(CP_Input_KeyDown(KEY_D))) {
+			ply->movex -= accel * dt;
 		};
+		if ((!((CP_Input_KeyDown(KEY_A)) || (CP_Input_KeyDown(KEY_D))) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
+			ply->movex = 0;
+		}
 	}
 	if (movestate == InPlat) { // inside platform
-		p->movex = 0; p->movey = 0;
-		if (CP_Input_KeyDown(KEY_W)) { p->movey = -speed; };
-		if (CP_Input_KeyDown(KEY_A)) { p->movex = -speed; };
-		if (CP_Input_KeyDown(KEY_S)) { p->movey = speed; };
-		if (CP_Input_KeyDown(KEY_D)) { p->movex = speed; };
+		ply->movex = 0; ply->movey = 0;
+		if (CP_Input_KeyDown(KEY_W)) { ply->movey = -speed / 2; };
+		if (CP_Input_KeyDown(KEY_A)) { ply->movex = -speed / 2; };
+		if (CP_Input_KeyDown(KEY_S)) { ply->movey = speed / 2; };
+		if (CP_Input_KeyDown(KEY_D)) { ply->movex = speed / 2; };
+	}
+
+	// Update movestate if InPlat/OnPlat
+	if (movestate == InPlat || movestate == OnPlat) {
+		ply->x += ply->movex * dt;
+		ply->y += ply->movey * dt;
 	}
 }
 #pragma endregion
@@ -175,25 +228,6 @@ void movement(Player* p, MoveState movestate, float speed) {
 	}
 
 	// checks if collision is vertical or horizontal
-	//int collision_direction(platblocks plt, Player p) {
-
-	//	// assign player center xy coordinates
-	//	float px = (p.x + p.width/2);
-	//	float py = (p.y + p.height/2);
-	//	// how much the player goes into the platform
-	//	float leftcoll = (px - plt.x1);
-	//	float rightcoll = (plt.x2 - px);
-	//	float topcoll = (py - plt.y1);
-	//	float botcoll = (plt.y2 - py);
-
-	//	// return lower value for horizontal/vertical
-	//	float horizontal = (leftcoll < rightcoll) ? leftcoll : rightcoll;
-	//	float vertical = (topcoll < botcoll) ? topcoll : botcoll;
-
-	//	// horizontal = 1, vertical = 2
-	//	return (horizontal < vertical) ? 1 : 2;
-	//}
-
 
 	int collision_direction(platblocks plt, Player p) {
 

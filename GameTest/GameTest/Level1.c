@@ -12,7 +12,6 @@
 //---------------------------------------------------------
 
 #include "Level1.h"
-#include "hazard.h"
 
 CP_Color bg, red, green, hpcol; //colors
 float speed; //speed
@@ -20,8 +19,6 @@ float width, height; //window width/height
 float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
 CP_Font text;
 CP_Image player_sprite;
-hazard traps[100];
-int numberoftraps;
 
 void L1_Init(void)
 {
@@ -42,13 +39,10 @@ void L1_Init(void)
 	hpcol = CP_Color_Create(255, 150, 150, 255); //hp colour
 
 	// initialize base speed
-	speed = 400;
+	speed = 600;
 
 	// initialize movestate
 	movestate = OnPlat;
-
-	// initialize switchtime
-	switchtime = 1;
 
 	// initialize player
 	// size
@@ -60,6 +54,8 @@ void L1_Init(void)
 	// movement
 	player.movex = 0;
 	player.movey = 0;
+	// transit variables
+	player.transition_time = 1;
 	// health
 	player.hp = 100;
 	// color
@@ -68,9 +64,11 @@ void L1_Init(void)
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
-	numplats = 4;
-
 	FILE* file = fopen("Assets/Level1.txt", "r");
+
+	// read how many platforms in level
+	fscanf_s(file, "%d", &numplats);
+
 	// pindex - platform index
 	// pcindex - platform coordinate index
 	int pindex = 0; int pcindex = 0;
@@ -92,12 +90,7 @@ void L1_Init(void)
 		while (pcindex < Platform[pindex].numblocks) {
 			int x1, y1, x2, y2;
 			fscanf_s(file, "%d %d %d %d", &x1, &y1, &x2, &y2);
-			Platform[pindex].onblocks[pcindex].x1 = x1 - 15;
-			Platform[pindex].onblocks[pcindex].y1 = y1 - 15;
-			Platform[pindex].onblocks[pcindex].x2 = x2 + 15;
-			Platform[pindex].onblocks[pcindex].y2 = y2 + 15;
-			Platform[pindex].onblocks[pcindex].w = Platform[pindex].onblocks[pcindex].x2 - Platform[pindex].onblocks[pcindex].x1;
-			Platform[pindex].onblocks[pcindex].h = Platform[pindex].onblocks[pcindex].y2 - Platform[pindex].onblocks[pcindex].y1;
+			platform_onblocks(pindex, pcindex, x1, y1, x2, y2);
 			pcindex++;
 		}
 		pcindex = 0;
@@ -151,41 +144,25 @@ void L1_Update(void)
 	// ExitPlat - from InPlat to OnPlat
 	if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
 		movestate = start_transition(&player, movestate);
-		if (movestate == EnterPlat || movestate == ExitPlat) {
-			switchtime = 0;
-		}
 	}
-	// Transition animation
-	if (switchtime < 1) {
-		if ((movestate == EnterPlat && switchtime < 0.5f) || (movestate == ExitPlat && switchtime >= 0.5f)) {
-			player.movey += 800.0f / 60.0f;
-		}
-		if ((movestate == ExitPlat && switchtime < 0.5f) || (movestate == EnterPlat && switchtime >= 0.5f)) {
-			player.movey -= 800.0f / 60.0f;
-		}
-		switchtime += 1.0f / 30.0f;
-	}
-	if (switchtime >= 1) {
-		if (movestate == EnterPlat) {
-			movestate = InPlat;
-		}
-		if (movestate == ExitPlat) {
-			movestate = OnPlat;
-		}
-	}
+	// Transiting movestate
+	movestate = transition(&player, movestate, dt);
 
-	// different movement logics
-	movement(&player, movestate, speed);
-	// position update
-	player.x += player.movex * dt;
-	player.y += player.movey * dt;
+	// movement logics
+	movement(&player, movestate, speed, dt);
 
 	// reset checks for jumping and entering
 	player.onplatform = 0;
 	player.withinx = 0;
 	player.leaveplatform = 0;
 	// collision against platforms
-	if (movestate == InPlat || movestate == OnPlat) {
+	if (movestate == OnPlat) {
+		for (int plat_index = 0; plat_index < numplats; plat_index++) {
+			CollOnPlatforms(plat_index, Platform[plat_index], &player, player);
+		}
+	}
+
+	else if (movestate == InPlat) {
 		for (int plat_index = 0; plat_index < numplats; plat_index++) {
 			CollPlatforms(plat_index, Platform[plat_index], &player, player);
 		}
@@ -207,19 +184,9 @@ void L1_Update(void)
 	
 #pragma endregion
 
-	// HP
-	/*---------------------------------------------------------------------------------------------------*/
-#pragma region HP
-
-	// hp clamp
-	if (player.hp < 0) { player.hp = 0; };
-	if (player.hp > 100) { player.hp = 100; };
-#pragma endregion
-
 	// RENDER
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
-
 	// Platforms
 	CP_Settings_Fill(hpcol);
 	for (int i = 0; i < numplats; i++) {
@@ -235,43 +202,6 @@ void L1_Update(void)
 		CP_Settings_TextSize(150);
 		CP_Font_DrawText("Yippie!", 1300, 50);
 	}
-
-#pragma region KBoverlay
-
-	CP_Settings_TextSize(25);
-	TextBoxCreate(100, 50, 25, 25, "W");
-	if (CP_Input_KeyDown(KEY_W)) {
-		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 80)); //highlight button
-		CP_Graphics_DrawRect(100,50,25,25);
-	}
-	TextBoxCreate(50, 100, 25, 25, "A");
-	if (CP_Input_KeyDown(KEY_A)) {
-		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 80)); //highlight button
-		CP_Graphics_DrawRect(50, 100, 25, 25);
-	}
-	TextBoxCreate(100, 100, 25, 25, "S");
-	if (CP_Input_KeyDown(KEY_S)) {
-		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 80)); //highlight button
-		CP_Graphics_DrawRect(100, 100, 25, 25);
-	}
-	TextBoxCreate(150, 100, 25, 25, "D");
-	if (CP_Input_KeyDown(KEY_D)) {
-		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 80)); //highlight button
-		CP_Graphics_DrawRect(150, 100, 25, 25);
-	}
-	TextBoxCreate(150, 50, 25, 25, "E");
-	if (CP_Input_KeyDown(KEY_E)) {
-		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 80)); //highlight button
-		CP_Graphics_DrawRect(150, 50, 25, 25);
-	}
-	TextBoxCreate(300, 100, 100, 25, "");
-	if (CP_Input_KeyDown(KEY_SPACE)) {
-		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 80)); //highlight button
-		CP_Graphics_DrawRect(300, 100, 100, 25);
-	}
-
-#pragma endregion
-
 
 	// HAZARD DRAWING
 	for (int i = 0; i < numberoftraps; ++i) {

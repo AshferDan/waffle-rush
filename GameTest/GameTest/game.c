@@ -46,9 +46,6 @@ void Game_Init(void)
 	// initialize movestate
 	movestate = OnPlat;
 
-	// initialize switchtime
-	switchtime = 1;
-
 	// initialize player
 	// size
 	player.width = 20;
@@ -59,6 +56,8 @@ void Game_Init(void)
 	// movement
 	player.movex = 0;
 	player.movey = 0;
+	// transit variables
+	player.transition_time = 1;
 	// health
 	player.hp = 100;
 	// color
@@ -67,9 +66,12 @@ void Game_Init(void)
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
-	numplats = 2;
 
 	FILE* file = fopen("Assets/Base.txt", "r");
+
+	// read how many platforms in level
+	fscanf_s(file, "%d", &numplats);
+
 	// pindex - platform index
 	// pcindex - platform coordinate index
 	int pindex = 0; int pcindex = 0;
@@ -91,13 +93,6 @@ void Game_Init(void)
 		while (pcindex < Platform[pindex].numblocks) {
 			int x1, y1, x2, y2;
 			fscanf_s(file, "%d %d %d %d", &x1, &y1, &x2, &y2);
-			/*Platform[pindex].onblocks[pcindex].x1 = x1-15;
-			Platform[pindex].onblocks[pcindex].y1 = y1-15;
-			Platform[pindex].onblocks[pcindex].x2 = x2+15;
-			Platform[pindex].onblocks[pcindex].y2 = y2+15;
-			Platform[pindex].onblocks[pcindex].w = Platform[pindex].onblocks[pcindex].x2 - Platform[pindex].onblocks[pcindex].x1;
-			Platform[pindex].onblocks[pcindex].h = Platform[pindex].onblocks[pcindex].y2 - Platform[pindex].onblocks[pcindex].y1;
-			pcindex++;*/
 			platform_onblocks(pindex, pcindex, x1, y1, x2, y2);
 			pcindex++;
 		}
@@ -151,66 +146,12 @@ void Game_Update(void)
 	// ExitPlat - from InPlat to OnPlat
 	if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
 		movestate = start_transition(&player, movestate);
-		if (movestate == EnterPlat || movestate == ExitPlat) {
-			switchtime = 0;
-		}
 	}
-	// Transition animation
-	if (switchtime < 1) {
-		if ((movestate == EnterPlat && switchtime < 0.5f) || (movestate == ExitPlat && switchtime >= 0.5f)) {
-			player.movey += 800.0f / 60.0f;
-		}
-		if ((movestate == ExitPlat && switchtime < 0.5f) || (movestate == EnterPlat && switchtime >= 0.5f)) {
-			player.movey -= 800.0f / 60.0f;
-		}
-		switchtime += 1.0f / 30.0f;
-	}
-	if (switchtime >= 1) {
-		if (movestate == EnterPlat) {
-			movestate = InPlat;
-		}
-		if (movestate == ExitPlat) {
-			movestate = OnPlat;
-		}
-	}
+	// Transiting movestate
+	movestate = transition(&player, movestate, dt);
 
-	// different movement logics
-	//movement(&player, movestate, speed);
-	if (movestate == OnPlat) { // platformer
-		
-		if (player.movey < 1000) {
-			player.movey += 25;
-		}
-		//if (CP_Input_KeyDown(KEY_W)) { player.movey = -speed; }; //temp fly
-		if (CP_Input_KeyTriggered(KEY_SPACE) && player.onplatform == 1) {
-			player.movey = -speed;
-		} // jump!
-		if (CP_Input_KeyDown(KEY_A) && (player.movex > -speed)) {
-			player.movex -= 50.f;
-		} else if ((player.movex < 100.f) && !(CP_Input_KeyDown(KEY_A))) {
-			player.movex += 50.f;
-		};
-		if (CP_Input_KeyDown(KEY_D) && (player.movex < speed)) {
-			player.movex += 50.f;
-		} else if ((player.movex > 100.f) && !(CP_Input_KeyDown(KEY_D))) {
-			player.movex -= 50.f;
-		};
-		if ((!((CP_Input_KeyDown(KEY_A)) || (CP_Input_KeyDown(KEY_D))) && (player.movex <= 100.f && player.movex >= -100.f))) {
-			player.movex = 0;
-		}
-	}
-	if (movestate == InPlat) { // inside platform
-		player.movex = 0; player.movey = 0;
-		if (CP_Input_KeyDown(KEY_W)) { player.movey = -speed/2; };
-		if (CP_Input_KeyDown(KEY_A)) { player.movex = -speed/2; };
-		if (CP_Input_KeyDown(KEY_S)) { player.movey = speed/2; };
-		if (CP_Input_KeyDown(KEY_D)) { player.movex = speed/2; };
-	}
-	printf("movex %f, movexdt %f, movey %f, moveydt %f\n", player.movex, player.movex * dt, player.movey, player.movey * dt);
-
-	// position update
-	player.x += player.movex * dt;
-	player.y += player.movey * dt;
+	// movement logics
+	movement(&player, movestate, speed, dt);
 
 	// reset checks for jumping and entering
 	player.onplatform = 0;
@@ -242,16 +183,6 @@ void Game_Update(void)
 		movestate = OnPlat;
 		player.movey = 0;
 	}
-
-#pragma endregion
-
-	// HP
-	/*---------------------------------------------------------------------------------------------------*/
-#pragma region HP
-
-	// hp clamp
-	if (player.hp < 0) { player.hp = 0; };
-	if (player.hp > 100) { player.hp = 100; };
 #pragma endregion
 
 	// RENDER
