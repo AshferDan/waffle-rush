@@ -202,7 +202,7 @@ void L1_Update(void)
 	CP_Settings_Fill(green);
 	CP_Graphics_DrawRect(1520, 250, 50, 50);
 
-	if (AreSquaresIntersecting(player.x,player.y,player.height,player.width,1520,250,50,50)) {
+	if (AreSquaresIntersecting(player.x - 15,player.y - 15,player.height + 30,player.width + 30,1520,250,50,50)) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
 		CP_Settings_TextSize(150);
 		CP_Font_DrawText("Yippie!", 1300, 50);
