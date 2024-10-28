@@ -1,7 +1,7 @@
 //---------------------------------------------------------
 // file:	mainmenu.c
-// author:	TAN JUN QUAN
-// email:	t.junquan@digipen.edu
+// author:	AVID WAFFLE ENJOYERS
+// email:	-
 //
 // brief:	Main menu stage with a play button and an exit
 //          button

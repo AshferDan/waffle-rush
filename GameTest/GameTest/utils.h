@@ -1,9 +1,9 @@
 //---------------------------------------------------------
 // file:	utils.h
-// author:	TAN JUN QUAN
-// email:	t.junquan@digipen.edu
+// author:	AVID WAFFLE ENJOYERS
+// email:	-
 //
-// brief:	Declarations of utility functions
+// brief:   Declaration of utility functions
 //
 // Copyright © 2020 DigiPen, All rights reserved.
 //---------------------------------------------------------

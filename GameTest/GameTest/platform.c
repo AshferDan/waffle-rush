@@ -1,3 +1,17 @@
+//---------------------------------------------------------
+// file:	platform.c
+// author:	AVID WAFFLE ENJOYERS
+// email:	-
+//
+// brief:   Definition of functions used in platformer logic
+//			- Movement
+//			- Transitioning movestates
+//			- Assigning platform properties
+//			- Collision logic
+//
+// Copyright © 2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
+
 #pragma once
 #include "platform.h"
 

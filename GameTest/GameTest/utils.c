@@ -1,7 +1,7 @@
 //---------------------------------------------------------
 // file:	utils.c
-// author:	TAN JUN QUAN
-// email:	t.junquan@digipen.edu
+// author:	AVID WAFFLE ENJOYERS
+// email:	-
 //
 // brief:	Compilation of utility functions used throughout
 //			the assignment

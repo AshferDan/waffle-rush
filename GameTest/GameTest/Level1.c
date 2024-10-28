@@ -1,12 +1,9 @@
 //---------------------------------------------------------
-// file:	game.c
-// author:	TAN JUN QUAN
-// email:	t.junquan@digipen.edu
+// file:	Level1.c
+// author:	AVID WAFFLE ENJOYERS
+// email:	-
 //
-// brief:   When the player goes into red or green circles,
-//			they will lose and gain health respectively
-//			Render health bar on top, with segmented health
-//			bar every 10%
+// brief:   Level 1 stage
 //
 // Copyright © 2020 DigiPen, All rights reserved.
 //---------------------------------------------------------
@@ -55,9 +52,9 @@ void L1_Init(void)
 	player.movex = 0;
 	player.movey = 0;
 	// transit variables
-	player.transition_time = 1;
+	player.transition_time = 1.0f;
 	// health
-	player.hp = 100;
+	player.stamina = 100.0f;
 	// color
 	player.color = CP_Color_Create(150, 150, 200, 255);
 
@@ -66,6 +63,10 @@ void L1_Init(void)
 #pragma region Initialize Platform
 	FILE* file = fopen("Assets/Level1.txt", "r");
 
+	if (file == NULL) {
+		printf("Failed to open platform file! Check if file exists\n");
+		CP_Engine_Terminate;
+	}
 	// read how many platforms in level
 	fscanf_s(file, "%d", &numplats);
 

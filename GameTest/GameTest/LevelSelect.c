@@ -1,13 +1,13 @@
 //---------------------------------------------------------
-// file:	mainmenu.c
-// author:	TAN JUN QUAN
-// email:	t.junquan@digipen.edu
+// file:	LevelSelect.c
+// author:	AVID WAFFLE ENJOYERS
+// email:	-
 //
-// brief:	Main menu stage with a play button and an exit
-//          button
+// brief:   Level selector menu
 //
 // Copyright © 2020 DigiPen, All rights reserved.
 //---------------------------------------------------------
+
 #include "LevelSelect.h"
 
 CP_Font exo;

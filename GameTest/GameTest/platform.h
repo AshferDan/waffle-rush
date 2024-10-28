@@ -1,3 +1,14 @@
+//---------------------------------------------------------
+// file:	platform.h
+// author:	AVID WAFFLE ENJOYERS
+// email:	-
+//
+// brief:   Declaration of global variables and functions 
+//			used in platformer logic
+//
+// Copyright © 2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
+
 #pragma once
 #include "utils.h"
 #include "hazard.h"
@@ -88,7 +99,7 @@ int numplats;
 			float y; //posy
 			float movex; //movex
 			float movey; //movey
-			float hp; //health (NOTE: change to lives)
+			float stamina; //stamina for InPlat
 			float width; //width
 			float height; //height
 			float transition_time;
