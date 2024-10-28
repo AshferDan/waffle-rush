@@ -11,6 +11,7 @@
 #include "mainmenu.h"
 
 CP_Font exo;
+CP_Color button_color;
 
 void Main_Menu_Init(void)
 {
@@ -31,12 +32,15 @@ void Main_Menu_Update(void)
 	float mouseY = CP_Input_GetMouseY();
 
 
+	//button color
+	button_color = CP_Color_Create(200, 60, 60, 255);
+
 	//background
 	CP_Graphics_ClearBackground(CP_Color_Create(100, 100, 100, 255));
 
 
 	//draw play button
-	TextBoxCreate(width / 2, height / 3, 500, 150, "PLAY");
+	TextBoxCreate(width / 2, height / 3, 500, 150, "PLAY", button_color);
 	int PlayClick = IsAreaClicked(width / 2, height / 3, 500, 150, mouseX, mouseY); //if mouse is over button
 	if (PlayClick) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
@@ -47,7 +51,7 @@ void Main_Menu_Update(void)
 	}
 
 	//test level button
-	TextBoxCreate(3*width / 4, height / 3, 150, 150, "T");
+	TextBoxCreate(3*width / 4, height / 3, 150, 150, "T", button_color);
 	int TestClick = IsAreaClicked(3 * width / 4, height / 3, 150, 150, mouseX, mouseY); //if mouse is over button
 	if (TestClick) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
@@ -58,7 +62,7 @@ void Main_Menu_Update(void)
 	}
 
 	//draw exit button
-	TextBoxCreate(width / 2, 2 * height / 3, 500, 150, "EXIT");
+	TextBoxCreate(width / 2, 2 * height / 3, 500, 150, "EXIT", button_color);
 	int ExitClick = IsAreaClicked(width / 2, 2 * height / 3, 500, 150, mouseX, mouseY); //if mouse is over button
 	if (ExitClick) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button

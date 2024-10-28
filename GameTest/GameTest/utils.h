@@ -32,7 +32,7 @@ int AreSquaresIntersecting(float s1_x, float s1_y, float s1_w, float s1_h, float
 int IsTriangleClicked(float tri_x1, float tri_y1, float tri_x2, float tri_y2, float tri_x3, float tri_y3, float click_x, float click_y);
 
 // create a red box with text within
-void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const char* text);
+void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const char* text, CP_Color color);
 
 // draw full hp bar
 void DrawHPBar(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp, float maxhp);

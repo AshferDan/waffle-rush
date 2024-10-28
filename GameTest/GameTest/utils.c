@@ -97,9 +97,9 @@ int IsTriangleClicked(float tri_x1, float tri_y1, float tri_x2, float tri_y2, fl
 // size_x - width of box
 // size_y - height of box
 //
-void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const char* text) {
+void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const char* text, CP_Color color) {
 	CP_Settings_RectMode(CP_POSITION_CENTER);
-	CP_Settings_Fill(CP_Color_Create(200, 60, 60, 255));
+	CP_Settings_Fill(color);
 	CP_Graphics_DrawRect(pos_x, pos_y, size_x, size_y);
 	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
 	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);

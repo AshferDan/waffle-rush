@@ -10,7 +10,7 @@
 
 #include "Level1.h"
 
-CP_Color bg, red, green, hpcol; //colors
+CP_Color bg, red, green, hpcol, button_color; //colors
 float speed; //speed
 float width, height; //window width/height
 float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
@@ -130,8 +130,12 @@ void L1_Init(void)
 
 void L1_Update(void)
 {
+	//button color
+	button_color = CP_Color_Create(200, 60, 60, 255);
+
 	// background
 	CP_Graphics_ClearBackground(bg);
+
 	// getdt
 	float dt = CP_System_GetDt();
 
