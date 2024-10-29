@@ -17,6 +17,7 @@
     <ClCompile Include="LevelSelect.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="mainmenu.c" />
+    <ClCompile Include="mainmenu1.c" />
     <ClCompile Include="platform.c" />
     <ClCompile Include="utils.c" />
   </ItemGroup>
@@ -25,6 +26,7 @@
     <ClInclude Include="hazard.h" />
     <ClInclude Include="Level1.h" />
     <ClInclude Include="LevelSelect.h" />
+    <ClInclude Include="mainmenu1.h" />
     <ClInclude Include="platform.h" />
     <ClInclude Include="mainmenu.h" />
     <ClInclude Include="utils.h" />
