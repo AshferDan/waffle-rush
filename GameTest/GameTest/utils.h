@@ -35,7 +35,7 @@ int IsTriangleClicked(float tri_x1, float tri_y1, float tri_x2, float tri_y2, fl
 void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const char* text, CP_Color color);
 
 // draw full hp bar
-void DrawHPBar(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp, float maxhp);
+void DrawStatBar(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp, float maxhp);
 
 // draw segmented hp bar
 void DrawHPBar2(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp, float maxhp);

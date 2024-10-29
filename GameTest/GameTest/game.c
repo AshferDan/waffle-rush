@@ -10,15 +10,6 @@
 
 #include "game.h"
 
-CP_Color bg, red, green, hpcol; //colors
-float speed; //speed
-float width, height; //window width/height
-float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
-CP_Font text;
-CP_Image player_sprite;
-
-hazard traps[100];
-
 void Game_Init(void)
 {
 	// load font
@@ -33,9 +24,11 @@ void Game_Init(void)
 
 	// initialize colors
 	bg = CP_Color_Create(100, 100, 100, 255); //background
+	black = CP_Color_Create(0, 0, 0, 255); //black
 	red = CP_Color_Create(200, 50, 50, 255); //red
 	green = CP_Color_Create(50, 200, 50, 255); //green
-	hpcol = CP_Color_Create(255, 150, 150, 255); //hp colour
+	plat = CP_Color_Create(255, 150, 150, 255); //platform colour
+	stamina = CP_Color_Create(255, 255, 40, 255); //stamina colour
 
 	// initialize base speed
 	speed = 600;
@@ -43,13 +36,16 @@ void Game_Init(void)
 	// initialize movestate
 	movestate = OnPlat;
 
+	// initialize deaths
+	deaths = 0;
+
 	// initialize player
 	// size
 	player.width = 20;
 	player.height = 20;
 	// position
-	player.x = 700;
-	player.y = 200;
+	player.x = spawnx = 700;
+	player.y = spawny = 200;
 	// movement
 	player.movex = 0;
 	player.movey = 0;
@@ -63,7 +59,6 @@ void Game_Init(void)
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
-
 	FILE* file = fopen("Assets/Base.txt", "r");
 
 	if (file == NULL) {
@@ -73,32 +68,32 @@ void Game_Init(void)
 	// read how many platforms in level
 	fscanf_s(file, "%d", &numplats);
 
-	// pindex - platform index
-	// pcindex - platform coordinate index
-	int pindex = 0; int pcindex = 0;
-	while (pindex < numplats) {
+	// plat_index - platform index
+	// plat_coord_index - platform coordinate index
+	int plat_index = 0; int plat_coord_index = 0;
+	while (plat_index < numplats) {
 		// coordinate ints to read
 		// scan how many coordinates
-		fscanf_s(file, "%d", &Platform[pindex].numcoords);
+		fscanf_s(file, "%d", &Platform[plat_index].numcoords);
 		// for how many coordinates in platform
-		while (pcindex < Platform[pindex].numcoords) {
+		while (plat_coord_index < Platform[plat_index].numcoords) {
 			int x, y;
 			// scan coordinates
 			fscanf_s(file, "%d %d", &x, &y);
 			// assign coordinates to array
-			platform_coordinates(pindex, pcindex, x, y);
-			pcindex++;
+			platform_coordinates(plat_index, plat_coord_index, x, y);
+			plat_coord_index++;
 		}
-		pcindex = 0;
-		fscanf_s(file, "%d", &Platform[pindex].numblocks);
-		while (pcindex < Platform[pindex].numblocks) {
+		plat_coord_index = 0;
+		fscanf_s(file, "%d", &Platform[plat_index].numblocks);
+		while (plat_coord_index < Platform[plat_index].numblocks) {
 			int x1, y1, x2, y2;
 			fscanf_s(file, "%d %d %d %d", &x1, &y1, &x2, &y2);
-			platform_onblocks(pindex, pcindex, x1, y1, x2, y2);
-			pcindex++;
+			platform_onblocks(plat_index, plat_coord_index, x1, y1, x2, y2);
+			plat_coord_index++;
 		}
-		pcindex = 0;
-		pindex++;
+		plat_coord_index = 0;
+		plat_index++;
 	}
 	fclose(file);
 
@@ -113,7 +108,6 @@ void Game_Init(void)
 	/*-----------------------------------------------------------------------------------------------------------*/
 #pragma region Hazard
 	FILE* file1 = fopen("Assets/testhazard.txt", "r");
-	int numberoftraps;
 	fscanf_s(file1, "%d", &numberoftraps);
 
 	for (int i = 0; i < numberoftraps; ++i) {
@@ -134,6 +128,7 @@ void Game_Update(void)
 {
 	// background
 	CP_Graphics_ClearBackground(bg);
+
 	// getdt
 	float dt = CP_System_GetDt();
 
@@ -160,9 +155,9 @@ void Game_Update(void)
 	player.leaveplatform = 0;
 	// collision against platforms
 	if (movestate == OnPlat) {
-		player.stamina += 20.0f * dt;
+		player.stamina += 40.0f * dt;
 		for (int plat_index = 0; plat_index < numplats; plat_index++) {
-			CollOnPlatforms(plat_index,Platform[plat_index], &player, player);
+			CollOnPlatforms(plat_index, Platform[plat_index], &player, player);
 		}
 	}
 
@@ -173,49 +168,55 @@ void Game_Update(void)
 		}
 	}
 	player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
-	printf("%f\n", player.stamina);
 	// window clamps
 	player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
-	if (player.y + player.height > height || player.y<0) {
+	if (player.y + player.height > height || player.y < 0) {
 		player.movey = 0;
 	}
 	player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
 
 	// reset with R or touch ground while movestate OnPlat
-	if (CP_Input_KeyDown(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat)) {
-		player.x = 150;
-		player.y = 200;
+	if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)) {
+		player.x = spawnx;
+		player.y = spawny;
 		movestate = OnPlat;
 		player.movey = 0;
+		deaths++;
 	}
 #pragma endregion
 
 	// RENDER
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
-
 	// Platforms
-	CP_Settings_Fill(hpcol);
+	CP_Settings_Fill(plat);
 	for (int i = 0; i < numplats; i++) {
 		DrawPlatform(i);
 	}
-
-	/*for (int i = 0; i < numplats; i++) {
-		for (int j = 0; j < Platform[i].numblocks; j++) {
-			CP_Graphics_DrawRect(Platform[i].onblocks[j].x1, Platform[i].onblocks[j].y1, Platform[i].onblocks[j].w, Platform[i].onblocks[j].h);
-		}
-	}*/
-
 
 	// HAZARD DRAWING
 	CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
 	CP_Graphics_DrawTriangle(traps[0].x[0], traps[0].y[0], traps[0].x[1], traps[0].y[1], traps[0].x[2], traps[0].y[2]);
 
 	// Player
-	// CP_Settings_Fill(player.color);
-	// CP_Graphics_DrawRect(player.x - 10, player.y - 10, player.width + 20, player.height + 20);
-	CP_Image_Draw(player_sprite, player.x -15, player.y -15, player.width + 30, player.height + 30, 255);
+	CP_Image_Draw(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, 255);
+	// Stamina Bar
+	CP_Settings_Fill(stamina);
+	DrawStatBar(player.x - 15, player.y - 25, player.x + 35, player.y - 20, player.stamina, 100);
 
+	// DEATHS DRAWING
+	CP_Settings_Fill(black);
+	CP_Settings_TextSize(50);
+	char deathcount[20] = { 0 };
+	if (deaths < 100) {
+		sprintf_s(deathcount, 20, "Deaths: %d", deaths);
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Font_DrawText(deathcount, 50, 50);
+	}
+	else {
+		CP_Font_DrawText("Bruh", 50, 50);
+	}
+	
 #pragma endregion
 
 	// Back to main menu

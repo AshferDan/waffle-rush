@@ -10,13 +10,6 @@
 
 #include "Level1.h"
 
-CP_Color bg, red, green, hpcol, button_color; //colors
-float speed; //speed
-float width, height; //window width/height
-float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
-CP_Font text;
-CP_Image player_sprite;
-
 void L1_Init(void)
 {
 	// load font
@@ -31,9 +24,11 @@ void L1_Init(void)
 
 	// initialize colors
 	bg = CP_Color_Create(100, 100, 100, 255); //background
+	black = CP_Color_Create(0, 0, 0, 255); //black
 	red = CP_Color_Create(200, 50, 50, 255); //red
 	green = CP_Color_Create(50, 200, 50, 255); //green
-	hpcol = CP_Color_Create(255, 150, 150, 255); //hp colour
+	plat = CP_Color_Create(255, 150, 150, 255); //platform colour
+	stamina = CP_Color_Create(255, 255, 40, 255); //stamina colour
 
 	// initialize base speed
 	speed = 600;
@@ -41,13 +36,20 @@ void L1_Init(void)
 	// initialize movestate
 	movestate = OnPlat;
 
+	// initialize deaths
+	deaths = 0;
+
+	// initialize goal
+	goalx = 1520;
+	goaly = 250;
+
 	// initialize player
 	// size
 	player.width = 20;
 	player.height = 20;
 	// position
-	player.x = 150;
-	player.y = 200;
+	player.x = spawnx = 150;
+	player.y = spawny = 200;
 	// movement
 	player.movex = 0;
 	player.movey = 0;
@@ -70,32 +72,32 @@ void L1_Init(void)
 	// read how many platforms in level
 	fscanf_s(file, "%d", &numplats);
 
-	// pindex - platform index
-	// pcindex - platform coordinate index
-	int pindex = 0; int pcindex = 0;
-	while (pindex < numplats) {
+	// plat_index - platform index
+	// plat_coord_index - platform coordinate index
+	int plat_index = 0; int plat_coord_index = 0;
+	while (plat_index < numplats) {
 		// coordinate ints to read
 		// scan how many coordinates
-		fscanf_s(file, "%d", &Platform[pindex].numcoords);
+		fscanf_s(file, "%d", &Platform[plat_index].numcoords);
 		// for how many coordinates in platform
-		while (pcindex < Platform[pindex].numcoords) {
+		while (plat_coord_index < Platform[plat_index].numcoords) {
 			int x, y;
 			// scan coordinates
 			fscanf_s(file, "%d %d", &x, &y);
 			// assign coordinates to array
-			platform_coordinates(pindex, pcindex, x, y);
-			pcindex++;
+			platform_coordinates(plat_index, plat_coord_index, x, y);
+			plat_coord_index++;
 		}
-		pcindex = 0;
-		fscanf_s(file, "%d", &Platform[pindex].numblocks);
-		while (pcindex < Platform[pindex].numblocks) {
+		plat_coord_index = 0;
+		fscanf_s(file, "%d", &Platform[plat_index].numblocks);
+		while (plat_coord_index < Platform[plat_index].numblocks) {
 			int x1, y1, x2, y2;
 			fscanf_s(file, "%d %d %d %d", &x1, &y1, &x2, &y2);
-			platform_onblocks(pindex, pcindex, x1, y1, x2, y2);
-			pcindex++;
+			platform_onblocks(plat_index, plat_coord_index, x1, y1, x2, y2);
+			plat_coord_index++;
 		}
-		pcindex = 0;
-		pindex++;
+		plat_coord_index = 0;
+		plat_index++;
 	}
 	fclose(file);
 
@@ -113,8 +115,7 @@ void L1_Init(void)
 	fscanf_s(file2, "%d", &numberoftraps);
 
 	for (int i = 0; i < numberoftraps; ++i) {
-		int j=0;
-		for (; j < 3; ++j) {
+		for (int j = 0; j < 3; ++j) {
 			fscanf_s(file2, "%d %d", &traps[i].x[j], &traps[i].y[j]);
 		}
 		fscanf_s(file2, "%d", &traps[i].type);
@@ -127,12 +128,8 @@ void L1_Init(void)
 	CP_Settings_ImageMode(CP_POSITION_CORNER);
 }
 
-
 void L1_Update(void)
 {
-	//button color
-	button_color = CP_Color_Create(200, 60, 60, 255);
-
 	// background
 	CP_Graphics_ClearBackground(bg);
 
@@ -162,16 +159,19 @@ void L1_Update(void)
 	player.leaveplatform = 0;
 	// collision against platforms
 	if (movestate == OnPlat) {
+		player.stamina += 40.0f * dt;
 		for (int plat_index = 0; plat_index < numplats; plat_index++) {
 			CollOnPlatforms(plat_index, Platform[plat_index], &player, player);
 		}
 	}
 
 	else if (movestate == InPlat) {
+		player.stamina -= 20.0f * dt;
 		for (int plat_index = 0; plat_index < numplats; plat_index++) {
 			CollPlatforms(plat_index, Platform[plat_index], &player, player);
 		}
 	}
+	player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
 	// window clamps
 	player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
 	if (player.y + player.height > height || player.y < 0) {
@@ -180,31 +180,32 @@ void L1_Update(void)
 	player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
 
 	// reset with R or touch ground while movestate OnPlat
-	if (CP_Input_KeyDown(KEY_R)|| ((player.y >= height - player.height) && movestate == OnPlat)) {
-		player.x = 150;
-		player.y = 200;
+	if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)) {
+		player.x = spawnx;
+		player.y = spawny;
 		movestate = OnPlat;
 		player.movey = 0;
+		deaths++;
 	}
-	
 #pragma endregion
 
 	// RENDER
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
 	// Platforms
-	CP_Settings_Fill(hpcol);
+	CP_Settings_Fill(plat);
 	for (int i = 0; i < numplats; i++) {
 		DrawPlatform(i);
 	}
 
 	// Goal
 	CP_Settings_Fill(green);
-	CP_Graphics_DrawRect(1520, 250, 50, 50);
+	CP_Graphics_DrawRect(goalx, goaly, 50, 50);
 
-	if (AreSquaresIntersecting(player.x - 15,player.y - 15,player.height + 30,player.width + 30,1520,250,50,50)) {
+	if (AreSquaresIntersecting(player.x - 15,player.y - 15,player.height + 30,player.width + 30,goalx,goaly,50,50)) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
 		CP_Settings_TextSize(150);
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
 		CP_Font_DrawText("Yippie!", 1300, 50);
 	}
 
@@ -216,6 +217,25 @@ void L1_Update(void)
 
 	// Player
 	CP_Image_Draw(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, 255);
+	// Stamina Bar
+	CP_Settings_Fill(stamina);
+	if (player.stamina <= 25.0f) {
+		CP_Settings_Fill(red);
+	}
+	DrawStatBar(player.x - 15, player.y - 25, player.x + 35, player.y - 20, player.stamina, 100);
+
+	// DEATHS DRAWING
+	CP_Settings_Fill(black);
+	CP_Settings_TextSize(50);
+	char deathcount[20] = { 0 };
+	if (deaths < 100) {
+		sprintf_s(deathcount, 20, "Deaths: %d", deaths);
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Font_DrawText(deathcount, 50, 50);
+	}
+	else {
+		CP_Font_DrawText("Bruh", 50, 50);
+	}
 
 #pragma endregion
 

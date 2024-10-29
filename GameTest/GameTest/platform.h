@@ -29,6 +29,14 @@ MoveState movestate;
 
 int numplats;
 
+int deaths;
+float speed; //speed
+float width, height; //window width/height
+float spawnx, spawny, goalx, goaly;
+
+CP_Font text;
+CP_Image player_sprite;
+CP_Color bg, black, red, green, plat, stamina; //colors
 
 // STRUCTS --------------------------------------------
 #pragma region Structs
