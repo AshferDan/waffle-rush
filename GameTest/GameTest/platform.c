@@ -301,7 +301,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 						if (ply.x >= Platform[plat_index].inblocks[coord_index].x1 && ply.x + ply.width <= Platform[plat_index].inblocks[coord_index].x2) {
 							pply->withinx = 1;
 							// check player touching top surface of platform to exit
-							if (pply->y == Platform[plat_index].inblocks[coord_index].y2) {
+							if ((coord_index%2==0) && (pply->y == Platform[plat_index].inblocks[coord_index].y2)) {
 								pply->leaveplatform = 1;
 							}
 						}
