@@ -18,11 +18,21 @@ float speed; //speed
 float width, height; //window width/height
 float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
 CP_Font text;
+<<<<<<< Updated upstream
+=======
+CP_Image player_sprite;
+float totalMinutes, totalSeconds; // timer
+int isPaused; // check if game paused
+float frameRate;
+>>>>>>> Stashed changes
 
 int numplats = 2;
 
 void Game_Init(void)
 {
+	// set frame rate
+	frameRate = CP_System_GetFrameRate();
+
 	// load font
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
@@ -56,6 +66,9 @@ void Game_Init(void)
 	p.hp = 100;
 	// color
 	p.color = CP_Color_Create(150, 150, 200, 255);
+
+	// game pause
+	isPaused = 0;
 
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------*/
@@ -98,6 +111,31 @@ void Game_Update(void)
 	// getdt
 	float dt = CP_System_GetDt();
 
+	// Timer UI
+	if (isPaused == 0) {
+		totalMinutes = totalMinutes;
+		totalSeconds += dt;
+	}
+	else if (isPaused == 1) {
+		totalMinutes = totalMinutes;
+		totalSeconds = totalSeconds;
+	}
+	
+	totalMinutes = 0.0;
+	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
+	CP_Settings_TextSize(60);
+	char time[16] = { 0 };
+	if (totalSeconds >= 60) {
+		totalSeconds -= 60;
+		totalMinutes += 1;
+	}
+	CP_TEXT_ALIGN_HORIZONTAL horizontal = CP_TEXT_ALIGN_H_RIGHT;
+	CP_TEXT_ALIGN_VERTICAL vertical = CP_TEXT_ALIGN_V_BASELINE;
+	CP_Settings_TextAlignment(horizontal, vertical);
+	CP_Font_DrawText("Time: ", 1400, 100);
+	sprintf_s(time, 16, "%02d:%02d", (int) totalMinutes, (int) totalSeconds);
+	CP_Font_DrawText(time, 1550, 100);
+
 	// MOVEMENT 
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Movement
@@ -110,6 +148,7 @@ void Game_Update(void)
 		movestate = (movestate == 0) ? 1 : 0;
 	}
 
+<<<<<<< Updated upstream
 	// conditional switch
 	if (CP_Input_KeyTriggered(KEY_F)) {
 		if (movestate == 0 && p.onplatform == 1 && p.withinx == 1) {
@@ -142,6 +181,12 @@ void Game_Update(void)
 	// position update
 	p.x += p.movex * dt;
 	p.y += p.movey * dt;
+=======
+	// movement logics
+	if (isPaused == 0) {
+		movement(&player, movestate, speed, dt);
+	}
+>>>>>>> Stashed changes
 
 	// reset checks for jumping and entering
 	p.onplatform = 0;
@@ -164,6 +209,7 @@ void Game_Update(void)
 	}
 	p.y = CP_Math_ClampFloat(p.y, 0, height - p.height);
 
+<<<<<<< Updated upstream
 #pragma endregion
 
 	// HP
@@ -173,6 +219,27 @@ void Game_Update(void)
 	// hp clamp
 	if (p.hp < 0) { p.hp = 0; };
 	if (p.hp > 100) { p.hp = 100; };
+=======
+	// reset with R or touch ground while movestate OnPlat
+	if (CP_Input_KeyDown(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat)) {
+		player.x = 150;
+		player.y = 200;
+		movestate = OnPlat;
+		player.movey = 0;
+	}
+
+	// pause/resume game with Esc
+	if (isPaused == 1) {
+		CP_Font_DrawText("PAUSED", width / 2, 100);
+	}
+	if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 0) {
+		isPaused = 1;
+		
+	}
+	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 1) {
+		isPaused = 0;
+	}
+>>>>>>> Stashed changes
 #pragma endregion
 
 	// RENDER
