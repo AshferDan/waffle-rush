@@ -10,8 +10,17 @@
 
 #include "game.h"
 
+
+CP_Image player_sprite;
+float totalMinutes, totalSeconds; // timer
+int isPaused; // check if game paused
+float frameRate;
+
 void Game_Init(void)
 {
+	// set frame rate
+	frameRate = CP_System_GetFrameRate();
+
 	// load font
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
@@ -55,6 +64,9 @@ void Game_Init(void)
 	player.stamina = 100.0f;
 	// color
 	player.color = CP_Color_Create(150, 150, 200, 255);
+
+	// game pause
+	isPaused = 0;
 
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------*/
@@ -132,6 +144,31 @@ void Game_Update(void)
 	// getdt
 	float dt = CP_System_GetDt();
 
+	// Timer UI
+	if (isPaused == 0) {
+		totalMinutes = totalMinutes;
+		totalSeconds += dt;
+	}
+	else if (isPaused == 1) {
+		totalMinutes = totalMinutes;
+		totalSeconds = totalSeconds;
+	}
+	
+	totalMinutes = 0.0;
+	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
+	CP_Settings_TextSize(60);
+	char time[16] = { 0 };
+	if (totalSeconds >= 60) {
+		totalSeconds -= 60;
+		totalMinutes += 1;
+	}
+	CP_TEXT_ALIGN_HORIZONTAL horizontal = CP_TEXT_ALIGN_H_RIGHT;
+	CP_TEXT_ALIGN_VERTICAL vertical = CP_TEXT_ALIGN_V_BASELINE;
+	CP_Settings_TextAlignment(horizontal, vertical);
+	CP_Font_DrawText("Time: ", 1400, 100);
+	sprintf_s(time, 16, "%02d:%02d", (int) totalMinutes, (int) totalSeconds);
+	CP_Font_DrawText(time, 1550, 100);
+
 	// MOVEMENT 
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Movement
@@ -175,6 +212,30 @@ void Game_Update(void)
 	}
 	player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
 
+	// hp clamp
+	if (p.hp < 0) { p.hp = 0; };
+	if (p.hp > 100) { p.hp = 100; };
+=======
+	// reset with R or touch ground while movestate OnPlat
+	if (CP_Input_KeyDown(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat)) {
+		player.x = 150;
+		player.y = 200;
+		movestate = OnPlat;
+		player.movey = 0;
+	}
+
+	// pause/resume game with Esc
+	if (isPaused == 1) {
+		CP_Font_DrawText("PAUSED", width / 2, 100);
+	}
+	if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 0) {
+		isPaused = 1;
+		
+	}
+	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 1) {
+		isPaused = 0;
+	}
+>>>>>>> Stashed changes
 	// reset with R or touch ground while movestate OnPlat
 	if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)) {
 		player.x = spawnx;
