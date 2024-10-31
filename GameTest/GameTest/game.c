@@ -52,6 +52,10 @@ void Game_Init(void)
 	// initialize movestate
 	movestate = 0;
 
+	//initialize test goal
+	goalx = 1000;
+	goaly = 350;
+
 	// initialize player
 	// size
 	p.width = 30;
@@ -69,6 +73,12 @@ void Game_Init(void)
 
 	// game pause
 	isPaused = 0;
+
+	// check if level complete
+	isCleared = 0;
+
+	// score
+	levelScore = 0;
 
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------*/
@@ -96,6 +106,7 @@ void Game_Init(void)
 		hitbox(plat_index, Platform[plat_index].numcoords, &Platform[plat_index]);
 	}
 
+
 #pragma endregion
 
 	//healthbar position
@@ -111,8 +122,24 @@ void Game_Update(void)
 	// getdt
 	float dt = CP_System_GetDt();
 
+<<<<<<< Updated upstream
+=======
+	// track pointer
+	float mouseX = CP_Input_GetMouseX();
+	float mouseY = CP_Input_GetMouseY();
+
+	// pause/resume game with Esc
+	if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 0) {
+		isPaused = 1;
+
+	}
+	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 1) {
+		isPaused = 0;
+	}
+
+>>>>>>> Stashed changes
 	// Timer UI
-	if (isPaused == 0) {
+	if (isPaused == 0 && isCleared == 0) {
 		totalMinutes = totalMinutes;
 		totalSeconds += dt;
 	}
@@ -155,9 +182,54 @@ void Game_Update(void)
 			p.y += 80;
 			movestate = 1;
 		}
+<<<<<<< Updated upstream
 		else if (movestate == 1 && p.y > 200 && p.leaveplatform == 1) {
 			p.y -= 80;
 			movestate = 0;
+=======
+		// Transiting movestate
+		movestate = transition(&player, movestate, dt);
+
+		// movement logics
+		movement(&player, movestate, speed, dt);
+
+		// reset checks for jumping and entering
+		player.onplatform = 0;
+		player.withinx = 0;
+		player.leaveplatform = 0;
+
+		// collision against platforms
+		if (movestate == OnPlat) {
+			player.stamina += 40.0f * dt;
+			for (int plat_index = 0; plat_index < numplats; plat_index++) {
+				CollOnPlatforms(plat_index, Platform[plat_index], &player, player);
+			}
+		}
+
+		else if (movestate == InPlat) {
+			player.stamina -= 20.0f * dt;
+			for (int plat_index = 0; plat_index < numplats; plat_index++) {
+				CollPlatforms(plat_index, Platform[plat_index], &player, player);
+			}
+		}
+		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
+
+		// window clamps
+		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
+		if (player.y + player.height > height || player.y < 0) {
+			player.movey = 0;
+		}
+		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
+
+		// reset with R or touch ground while movestate OnPlat
+		if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)) {
+			player.x = spawnx;
+			player.y = spawny;
+			movestate = OnPlat;
+			player.movey = 0;
+			deaths++;
+			AddScore(&levelScore, -100, &isCleared);
+>>>>>>> Stashed changes
 		}
 	}
 
@@ -251,6 +323,26 @@ void Game_Update(void)
 		DrawPlatform(i);
 	}
 
+<<<<<<< Updated upstream
+=======
+	// Goal
+	CP_Settings_Fill(green);
+	CP_Graphics_DrawRect(goalx, goaly, 50, 50);
+
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly, 50, 50)) {
+		CP_Settings_Fill(green);
+		CP_Settings_TextSize(100);
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Font_DrawText("You touched grass", width / 2, 50);
+		AddScore(&levelScore, 1000, &isCleared);
+		isCleared = 1;
+	}
+
+	// HAZARD DRAWING
+	CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
+	CP_Graphics_DrawTriangle(traps[0].x[0], traps[0].y[0], traps[0].x[1], traps[0].y[1], traps[0].x[2], traps[0].y[2]);
+
+>>>>>>> Stashed changes
 	// Player
 	CP_Settings_Fill(p.color);
 	CP_Graphics_DrawRect(p.x - 10, p.y - 10, p.width + 20, p.height + 20);
@@ -260,6 +352,53 @@ void Game_Update(void)
 	CP_Settings_Fill(hpcol); 
 	CP_Settings_RectMode(CP_POSITION_CORNER);
 
+<<<<<<< Updated upstream
+=======
+	// SCORE DRAWING
+	char score[20] = { 0 };
+	sprintf_s(score, 20, "SCORE: %d", levelScore);
+	CP_Font_DrawText(score, 1250, 50);
+	// TIMER DRAWING
+	sprintf_s(time, 16, "TIME: %02d:%02d:%02d", (int)totalMinutes, (int)totalSeconds, (int)totalMillis);
+	CP_Font_DrawText(time, 1250, 100);
+
+	// PAUSE PAGE
+	if (isPaused == 1) {
+		CP_Settings_RectMode(CP_POSITION_CENTER);
+		CP_Settings_Fill(pausebg);
+		CP_Graphics_DrawRect(width/2, height/2, width, height);
+		CP_Settings_Fill(plat);
+		CP_Graphics_DrawRect(width/2, height/2, 1200, 600);
+		CP_Settings_Fill(black);
+		CP_Settings_TextSize(150);
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Font_DrawText("PAUSED", width/2, 300);
+
+		CP_Settings_TextSize(100);
+		// draw resume button
+		TextBoxCreate(500, 2 * height / 3, 350, 200, "RESUME", red);
+		int ResumeClick = IsAreaClicked(500, 2 * height / 3, 350, 200, mouseX, mouseY); //if mouse is over button
+		if (ResumeClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+			CP_Graphics_DrawRect(500, 2 * height / 3, 350, 200);
+			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				isPaused = 0;
+			}
+		}
+
+		// draw quit button
+		TextBoxCreate(1100, 2 * height / 3, 350, 200, "QUIT", red);
+		int QuitClick = IsAreaClicked(1100, 2 * height / 3, 350, 200, mouseX, mouseY); //if mouse is over button
+		if (QuitClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+			CP_Graphics_DrawRect(1100, 2 * height / 3, 350, 200);
+			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit);
+			}
+		}
+		CP_Settings_RectMode(CP_POSITION_CORNER);
+	}
+>>>>>>> Stashed changes
 #pragma endregion
 
 	// Back to main menu

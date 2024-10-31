@@ -34,3 +34,12 @@ void DrawHPBar(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp,
 
 // draw segmented hp bar
 void DrawHPBar2(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp, float maxhp);
+<<<<<<< Updated upstream
+=======
+
+// check if square collides with triangle
+int SquareTriangleCollide(float squarex, float squarey, float squarewidth, float squareheight, float tri1x, float tri1y, float tri2x, float tri2y, float tri3x, float tri3y);
+
+// update score
+void AddScore(int *totalScore, int addScore, int *isCleared);
+>>>>>>> Stashed changes
