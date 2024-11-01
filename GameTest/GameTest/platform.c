@@ -72,7 +72,6 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 
 	// OnPlat movement
 	if (movestate == OnPlat) {
-
 		// Gravity and terminal velocity
 		if (ply->movey < 1000.0f) {
 			ply->movey += 1800.0f * dt;
@@ -84,6 +83,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		// left
 		if (CP_Input_KeyDown(KEY_A) && (ply->movex > -speed)) {
 			ply->movex -= accel * dt;
+			ply->direction = OnLeft;
 		}
 		else if ((ply->movex < 100.f) && !(CP_Input_KeyDown(KEY_A))) {
 			ply->movex += accel * dt;
@@ -91,12 +91,24 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		// right
 		if (CP_Input_KeyDown(KEY_D) && (ply->movex < speed)) {
 			ply->movex += accel * dt;
+			ply->direction = OnRight;
 		}
 		else if ((ply->movex > 100.f) && !(CP_Input_KeyDown(KEY_D))) {
 			ply->movex -= accel * dt;
 		};
 		if ((!((CP_Input_KeyDown(KEY_A)) || (CP_Input_KeyDown(KEY_D))) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
 			ply->movex = 0;
+		}
+
+		// anim state
+		if (ply->onplatform == 1) {
+			ply->state = Idle;
+			if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D)) {
+				ply->state = Running;
+			}
+		}
+		if (ply->onplatform == 0) {
+			ply->state = Jumping;
 		}
 	}
 	// InPlat movement

@@ -39,6 +39,7 @@ int levelScore; // level score
 
 CP_Font text;
 CP_Image player_sprite;
+int sprite_x, sprite_y;
 CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 
 int numplats;
@@ -117,7 +118,22 @@ int numplats;
 
 
 	// Player Struct
-	#pragma region Player Struct
+	#pragma region Player
+		typedef enum PlayerState {
+			Idle,
+			Running,
+			Jumping,
+		} PlayerState;
+		
+		typedef enum PlayerDirection {
+			OnLeft,
+			OnRight,
+			InUp,
+			InDown,
+			InLeft,
+			InRight,
+		} PlayerDirection;
+
 		typedef struct Player {
 			float x; //posx
 			float y; //posy
@@ -126,11 +142,14 @@ int numplats;
 			float stamina; //stamina for InPlat
 			float width; //width
 			float height; //height
-			float transition_time;
+			float transition_time; //transition timer
 			int onplatform;
 			int withinx;
 			int leaveplatform;
 			CP_Color color; //color
+			PlayerState state;
+			PlayerDirection direction;
+			float anim; //sprite animation timer
 		} Player;
 
 		Player player; //player 

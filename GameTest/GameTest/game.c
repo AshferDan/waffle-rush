@@ -22,7 +22,8 @@ void Game_Init(void)
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
 	// load player sprite
-	player_sprite = CP_Image_Load("Assets/Waffle_Player.png");
+	//player_sprite = CP_Image_Load("Assets/Waffle_Player.png");
+	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
 #pragma endregion
 
 
@@ -122,6 +123,11 @@ void Game_Init(void)
 	player.stamina = 100.0f;
 	// color
 	player.color = CP_Color_Create(150, 150, 200, 255);
+	// anim state
+	player.state = Idle;
+	player.anim = 0;
+	player.direction = OnRight;
+	// 
 
 	// initialize deaths
 	deaths = 0;
@@ -217,7 +223,7 @@ void Game_Update(void)
 
 		// movement logics
 		movement(&player, movestate, speed, dt);
-		printf("movex %f, movey %f\n", player.movex, player.movey);
+		printf("Playerstate %d\n", player.state);
 		// reset checks for jumping and entering
 		player.onplatform = 0;
 		player.withinx = 0;
@@ -254,6 +260,12 @@ void Game_Update(void)
 			player.movey = 0;
 			deaths++;
 		}
+
+		// animation timer update
+		player.anim += 10 * dt;
+		if (player.anim >= 20) {
+			player.anim = 0;
+		}
 	}
 #pragma endregion
 
@@ -286,7 +298,53 @@ void Game_Update(void)
 	}
 
 	// Player
-	CP_Image_Draw(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, 255);
+	if (player.direction == OnLeft) {
+		switch (player.state) {
+		case Idle:
+			sprite_y = 0;
+			break;
+		case Running:
+			sprite_y = 480;
+			break;
+		case Jumping:
+			sprite_y = 960;
+			break;
+		}
+	}
+	else if (player.direction == OnRight) {
+		switch (player.state) {
+		case Idle:
+			sprite_y = 1440;
+			break;
+		case Running:
+			sprite_y = 1920;
+			break;
+		case Jumping:
+			sprite_y = 2400;
+			break;
+		}
+	}
+	switch (player.state) {
+	case Idle:
+		if (player.anim < 10) {
+			sprite_x = 0;
+		} else {
+			sprite_x = 480;
+		}
+		break;
+	case Running:
+		if ((int)player.anim % 2 == 0) {
+			sprite_x = 0;
+		} else {
+			sprite_x = 480;
+		}
+		break;
+	case Jumping:
+		sprite_x = 0;
+		break;
+	}
+
+	CP_Image_DrawSubImage(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, sprite_x, sprite_y, sprite_x + 480, sprite_y + 480, 255);
 	// Stamina Bar
 	CP_Settings_Fill(stamina);
 	if (player.stamina <= 35.0f) {
