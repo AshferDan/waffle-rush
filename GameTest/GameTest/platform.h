@@ -30,14 +30,20 @@ MoveState movestate;
 int numplats;
 
 int deaths;
-float speed; // speed
-float width, height; // window width/height
-float spawnx, spawny, goalx, goaly; // spawn position
+float speed; //speed
+float width, height; //window width/height
+float spawnx, spawny, goalx, goaly; // spawn and goal position
 int isPaused; // check if game paused
+int isCleared; // check if level cleared (player touches goal)
+int levelScore; // level score
 
 CP_Font text;
 CP_Image player_sprite;
 CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
+
+int numplats;
+
+
 
 // STRUCTS --------------------------------------------
 #pragma region Structs
