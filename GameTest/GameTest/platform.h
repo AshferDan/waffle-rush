@@ -200,6 +200,9 @@ int numplats;
 		void CollOnPlatforms(int plat_index, platform plt, Player* p, Player ply);
 	#pragma endregion 
 
-	// draw platforms
+	// Draw Platforms
 	void DrawPlatform(int plat_index);
+
+	// Draw Player
+	void Draw_Player(CP_Image player_sprite, Player player, float* spr_x, float* spr_y);
 #pragma endregion

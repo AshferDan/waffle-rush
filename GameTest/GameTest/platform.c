@@ -8,6 +8,7 @@
 //			- Transitioning movestates
 //			- Assigning platform properties
 //			- Collision logic
+//			- Render logic
 //
 // Copyright © 2020 DigiPen, All rights reserved.
 //---------------------------------------------------------
@@ -433,4 +434,28 @@ void DrawPlatform(int plat_index) {
 		CP_Graphics_AddVertex(Platform[plat_index].platcoords[i].x, Platform[plat_index].platcoords[i].y);
 	}
 	CP_Graphics_EndShape();
+}
+
+void Draw_Player(CP_Image player_sprite, Player player, float *spr_x, float *spr_y) {
+	switch (player.direction) {
+	case OnLeft:
+		*spr_y = 0;
+		break;
+	case OnRight:
+		*spr_y = 480;
+		break;
+	}
+	switch (player.state) {
+	case Idle:
+		*spr_x = (player.anim < 10) ? 0 : 480;
+		break;
+	case Running:
+		*spr_x = ((int)player.anim % 2 == 0) ? 960 : 1440;
+		break;
+	case Jumping:
+		*spr_x = 1920;
+		break;
+	}
+
+	CP_Image_DrawSubImage(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, *spr_x, *spr_y, *spr_x + 480, *spr_y + 480, 255);
 }

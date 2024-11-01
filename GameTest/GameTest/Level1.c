@@ -19,7 +19,7 @@ void L1_Init(void)
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
 	// load player sprite
-	player_sprite = CP_Image_Load("Assets/Waffle_Player.png");
+	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
 #pragma endregion
 
 
@@ -252,6 +252,12 @@ void L1_Update(void)
 			player.movey = 0;
 			deaths++;
 		}
+
+		// animation timer update
+		player.anim += 10 * dt;
+		if (player.anim >= 20) {
+			player.anim = 0;
+		}
 	}
 #pragma endregion
 
@@ -284,7 +290,8 @@ void L1_Update(void)
 	}
 
 	// Player
-	CP_Image_Draw(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, 255);
+	Draw_Player(player_sprite, player, &sprite_x, &sprite_y);
+
 	// Stamina Bar
 	CP_Settings_Fill(stamina);
 	if (player.stamina <= 35.0f) {

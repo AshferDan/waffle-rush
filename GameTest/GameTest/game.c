@@ -22,7 +22,6 @@ void Game_Init(void)
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
 	// load player sprite
-	//player_sprite = CP_Image_Load("Assets/Waffle_Player.png");
 	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
 #pragma endregion
 
@@ -298,53 +297,8 @@ void Game_Update(void)
 	}
 
 	// Player
-	if (player.direction == OnLeft) {
-		switch (player.state) {
-		case Idle:
-			sprite_y = 0;
-			break;
-		case Running:
-			sprite_y = 480;
-			break;
-		case Jumping:
-			sprite_y = 960;
-			break;
-		}
-	}
-	else if (player.direction == OnRight) {
-		switch (player.state) {
-		case Idle:
-			sprite_y = 1440;
-			break;
-		case Running:
-			sprite_y = 1920;
-			break;
-		case Jumping:
-			sprite_y = 2400;
-			break;
-		}
-	}
-	switch (player.state) {
-	case Idle:
-		if (player.anim < 10) {
-			sprite_x = 0;
-		} else {
-			sprite_x = 480;
-		}
-		break;
-	case Running:
-		if ((int)player.anim % 2 == 0) {
-			sprite_x = 0;
-		} else {
-			sprite_x = 480;
-		}
-		break;
-	case Jumping:
-		sprite_x = 0;
-		break;
-	}
+	Draw_Player(player_sprite, player, &sprite_x, &sprite_y);
 
-	CP_Image_DrawSubImage(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, sprite_x, sprite_y, sprite_x + 480, sprite_y + 480, 255);
 	// Stamina Bar
 	CP_Settings_Fill(stamina);
 	if (player.stamina <= 35.0f) {
