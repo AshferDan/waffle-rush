@@ -61,9 +61,7 @@ void Game_Init(void)
 	player.color = CP_Color_Create(150, 150, 200, 255);
 
 	// timer
-	totalMinutes = 0;
-	totalSeconds = 0;
-	totalMillis = 0;
+	timer = (Timer){ 0,0,0 };
 
 	// game pause
 	isPaused = 0;
@@ -134,6 +132,8 @@ void Game_Init(void)
 	// Corner drawing
 	CP_Settings_RectMode(CP_POSITION_CORNER);
 	CP_Settings_ImageMode(CP_POSITION_CORNER);
+
+	//CP_System_SetFrameRate(30);
 }
 
 void Game_Update(void)
@@ -154,22 +154,16 @@ void Game_Update(void)
 	}
 
 	// Timer UI
+
 	if (isPaused == 0) {
-		totalMinutes = totalMinutes;
-		totalSeconds += dt;
-		totalMillis += dt*100;
-		if (totalMillis >= 100) {
-			totalMillis = 0;
+		timer.seconds += dt;
+		if (timer.seconds >= 60) {
+			timer.seconds = 0;
+			timer.minutes++;
 		}
+		timer.millis = (int)(timer.seconds * 100)%100;
 	}
 	
-	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
-	CP_Settings_TextSize(60);
-	char time[16] = { 0 };
-	if (totalSeconds >= 60) {
-		totalSeconds -= 60;
-		totalMinutes += 1;
-	}
 
 	// MOVEMENT 
 	/*---------------------------------------------------------------------------------------------------*/
@@ -189,7 +183,7 @@ void Game_Update(void)
 
 		// movement logics
 		movement(&player, movestate, speed, dt);
-
+		printf("movex %f, movey %f\n", player.movex, player.movey);
 		// reset checks for jumping and entering
 		player.onplatform = 0;
 		player.withinx = 0;
@@ -246,7 +240,10 @@ void Game_Update(void)
 	CP_Image_Draw(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, 255);
 	// Stamina Bar
 	CP_Settings_Fill(stamina);
-	DrawStatBar(player.x - 15, player.y - 25, player.x + 35, player.y - 20, player.stamina, 100);
+	if (player.stamina <= 35.0f) {
+		CP_Settings_Fill(red);
+	}
+	DrawStatBar(player.x - 15, player.y - 30, player.x + 35, player.y - 23, player.stamina, 100);
 
 	// DEATHS DRAWING
 	CP_Settings_Fill(black);
@@ -262,8 +259,10 @@ void Game_Update(void)
 	}
 
 	// TIMER DRAWING
-	sprintf_s(time, 16, "TIME: %02d:%02d:%02d", (int)totalMinutes, (int)totalSeconds, (int)totalMillis);
-	CP_Font_DrawText(time, 1250, 100);
+
+	char time[16] = { 0 };
+	sprintf_s(time, 16, "TIME: %02d:%02d:%02d", (int)timer.minutes, (int)timer.seconds, (int)timer.millis);
+	CP_Font_DrawText(time, 1250, 200);
 
 	// PAUSE PAGE
 	if (isPaused == 1) {

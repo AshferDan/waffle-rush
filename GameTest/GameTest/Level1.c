@@ -219,10 +219,10 @@ void L1_Update(void)
 	CP_Image_Draw(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, 255);
 	// Stamina Bar
 	CP_Settings_Fill(stamina);
-	if (player.stamina <= 25.0f) {
+	if (player.stamina <= 35.0f) {
 		CP_Settings_Fill(red);
 	}
-	DrawStatBar(player.x - 15, player.y - 25, player.x + 35, player.y - 20, player.stamina, 100);
+	DrawStatBar(player.x - 15, player.y - 30, player.x + 35, player.y - 23, player.stamina, 100);
 
 	// DEATHS DRAWING
 	CP_Settings_Fill(black);
