@@ -54,7 +54,7 @@ void LSelect_Update(void)
 
 	//header text
 	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
-	CP_Font_DrawText("LEVEL SELECT", CP_System_GetWindowWidth() / 2, 100);
+	CP_Font_DrawText("LEVEL SELECT", width / 2, 100);
 
 	//level 1 button
 	if (levels[0].isUnlocked == 1 && levels[0].isCleared == 1) {
