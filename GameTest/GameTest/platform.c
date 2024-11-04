@@ -57,9 +57,13 @@ MoveState transition(Player* ply, MoveState movestate, float dt) {
 	// End of transitioning, return movestate to continue movement
 	if (ply->transition_time >= 1) {
 		if (movestate == EnterPlat) {
+			ply->state = Idle;
+			ply->direction = InDown;
 			return InPlat;
 		}
 		if (movestate == ExitPlat) {
+			ply->state = Idle;
+			ply->direction = OnRight;
 			return OnPlat;
 		}
 	}
@@ -118,6 +122,8 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		if (CP_Input_KeyDown(KEY_W)) {
 			if (ply->movey > -speed2) {
 				ply->movey -= accel2 * dt;
+				ply->direction = InUp;
+				ply->state = Crawling;
 			}
 		}
 		else if (ply->movey < 0) {
@@ -127,6 +133,8 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		if (CP_Input_KeyDown(KEY_S)) {
 			if (ply->movey < speed2) {
 				ply->movey += accel2 * dt;
+				ply->direction = InDown;
+				ply->state = Crawling;
 			}
 		}
 		else if (ply->movey > 0) {
@@ -136,6 +144,8 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		if (CP_Input_KeyDown(KEY_A)) {
 			if (ply->movex > -speed2) {
 				ply->movex -= accel2 * dt;
+				ply->direction = InLeft;
+				ply->state = Crawling;
 			}
 		}
 		else if (ply->movex < 0) {
@@ -145,6 +155,8 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		if (CP_Input_KeyDown(KEY_D)) {
 			if (ply->movex < speed2) {
 				ply->movex += accel2 * dt;
+				ply->direction = InRight;
+				ply->state = Crawling;
 			}
 		}
 		else if (ply->movex > 0) {
@@ -157,6 +169,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		if (!(CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D)) && (ply->movex <= 50.f && ply->movex >= -50.f)) {
 			ply->movex = 0;
 		}
+
 	}
 
 	// Update movement only if InPlat/OnPlat, ignore transition
@@ -444,12 +457,25 @@ void Draw_Player(CP_Image player_sprite, Player player, float *spr_x, float *spr
 	case OnRight:
 		*spr_y = 480;
 		break;
+	case InUp:
+		*spr_y = 960;
+		break;
+	case InLeft:
+		*spr_y = 1440;
+		break;
+	case InDown:
+		*spr_y = 1920;
+		break;
+	case InRight:
+		*spr_y = 2400;
+		break;
 	}
 	switch (player.state) {
 	case Idle:
 		*spr_x = (player.anim < 10) ? 0 : 480;
 		break;
 	case Running:
+	case Crawling:
 		*spr_x = ((int)player.anim % 2 == 0) ? 960 : 1440;
 		break;
 	case Jumping:
@@ -458,4 +484,18 @@ void Draw_Player(CP_Image player_sprite, Player player, float *spr_x, float *spr
 	}
 
 	CP_Image_DrawSubImage(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, *spr_x, *spr_y, *spr_x + 480, *spr_y + 480, 255);
+	//CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, *spr_x, *spr_y, *spr_x + 48);
+}
+
+void Draw_Player_Transitioning_Sprite(Player player, float transit_time, MoveState movestate) {
+	float transit_sprite_x, transit_sprite_y;
+	transit_sprite_y = (movestate == EnterPlat) ? 96 : 0;
+
+	transit_sprite_x = ((int)transit_time / 1) * 48;
+	/*if (movestate == OnPlat || movestate == InPlat) {
+		Draw_Player(player_sprite, player, &sprite_x, &sprite_y);
+	}
+	else */if (movestate == EnterPlat || movestate == ExitPlat) {
+		CP_Image_DrawSubImage(transition_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, transit_sprite_x, transit_sprite_y, transit_sprite_x + 48, transit_sprite_y + 96, 255);
+	}
 }
