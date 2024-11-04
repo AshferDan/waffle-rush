@@ -29,6 +29,9 @@ void Credits_Init(void) {
 		fgets(names[i].name, sizeof(names[i].name), file);
 	}
 	fclose(file);
+
+	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+	CP_Settings_RectMode(CP_POSITION_CENTER);
 }
 
 void Credits_Update(void) {
@@ -49,7 +52,7 @@ void Credits_Update(void) {
 	//header text
 	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
 	CP_Settings_TextSize(150);
-	CP_Font_DrawText("CREDITS: ", width / 2, 100);
+	CP_Font_DrawText("CREDITS:", width / 2, 100);
 
 	CP_Settings_TextSize(100);
 	char credits[500] = { 0 };
