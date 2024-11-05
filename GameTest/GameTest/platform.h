@@ -36,6 +36,8 @@ float spawnx, spawny, goalx, goaly; // spawn and goal position
 int isPaused; // check if game paused
 int isCleared; // check if level cleared (player touches goal)
 int levelScore; // level score
+int highScore; // level high score
+int levelNumber; // level number
 
 CP_Font text;
 CP_Image player_sprite;
