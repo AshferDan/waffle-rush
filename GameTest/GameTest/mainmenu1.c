@@ -19,7 +19,7 @@ float hpx1, hpx2, hpy1, hpy2; //positions of hp bar
 CP_Font text;
 CP_Image player_sprite;
 
-void L1_Init(void)
+void MainMenu1_Init(void)
 {
 	// load font
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
@@ -130,7 +130,7 @@ void L1_Init(void)
 }
 
 
-void L1_Update(void)
+void MainMenu1_Update(void)
 {
 	//button color
 	button_color = CP_Color_Create(200, 60, 60, 255);
@@ -225,7 +225,7 @@ void L1_Update(void)
 	if (CP_Input_KeyDown(KEY_Q)) { CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit); };
 }
 
-void L1_Exit(void)
+void MainMenu1_Exit(void)
 {
 
 	CP_Image_Free(player_sprite);
