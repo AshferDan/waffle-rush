@@ -285,7 +285,7 @@ void Game_Update(void)
 		}
 
 		else if (movestate == InPlat) {
-			player.stamina -= 20.0f * dt;
+			//player.stamina -= 20.0f * dt;
 			for (int plat_index = 0; plat_index < numplats; plat_index++) {
 				CollPlatforms(plat_index, Platform[plat_index], &player, player);
 			}

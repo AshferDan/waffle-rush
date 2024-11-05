@@ -86,24 +86,25 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			ply->movey = -speed;
 		}
 		// left
-		if (CP_Input_KeyDown(KEY_A) && (ply->movex > -speed)) {
+		if (CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D)) && (ply->movex > -speed)) {
 			ply->movex -= accel * dt;
 			ply->direction = OnLeft;
 		}
-		else if ((ply->movex < 100.f) && !(CP_Input_KeyDown(KEY_A))) {
+		else if ((ply->movex < 100.f) && (!(CP_Input_KeyDown(KEY_A))|| ((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))))) {
 			ply->movex += accel * dt;
 		};
 		// right
-		if (CP_Input_KeyDown(KEY_D) && (ply->movex < speed)) {
+		if (CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A)) && (ply->movex < speed)) {
 			ply->movex += accel * dt;
 			ply->direction = OnRight;
 		}
-		else if ((ply->movex > 100.f) && !(CP_Input_KeyDown(KEY_D))) {
+		else if ((ply->movex > 100.f) && (!(CP_Input_KeyDown(KEY_A)) || ((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))))) {
 			ply->movex -= accel * dt;
 		};
-		if ((!((CP_Input_KeyDown(KEY_A)) || (CP_Input_KeyDown(KEY_D))) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
+		if (((((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))) || !((CP_Input_KeyDown(KEY_A)) || (CP_Input_KeyDown(KEY_D)))) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
 			ply->movex = 0;
 		}
+
 
 		// anim state
 		if (ply->onplatform == 1) {
