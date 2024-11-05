@@ -42,6 +42,9 @@
     <ClCompile Include="mainmenu1.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="credits.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainmenu.h">
@@ -68,6 +71,9 @@
     <ClInclude Include="mainmenu1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="credits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Assets\Level1.txt">
@@ -83,6 +89,9 @@
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="..\Assets\LevelSelect.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\Assets\Credits.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

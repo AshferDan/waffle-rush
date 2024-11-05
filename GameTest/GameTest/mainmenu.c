@@ -28,8 +28,8 @@ void Main_Menu_Update(void)
 	int height = CP_System_GetWindowHeight();
 
 	//track pointer
-	float mouseX = CP_Input_GetMouseX();
-	float mouseY = CP_Input_GetMouseY();
+	mouseX = CP_Input_GetMouseX();
+	mouseY = CP_Input_GetMouseY();
 
 
 	//button color
@@ -61,12 +61,23 @@ void Main_Menu_Update(void)
 		}
 	}
 
+	//credits button
+	TextBoxCreate(width / 2, 5 * height / 9, 500, 150, "CREDITS", button_color);
+	int CreditsClick = IsAreaClicked(width / 2, 5 * height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
+	if (CreditsClick) {
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
+		CP_Graphics_DrawRect(width / 2, 5 * height / 9, 500, 150);
+		if (CP_Input_MouseClicked()) { //if LMB1 pressed
+			CP_Engine_SetNextGameState(Credits_Init, Credits_Update, Credits_Exit); //go to test stage
+		}
+	}
+
 	//draw exit button
-	TextBoxCreate(width / 2, 2 * height / 3, 500, 150, "EXIT", button_color);
-	int ExitClick = IsAreaClicked(width / 2, 2 * height / 3, 500, 150, mouseX, mouseY); //if mouse is over button
+	TextBoxCreate(width / 2, 7 * height / 9, 500, 150, "EXIT", button_color);
+	int ExitClick = IsAreaClicked(width / 2, 7 * height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
 	if (ExitClick) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-		CP_Graphics_DrawRect(width / 2, 2 * height / 3, 500, 150);
+		CP_Graphics_DrawRect(width / 2, 7 * height / 9, 500, 150);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
 			CP_Engine_Terminate(); //end game
 		}

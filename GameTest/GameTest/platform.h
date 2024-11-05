@@ -29,9 +29,35 @@ MoveState movestate;
 
 int numplats;
 
+int deaths;
+float speed; //speed
+float width, height; //window width/height
+float spawnx, spawny, goalx, goaly; // spawn and goal position
+int isPaused; // check if game paused
+int isCleared; // check if level cleared (player touches goal)
+int levelScore; // level score
+
+CP_Font text;
+CP_Image player_sprite;
+int sprite_x, sprite_y;
+CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
+
+int numplats;
+
+
 
 // STRUCTS --------------------------------------------
 #pragma region Structs
+
+	// Time Struct
+	#pragma region Timer
+		typedef struct Timer {
+			float minutes, seconds, millis;
+		} Timer;
+
+		Timer timer;
+	#pragma endregion
+
 
 	// Platform Struct
 	#pragma region Platform Structs
@@ -91,9 +117,23 @@ int numplats;
 	#pragma endregion Platform Structs
 
 
-
 	// Player Struct
-	#pragma region Player Struct
+	#pragma region Player
+		typedef enum PlayerState {
+			Idle,
+			Running,
+			Jumping,
+		} PlayerState;
+		
+		typedef enum PlayerDirection {
+			OnLeft,
+			OnRight,
+			InUp,
+			InDown,
+			InLeft,
+			InRight,
+		} PlayerDirection;
+
 		typedef struct Player {
 			float x; //posx
 			float y; //posy
@@ -102,14 +142,17 @@ int numplats;
 			float stamina; //stamina for InPlat
 			float width; //width
 			float height; //height
-			float transition_time;
+			float transition_time; //transition timer
 			int onplatform;
 			int withinx;
 			int leaveplatform;
 			CP_Color color; //color
+			PlayerState state;
+			PlayerDirection direction;
+			float anim; //sprite animation timer
 		} Player;
 
-		struct Player player; //player 
+		Player player; //player 
 	#pragma endregion Player Struct
 
 #pragma endregion
@@ -157,6 +200,9 @@ int numplats;
 		void CollOnPlatforms(int plat_index, platform plt, Player* p, Player ply);
 	#pragma endregion 
 
-	// draw platforms
+	// Draw Platforms
 	void DrawPlatform(int plat_index);
+
+	// Draw Player
+	void Draw_Player(CP_Image player_sprite, Player player, float* spr_x, float* spr_y);
 #pragma endregion

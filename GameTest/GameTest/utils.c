@@ -106,33 +106,33 @@ void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const c
 	CP_Font_DrawText(text, pos_x, pos_y);
 }
 
-// draw full hp bar
+// draw full stat bar
 // 
 // pos_x1, pos_y1 - position of top left corner
 // pos_x2, pos_y2 - position of bottom right corner
-// hp - current health
-// maxhp - max health
+// stat - current health
+// max_stat - max health
 //
-void DrawHPBar(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp, float maxhp) {
+void DrawStatBar(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float stat, float max_stat) {
 	// assign total width, height, and width of health bar
-	float width, height, hpwidth;
+	float width, height, statwidth;
 	//width and height of total bar
 	width = pos_x2 - pos_x1;
 	height = pos_y2 - pos_y1;
-	//width of current hp
-	hpwidth = width * hp / maxhp;
+	//width of current stat
+	statwidth = width * stat / max_stat;
 	// draw the rectangle
-	CP_Graphics_DrawRect(pos_x1, pos_y1, hpwidth, height);
+	CP_Graphics_DrawRect(pos_x1, pos_y1, statwidth, height);
 }
-// draw segmented hp bar
+// draw segmented stat bar
 // 
 // pos_x1, pos_y1 - position of top left corner
 // pos_x2, pos_y2 - position of bottom right corner
-// hp - current health
-// maxhp - max health
+// stat - current health
+// max_stat - max health
 //
 void DrawHPBar2(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp, float maxhp) {
-	//array of hp in 10% chunks
+	//array of stat in 10% chunks
 	int hpbar[10] = {0, maxhp / 10, 2 * maxhp / 10, 3 * maxhp / 10, 4 * maxhp / 10, 5 * maxhp / 10, 6 * maxhp / 10, 7 * maxhp / 10, 8 * maxhp / 10 , 9 * maxhp / 10}; //array 10% blocks
 	//size of full bar
 	float width = pos_x2 - pos_x1;
@@ -140,9 +140,9 @@ void DrawHPBar2(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float hp
 	//segment width and interval
 	float segmentwidth = width / 10;
 	float segmentinterval = 15;
-	//for loop to check hp 10% chunks
+	//for loop to check stat 10% chunks
 	for (int i = 0; i < 10; ++i) {
-		if (hp > (hpbar[i])+maxhp/20) { //if hp>10% interval, draw 10% chunk
+		if (hp > (hpbar[i])+maxhp/20) { //if stat>10% interval, draw 10% chunk
 			CP_Graphics_DrawRect(pos_x1 + (i * (segmentwidth + segmentinterval/10)), pos_y1 + 100, segmentwidth - segmentinterval, height);
 		}
 
@@ -157,4 +157,10 @@ int SquareTriangleCollide (float squarex, float squarey, float squarewidth, floa
 
 
 	return 0;
+}
+
+void AddScore(int *totalScore, int addScore, int *isCleared) {
+	if (!*isCleared) {
+		*totalScore += addScore;
+	}
 }

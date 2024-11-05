@@ -9,6 +9,7 @@
 //---------------------------------------------------------
 #pragma once
 #include "LevelSelect.h"
+#include "credits.h"
 
 void Main_Menu_Init(void);
 void Main_Menu_Update(void);
