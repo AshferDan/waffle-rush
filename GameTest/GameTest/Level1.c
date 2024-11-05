@@ -7,8 +7,9 @@
 //
 // Copyright © 2020 DigiPen, All rights reserved.
 //---------------------------------------------------------
-
+#pragma once
 #include "Level1.h"
+#include "hazard.h"
 
 void L1_Init(void)
 {
@@ -245,7 +246,9 @@ void L1_Update(void)
 		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
 
 		// reset with R or touch ground while movestate OnPlat
-		if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)) {
+		Point squareTopLeft = { player.x, player.y };
+		Point A = { traps[2].x[0], traps[2].y[0] }, B = { traps[2].x[1], traps[2].y[1] }, C = { traps[2].x[2], traps[2].y[2] };
+		if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)|| check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C)) {
 			player.x = spawnx;
 			player.y = spawny;
 			movestate = OnPlat;
@@ -259,6 +262,12 @@ void L1_Update(void)
 			player.anim = 0;
 		}
 	}
+#pragma endregion
+	// Hazard
+	/*---------------------------------------------------------------------------------------------------*/
+#pragma region Hazard stuff
+	
+//placeholder
 #pragma endregion
 
 	// RENDER
