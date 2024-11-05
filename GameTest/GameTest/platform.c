@@ -118,12 +118,13 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	}
 	// InPlat movement
 	if (movestate == InPlat) {
+		ply->state = Idle;
 		// up
 		if (CP_Input_KeyDown(KEY_W)) {
+			ply->state = Crawling;
 			if (ply->movey > -speed2) {
 				ply->movey -= accel2 * dt;
 				ply->direction = InUp;
-				ply->state = Crawling;
 			}
 		}
 		else if (ply->movey < 0) {
@@ -131,10 +132,11 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		}
 		// down
 		if (CP_Input_KeyDown(KEY_S)) {
+			ply->state = Crawling;
 			if (ply->movey < speed2) {
 				ply->movey += accel2 * dt;
 				ply->direction = InDown;
-				ply->state = Crawling;
+				
 			}
 		}
 		else if (ply->movey > 0) {
@@ -142,10 +144,10 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		}
 		// left
 		if (CP_Input_KeyDown(KEY_A)) {
+			ply->state = Crawling;
 			if (ply->movex > -speed2) {
 				ply->movex -= accel2 * dt;
 				ply->direction = InLeft;
-				ply->state = Crawling;
 			}
 		}
 		else if (ply->movex < 0) {
@@ -153,10 +155,10 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		}
 		// right
 		if (CP_Input_KeyDown(KEY_D)) {
+			ply->state = Crawling;
 			if (ply->movex < speed2) {
 				ply->movex += accel2 * dt;
 				ply->direction = InRight;
-				ply->state = Crawling;
 			}
 		}
 		else if (ply->movex > 0) {
