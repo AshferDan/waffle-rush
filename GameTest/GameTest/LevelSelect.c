@@ -93,7 +93,7 @@ void LSelect_Update(void)
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 			CP_Graphics_DrawRect(width / 4 + 200, height / 3, 150, 150);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
-				CP_Engine_SetNextGameState(L1_Init, L1_Update, L1_Exit); //go to game
+				CP_Engine_SetNextGameState(L2_Init, L2_Update, L2_Exit); //go to game
 			}
 		}
 	}

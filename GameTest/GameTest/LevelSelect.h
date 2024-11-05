@@ -11,6 +11,7 @@
 #pragma once
 #include "game.h"
 #include "Level1.h"
+#include "Level2.h"
 
 // leevl struct
 typedef struct level {

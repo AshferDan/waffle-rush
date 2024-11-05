@@ -15,6 +15,7 @@
     <ClCompile Include="game.c" />
     <ClCompile Include="hazard.c" />
     <ClCompile Include="Level1.c" />
+    <ClCompile Include="Level2.c" />
     <ClCompile Include="LevelSelect.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="mainmenu.c" />
@@ -26,6 +27,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="hazard.h" />
     <ClInclude Include="Level1.h" />
+    <ClInclude Include="Level2.h" />
     <ClInclude Include="LevelSelect.h" />
     <ClInclude Include="platform.h" />
     <ClInclude Include="mainmenu.h" />
@@ -36,6 +38,7 @@
     <Text Include="..\Assets\Credits.txt" />
     <Text Include="..\Assets\Level1.txt" />
     <Text Include="..\Assets\Level1hazard.txt" />
+    <Text Include="..\Assets\Level2.txt" />
     <Text Include="..\Assets\LevelSelect.txt" />
     <Text Include="..\Assets\testhazard.txt" />
   </ItemGroup>
