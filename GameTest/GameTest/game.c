@@ -202,16 +202,16 @@ void Game_Update(void)
 		}
 		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
 
-	// Timer update
-	if (isPaused == 0 && isCleared == 0) {
-		timer.seconds += dt;
-		if (timer.seconds >= 60) {
-			timer.seconds = 0;
-			timer.minutes++;
+		// Timer update
+		if (isPaused == 0 && isCleared == 0) {
+			timer.seconds += dt;
+			if (timer.seconds >= 60) {
+				timer.seconds = 0;
+				timer.minutes++;
+			}
+			timer.millis = (int)(timer.seconds * 100) % 100;
 		}
-		timer.millis = (int)(timer.seconds * 100)%100;
 	}
-	
 	// MOVEMENT 
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Movement
@@ -376,7 +376,9 @@ void Game_Update(void)
 #pragma endregion
 
 	// Back to main menu
-	if (CP_Input_KeyDown(KEY_Q)) { CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit); };
+	if (CP_Input_KeyDown(KEY_Q)) {
+		CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit); 
+	}
 
 }
 

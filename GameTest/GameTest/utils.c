@@ -164,22 +164,5 @@ void AddScore(int *totalScore, int addScore, int *isCleared) {
 		*totalScore += addScore;
 	}
 }
-<<<<<<< Updated upstream
-=======
-
-int SquareTriangleCollide (float squarex, float squarey, float squarewidth, float squareheight, float tri1x,float tri1y, float tri2x, float tri2y, float tri3x, float tri3y) {
-	// is Triangle corner in square?
-	if ((IsAreaCornerClicked(squarex, squarey, squarewidth, squareheight, tri1x, tri1y))|| (IsAreaCornerClicked(squarex, squarey, squarewidth, squareheight, tri2x, tri2y))|| (IsAreaCornerClicked(squarex, squarey, squarewidth, squareheight, tri3x, tri3y))) {
-		return 1;
-	}
 
 
-	return 0;
-}
-
-void AddScore(int *totalScore, int addScore, int *isCleared) {
-	if (!*isCleared) {
-		*totalScore += addScore;
-	}
-}
->>>>>>> Stashed changes
