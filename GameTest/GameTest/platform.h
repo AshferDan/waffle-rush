@@ -27,8 +27,8 @@ typedef enum MoveState {
 
 MoveState movestate;
 
+// Level Variables
 int numplats;
-
 int deaths;
 float speed; //speed
 float width, height; //window width/height
@@ -37,13 +37,19 @@ int isPaused; // check if game paused
 int isCleared; // check if level cleared (player touches goal)
 int levelScore; // level score
 
+// Graphics
+CP_Image player_sprite, transition_sprite;
+
+int player_sprite_x, player_sprite_y;
+float transit_sprite_x, transit_sprite_y;
+
+// Anim timer
+float transit_anim;
+
+
 CP_Font text;
-CP_Image player_sprite;
 int sprite_x, sprite_y;
 CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
-
-int numplats;
-
 
 
 // STRUCTS --------------------------------------------
@@ -123,6 +129,7 @@ int numplats;
 			Idle,
 			Running,
 			Jumping,
+			Crawling,
 		} PlayerState;
 		
 		typedef enum PlayerDirection {
@@ -132,6 +139,11 @@ int numplats;
 			InDown,
 			InLeft,
 			InRight,
+			InUpLeft,
+			InUpRight,
+			InDownLeft,
+			InDownRight,
+			Null,
 		} PlayerDirection;
 
 		typedef struct Player {
@@ -205,4 +217,6 @@ int numplats;
 
 	// Draw Player
 	void Draw_Player(CP_Image player_sprite, Player player, float* spr_x, float* spr_y);
+
+	void Draw_Player_Transitioning_Sprite(Player player, float transit_time, MoveState movestate);
 #pragma endregion

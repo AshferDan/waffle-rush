@@ -164,3 +164,5 @@ void AddScore(int *totalScore, int addScore, int *isCleared) {
 		*totalScore += addScore;
 	}
 }
+
+
