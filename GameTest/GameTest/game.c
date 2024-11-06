@@ -10,7 +10,6 @@
 
 #include "game.h"
 
-float transit_time;
 
 void Game_Init(void)
 {
@@ -149,7 +148,7 @@ void Game_Init(void)
 	// score
 	levelScore = 0;
 
-	transit_time = 15;
+	transit_anim = 15;
 	transit_anim = 15;
 
 	transit_sprite_x = 0;
@@ -186,6 +185,7 @@ void Game_Update(void)
 
 	// getdt
 	float dt = CP_System_GetDt();
+	dt = CP_Math_ClampFloat(dt, 0, 0.05);
 
 	// get mouse coords
 	mouseX = CP_Input_GetMouseX();
@@ -210,11 +210,11 @@ void Game_Update(void)
 		timer.millis = (int)(timer.seconds * 100) % 100;
 	}
 
-	if (transit_time < 13) {
-		transit_time += 20 * dt;
+	if (transit_anim < 13) {
+		transit_anim += 20 * dt;
 	}
-	if (transit_time > 13) {
-		transit_time = 13;
+	if (transit_anim > 13) {
+		transit_anim = 13;
 	}
 
 	// MOVEMENT 
@@ -238,7 +238,7 @@ void Game_Update(void)
 				player.movex = 0;
 			}
 			if (movestate == EnterPlat || movestate == ExitPlat) {
-				transit_time = 0;
+				transit_anim = 0;
 			}
 
 
@@ -246,7 +246,7 @@ void Game_Update(void)
 		}
 		// Transiting movestate
 		//movestate = transition(&player, movestate, dt);
-		if (transit_time >= 13) {
+		if (transit_anim >= 13) {
 			switch (movestate) {
 			case EnterPlat:
 				player.y += 50;
@@ -261,7 +261,7 @@ void Game_Update(void)
 				break;
 			case InPlat:
 			case OnPlat:
-				transit_time = 13;
+				transit_anim = 13;
 				break;
 			}
 
@@ -304,6 +304,8 @@ void Game_Update(void)
 			player.x = spawnx;
 			player.y = spawny;
 			movestate = OnPlat;
+			player.state = Idle;
+			player.direction = OnRight;
 			player.movey = 0;
 			deaths++;
 		}
@@ -346,22 +348,23 @@ void Game_Update(void)
 	}
 
 	// Player
-	transit_sprite_x = ((int)transit_time / 1) * 48;
+	transit_sprite_x = ((int)transit_anim / 1) * 48;
 	if (movestate == OnPlat || movestate == InPlat) {
 		Draw_Player(player_sprite, player, &sprite_x, &sprite_y);
 	}
 	else {
-		Draw_Player_Transitioning_Sprite(player, transit_time, movestate);
+		Draw_Player_Transitioning_Sprite(player, transit_anim, movestate);
 	}
 
-	printf("player_state %d, player_direction %d\n", player.state, player.direction);
+	printf("player_movex %f, player_movey %f, dt %f\n", player.movex, player.movey, dt);
 	// Stamina Bar
-	CP_Settings_Fill(stamina);
-	if (player.stamina <= 35.0f) {
-		CP_Settings_Fill(red);
+	if (!(movestate == OnPlat && player.stamina >= 100.0f)) {
+		CP_Settings_Fill(stamina);
+		if (player.stamina <= 35.0f) {
+			CP_Settings_Fill(red);
+		}
+		DrawStatBar(player.x - 15, player.y - 30, player.x + 35, player.y - 23, player.stamina, 100);
 	}
-	DrawStatBar(player.x - 15, player.y - 30, player.x + 35, player.y - 23, player.stamina, 100);
-
 	// DEATHS DRAWING
 	CP_Settings_Fill(black);
 	CP_Settings_TextSize(50);
