@@ -176,8 +176,8 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 	// MOVEMENT AND MOVESTATE LOGIC
 	#pragma region Movement and movestate
 		// set movestate
-		int start_transition(Player* ply, MoveState movestate);
-		MoveState transition(Player* ply, MoveState, float dt);
+		void start_transition(Player* player, MoveState* movestate);
+		void end_transition(Player* player, MoveState* movestate);
 		// platformer and in platform movements
 		void movement(Player* p, MoveState movestate, float speed, float dt);
 		#pragma endregion
@@ -218,8 +218,8 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 	void DrawPlatform(int plat_index);
 
 	// Draw Player
-	void Draw_Player(CP_Image player_sprite, Player player, float* spr_x, float* spr_y);
+	void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate);
 
-	void Draw_Player_Transitioning_Sprite(Player player, float transit_time);
+	void Draw_Player_Transitioning_Sprite(Player player);
 
 #pragma endregion
