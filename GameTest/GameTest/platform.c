@@ -119,24 +119,27 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	}
 	// InPlat movement
 	if (movestate == InPlat) {
+
+		PlayerDirection tempdirV = Null;
+		PlayerDirection tempdirH = Null;
 		ply->state = Idle;
 		// up
-		if (CP_Input_KeyDown(KEY_W)) {
+		if (CP_Input_KeyDown(KEY_W) && !CP_Input_KeyDown(KEY_S)) {
 			ply->state = Crawling;
+			tempdirV = InUp;
 			if (ply->movey > -speed2) {
 				ply->movey -= accel2 * dt;
-				ply->direction = InUp;
 			}
 		}
 		else if (ply->movey < 0) {
 			ply->movey += accel2 * dt;
 		}
 		// down
-		if (CP_Input_KeyDown(KEY_S)) {
+		if (CP_Input_KeyDown(KEY_S) && !CP_Input_KeyDown(KEY_W)) {
 			ply->state = Crawling;
+			tempdirV = InDown;
 			if (ply->movey < speed2) {
 				ply->movey += accel2 * dt;
-				ply->direction = InDown;
 				
 			}
 		}
@@ -144,33 +147,62 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			ply->movey -= accel2 * dt;
 		}
 		// left
-		if (CP_Input_KeyDown(KEY_A)) {
+		if (CP_Input_KeyDown(KEY_A) && !CP_Input_KeyDown(KEY_D)) {
 			ply->state = Crawling;
+			tempdirH = InLeft;
 			if (ply->movex > -speed2) {
 				ply->movex -= accel2 * dt;
-				ply->direction = InLeft;
 			}
 		}
 		else if (ply->movex < 0) {
 			ply->movex += accel2 * dt;
 		}
 		// right
-		if (CP_Input_KeyDown(KEY_D)) {
+		if (CP_Input_KeyDown(KEY_D) && !CP_Input_KeyDown(KEY_A)) {
 			ply->state = Crawling;
+			tempdirH = InRight;
 			if (ply->movex < speed2) {
 				ply->movex += accel2 * dt;
-				ply->direction = InRight;
 			}
 		}
 		else if (ply->movex > 0) {
 			ply->movex -= accel2 * dt;
 		}
 		// idle brake
-		if (!(CP_Input_KeyDown(KEY_W) || CP_Input_KeyDown(KEY_S))&& (ply->movey <= 50.f && ply->movey >= -50.f)) {
+		if (!(CP_Input_KeyDown(KEY_W) || CP_Input_KeyDown(KEY_S))||(CP_Input_KeyDown(KEY_W) && CP_Input_KeyDown(KEY_S)) && (ply->movey <= 50.f && ply->movey >= -50.f)) {
 			ply->movey = 0;
 		}
-		if (!(CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D)) && (ply->movex <= 50.f && ply->movex >= -50.f)) {
+		if (!(CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D)) || (CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D)) && (ply->movex <= 50.f && ply->movex >= -50.f)) {
 			ply->movex = 0;
+		}
+
+		// direction assignment
+		if (tempdirH != Null && tempdirV != Null) {
+			if (tempdirV == InUp) {
+				if (tempdirH == InLeft) {
+					ply->direction = InUpLeft;
+				}
+				else {
+					ply->direction = InUpRight;
+				}
+			}
+			else {
+				if (tempdirH == InLeft) {
+					ply->direction = InDownLeft;
+				}
+				else {
+					ply->direction = InDownRight;
+				}
+			}
+		}
+		if (tempdirV == Null && tempdirH == Null) {
+			ply->direction = ply->direction;
+		} 
+		else if (tempdirV == Null) {
+			ply->direction = tempdirH;
+		}
+		else if (tempdirH == Null) {
+			ply->direction = tempdirV;
 		}
 
 	}
@@ -453,6 +485,7 @@ void DrawPlatform(int plat_index) {
 }
 
 void Draw_Player(CP_Image player_sprite, Player player, float *spr_x, float *spr_y) {
+	float rot = 0;
 	switch (player.direction) {
 	case OnLeft:
 		*spr_y = 0;
@@ -462,15 +495,35 @@ void Draw_Player(CP_Image player_sprite, Player player, float *spr_x, float *spr
 		break;
 	case InUp:
 		*spr_y = 960;
+		rot = 0;
+		break;
+	case InUpLeft:
+		*spr_y = 960;
+		rot = 315;
 		break;
 	case InLeft:
-		*spr_y = 1440;
+		*spr_y = 960;
+		rot = 270;
+		break;
+	case InDownLeft:
+		*spr_y = 960;
+		rot = 225;
 		break;
 	case InDown:
-		*spr_y = 1920;
+		*spr_y = 960;
+		rot = 180;
+		break;
+	case InDownRight:
+		*spr_y = 960;
+		rot = 135;
 		break;
 	case InRight:
-		*spr_y = 2400;
+		*spr_y = 960;
+		rot = 90;
+		break;
+	case InUpRight:
+		*spr_y = 960;
+		rot = 45;
 		break;
 	}
 	switch (player.state) {
@@ -486,7 +539,7 @@ void Draw_Player(CP_Image player_sprite, Player player, float *spr_x, float *spr
 		break;
 	}
 
-	CP_Image_DrawSubImage(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, *spr_x, *spr_y, *spr_x + 480, *spr_y + 480, 255);
+	CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, *spr_x, *spr_y, *spr_x + 480, *spr_y + 480, 255, rot);
 	//CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, *spr_x, *spr_y, *spr_x + 48);
 }
 

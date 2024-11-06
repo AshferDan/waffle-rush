@@ -139,6 +139,11 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			InDown,
 			InLeft,
 			InRight,
+			InUpLeft,
+			InUpRight,
+			InDownLeft,
+			InDownRight,
+			Null,
 		} PlayerDirection;
 
 		typedef struct Player {
