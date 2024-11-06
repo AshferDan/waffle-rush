@@ -82,6 +82,7 @@ void Game_Init(void)
 		hitbox(plat_index, Platform[plat_index].numcoords, &Platform[plat_index]);
 	}
 
+
 #pragma endregion
 
 	//HAZARDS
@@ -192,7 +193,14 @@ void Game_Update(void)
 	}
 	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 1) {
 		isPaused = 0;
-	}
+		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
+
+		// window clamps
+		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
+		if (player.y + player.height > height || player.y < 0) {
+			player.movey = 0;
+		}
+		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
 
 	// Timer update
 	if (isPaused == 0 && isCleared == 0) {
