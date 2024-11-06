@@ -8,7 +8,7 @@
 // Copyright © 2020 DigiPen, All rights reserved.
 //---------------------------------------------------------
 
-#include "Level1.h"
+#include "LevelSelect.h"
 
 void L1_Init(void)
 {
@@ -291,7 +291,7 @@ void L1_Update(void)
 	}
 
 	// Player
-	Draw_Player(player_sprite, player, &sprite_x, &sprite_y);
+	Draw_Player(player_sprite, player, &player_sprite_x, &player_sprite_y);
 
 	// Stamina Bar
 	CP_Settings_Fill(stamina);

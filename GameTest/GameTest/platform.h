@@ -40,7 +40,7 @@ int levelScore; // level score
 // Graphics
 CP_Image player_sprite, transition_sprite;
 
-int player_sprite_x, player_sprite_y;
+float player_sprite_x, player_sprite_y;
 float transit_sprite_x, transit_sprite_y;
 
 // Anim timer
@@ -48,7 +48,6 @@ float transit_anim;
 
 
 CP_Font text;
-int sprite_x, sprite_y;
 CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 
 
@@ -211,6 +210,9 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 
 		void CollOnPlatforms(int plat_index, platform plt, Player* p, Player ply);
 	#pragma endregion 
+	
+	// Reset Player
+	void Reset_Player(Player* player, MoveState* movestate, int* deaths);
 
 	// Draw Platforms
 	void DrawPlatform(int plat_index);
@@ -218,5 +220,6 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 	// Draw Player
 	void Draw_Player(CP_Image player_sprite, Player player, float* spr_x, float* spr_y);
 
-	void Draw_Player_Transitioning_Sprite(Player player, float transit_time, MoveState movestate);
+	void Draw_Player_Transitioning_Sprite(Player player, float transit_time);
+
 #pragma endregion

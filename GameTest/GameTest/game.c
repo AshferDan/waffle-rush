@@ -8,8 +8,7 @@
 // Copyright © 2020 DigiPen, All rights reserved.
 //---------------------------------------------------------
 
-#include "game.h"
-
+#include "LevelSelect.h"
 
 void Game_Init(void)
 {
@@ -23,7 +22,6 @@ void Game_Init(void)
 	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
 	transition_sprite = CP_Image_Load("Assets/transition.png");
 #pragma endregion
-
 
 	// MAP INIT
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -154,6 +152,8 @@ void Game_Init(void)
 
 	transit_sprite_x = 0;
 	transit_sprite_y = 0;
+	player_sprite_x = 0;
+	player_sprite_y = 0;
 
 #pragma endregion
 	// Misc settings
@@ -200,14 +200,14 @@ void Game_Update(void)
 	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 1) {
 		isPaused = 0;
 	}
-		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
+	player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
 
-		// window clamps
-		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
-		if (player.y + player.height > height || player.y < 0) {
-			player.movey = 0;
-		}
-		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
+	// window clamps
+	player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
+	if (player.y + player.height > height || player.y < 0) {
+		player.movey = 0;
+	}
+	player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
 
 	// Timer updates
 	if (isPaused == 0 && isCleared == 0) {
@@ -217,8 +217,6 @@ void Game_Update(void)
 			timer.minutes++;
 		}
 		timer.millis = (int)(timer.seconds * 100) % 100;
-
-
 	}
 
 
@@ -227,52 +225,19 @@ void Game_Update(void)
 #pragma region Movement
 	// pause check
 	if (isPaused == 0) {
-		// change movestate
-		// OnPlat - on platform
-		// InPlat - inside platform
-		// EnterPlat - from OnPlat to InPlat
-		// ExitPlat - from InPlat to OnPlat
-		if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
-			if (movestate == OnPlat && player.onplatform == 1 && player.withinx == 1) {
-				movestate = EnterPlat;
-				player.movex = 0;
-			}
-			else if (movestate == InPlat && player.y > 200 && player.leaveplatform == 1) {
-				movestate = ExitPlat;
-				player.y -= 50;
-				player.movex = 0;
-			}
-			if (movestate == EnterPlat || movestate == ExitPlat) {
-				transit_anim = 0;
-			}
-
-
-			//movestate = start_transition(&player, movestate);
+		// animation timer updates
+		player.anim += 10 * dt;
+		if (player.anim >= 20) {
+			player.anim = 0;
 		}
-		// Transiting movestate
-		//movestate = transition(&player, movestate, dt);
-		if (transit_anim >= 13) {
-			switch (movestate) {
-			case EnterPlat:
-				player.y += 50;
-				movestate = InPlat;
-				player.state = Idle;
-				player.direction = InDown;
-				break;
-			case ExitPlat:
-				movestate = OnPlat;
-				player.state = Idle;
-				player.direction = OnRight;
-				break;
-			case InPlat:
-			case OnPlat:
-				transit_anim = 13;
-				break;
-			}
-
+		if (transit_anim < 13) {
+			transit_anim += 20 * dt;
+		}
+		if (transit_anim > 13) {
+			transit_anim = 13;
 		}
 
-
+		printf("onplatform %d, player.y %f | ", player.onplatform, player.y);
 		// movement logics
 		movement(&player, movestate, speed, dt);
 
@@ -304,28 +269,55 @@ void Game_Update(void)
 		}
 		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
 
-		// reset with R or touch ground while movestate OnPlat
-		if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)) {
-			player.x = spawnx;
-			player.y = spawny;
-			movestate = OnPlat;
-			player.state = Idle;
-			player.direction = OnRight;
-			player.movey = 0;
-			deaths++;
+
+		// change movestate
+		// OnPlat - on platform
+		// InPlat - inside platform
+		// EnterPlat - from OnPlat to InPlat
+		// ExitPlat - from InPlat to OnPlat
+		if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
+			if (movestate == OnPlat && player.onplatform == 1 && player.withinx == 1) {
+				movestate = EnterPlat;
+				player.movex = 0;
+			}
+			else if (movestate == InPlat && player.y > 200 && player.leaveplatform == 1) {
+				movestate = ExitPlat;
+				player.y -= 50;
+				player.movex = 0;
+			}
+			if (movestate == EnterPlat || movestate == ExitPlat) {
+				transit_anim = 0;
+			}
+		}
+		// Transiting movestate
+		if (transit_anim >= 13) {
+			switch (movestate) {
+			case EnterPlat:
+				player.y += 50;
+				movestate = InPlat;
+				player.state = Idle;
+				player.direction = InDown;
+				break;
+			case ExitPlat:
+				movestate = OnPlat;
+				player.state = Idle;
+				player.direction = OnRight;
+				player.onplatform = 1;
+				break;
+			case InPlat:
+			case OnPlat:
+				transit_anim = 13;
+				break;
+			}
+
 		}
 
-		// animation timer updates
-		player.anim += 10 * dt;
-		if (player.anim >= 20) {
-			player.anim = 0;
+		// reset with R or touch ground while movestate OnPlat
+		if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)) {
+			Reset_Player(&player, &movestate, &deaths);
 		}
-		if (transit_anim < 13) {
-			transit_anim += 20 * dt;
-		}
-		if (transit_anim > 13) {
-			transit_anim = 13;
-		}
+
+
 	}
 #pragma endregion
 
@@ -358,13 +350,13 @@ void Game_Update(void)
 		CP_Graphics_DrawTriangle(traps[i].x[0], traps[i].y[0], traps[i].x[1], traps[i].y[1], traps[i].x[2], traps[i].y[2]);
 	}
 
+	printf("state %d| direction %d | movestate %d | onplatform %d\n", player.state, player.direction, movestate, player.onplatform);
 	// Player
 	if (movestate == OnPlat || movestate == InPlat) {
-		Draw_Player(player_sprite, player, &sprite_x, &sprite_y);
+		Draw_Player(player_sprite, player, &player_sprite_x, &player_sprite_y);
 	}
 	else {
-		//transit_sprite_x = ((int)transit_anim / 1) * 48;
-		Draw_Player_Transitioning_Sprite(player, transit_anim, movestate);
+		Draw_Player_Transitioning_Sprite(player, transit_anim);
 	}
 
 	// Stamina Bar

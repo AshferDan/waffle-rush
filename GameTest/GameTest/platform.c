@@ -491,7 +491,23 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			}// end if collision check
 		}
 	}
+
+	void Reset_Player(Player* player, MoveState* movestate, int* deaths) {
+		player->x = spawnx;
+		player->y = spawny;
+		*movestate = OnPlat;
+		player->state = Idle;
+		player->direction = OnRight;
+		player->movey = 0;
+		*deaths += 1;
+	}
 #pragma endregion
+
+
+
+// RENDER
+/*---------------------------------------------------------------------------------------------------*/
+#pragma region Render
 
 void DrawPlatform(int plat_index) {
 	CP_Graphics_BeginShape();
@@ -558,12 +574,13 @@ void Draw_Player(CP_Image player_sprite, Player player, float* spr_x, float* spr
 	CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, *spr_x+5, *spr_y+5, *spr_x + 170, *spr_y + 170, 255, rot);
 }
 
-void Draw_Player_Transitioning_Sprite(Player player, float transit_time, MoveState movestate) {
+void Draw_Player_Transitioning_Sprite(Player player, float transit_time) {
 	float transit_sprite_x, transit_sprite_y;
 	transit_sprite_y = (movestate == EnterPlat) ? 360 : 0;
 
 	transit_sprite_x = ((int)transit_time / 1) * 180;
-	if (movestate == EnterPlat || movestate == ExitPlat) {
-		CP_Image_DrawSubImage(transition_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, transit_sprite_x + 5, transit_sprite_y + 5, transit_sprite_x + 170, transit_sprite_y + 350, 255);
-	}
+	CP_Image_DrawSubImage(transition_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, transit_sprite_x + 5, transit_sprite_y + 5, transit_sprite_x + 170, transit_sprite_y + 350, 255);
+
 }
+
+#pragma endregion

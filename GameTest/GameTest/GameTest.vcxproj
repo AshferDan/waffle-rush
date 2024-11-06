@@ -23,9 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="credits.h" />
-    <ClInclude Include="game.h" />
     <ClInclude Include="hazard.h" />
-    <ClInclude Include="Level1.h" />
     <ClInclude Include="LevelSelect.h" />
     <ClInclude Include="platform.h" />
     <ClInclude Include="mainmenu.h" />
