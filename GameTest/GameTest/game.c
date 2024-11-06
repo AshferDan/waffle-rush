@@ -199,6 +199,7 @@ void Game_Update(void)
 	}
 	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 1) {
 		isPaused = 0;
+	}
 		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
 
 		// window clamps
@@ -208,7 +209,7 @@ void Game_Update(void)
 		}
 		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
 
-	// Timer update
+	// Timer updates
 	if (isPaused == 0 && isCleared == 0) {
 		timer.seconds += dt;
 		if (timer.seconds >= 60) {
@@ -216,14 +217,10 @@ void Game_Update(void)
 			timer.minutes++;
 		}
 		timer.millis = (int)(timer.seconds * 100) % 100;
+
+
 	}
 
-	if (transit_anim < 13) {
-		transit_anim += 20 * dt;
-	}
-	if (transit_anim > 13) {
-		transit_anim = 13;
-	}
 
 	// MOVEMENT 
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -318,10 +315,16 @@ void Game_Update(void)
 			deaths++;
 		}
 
-		// animation timer update
+		// animation timer updates
 		player.anim += 10 * dt;
 		if (player.anim >= 20) {
 			player.anim = 0;
+		}
+		if (transit_anim < 13) {
+			transit_anim += 20 * dt;
+		}
+		if (transit_anim > 13) {
+			transit_anim = 13;
 		}
 	}
 #pragma endregion
@@ -356,15 +359,14 @@ void Game_Update(void)
 	}
 
 	// Player
-	transit_sprite_x = ((int)transit_anim / 1) * 48;
 	if (movestate == OnPlat || movestate == InPlat) {
 		Draw_Player(player_sprite, player, &sprite_x, &sprite_y);
 	}
 	else {
+		//transit_sprite_x = ((int)transit_anim / 1) * 48;
 		Draw_Player_Transitioning_Sprite(player, transit_anim, movestate);
 	}
 
-	printf("player_x %f | ply_y %f\n", player.x, player.y, dt);
 	// Stamina Bar
 	if (!(movestate == OnPlat && player.stamina >= 100.0f)) {
 		CP_Settings_Fill(stamina);
