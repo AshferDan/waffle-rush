@@ -10,6 +10,10 @@
 
 #include "LevelSelect.h"
 
+#define num_levels 5
+level levels[num_levels];
+float timeElapsed;
+
 void L1_Init(void)
 {
 	// ASSET LOADS
@@ -22,6 +26,9 @@ void L1_Init(void)
 	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
 	transition_sprite = CP_Image_Load("Assets/transition.png");
 #pragma endregion
+
+	// time elapsed (for level complete screen)
+	timeElapsed = 0.0f;
 
 	// MAP INIT
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -143,6 +150,9 @@ void L1_Init(void)
 	// check if level complete
 	isCleared = 0;
 
+	// initialize level number
+	levelNumber = 1;
+
 	// score
 	levelScore = 0;
 #pragma endregion
@@ -165,6 +175,7 @@ void L1_Init(void)
 	// Corner drawing
 	CP_Settings_RectMode(CP_POSITION_CORNER);
 	CP_Settings_ImageMode(CP_POSITION_CORNER);
+
 #pragma endregion
 
 }
@@ -299,13 +310,31 @@ void L1_Update(void)
 	CP_Settings_Fill(green);
 	CP_Graphics_DrawRect(goalx, goaly, 50, 50);
 
+	FILE* file2 = fopen("Assets/LevelSelect.txt", "r");
+	for (int i = 0; i < num_levels; i++) {
+		fscanf_s(file2, "%d %d %d %d %d\n", &levels[i].level_no, &levels[i].isUnlocked, &levels[i].isCleared, &levels[i].score, &levels[i].time);
+	}
+	fclose(file2);
+
 	if (AreSquaresIntersecting(player.x - 15,player.y - 15,player.height + 30,player.width + 30,goalx,goaly,50,50)) {
-		CP_Settings_Fill(green);
-		CP_Settings_TextSize(150);
-		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
-		CP_Font_DrawText("Yippie!", 1300, 50);
-		AddScore(&levelScore, 1000, &isCleared);
+		// calculate score and mark the level as cleared
+		AddScore(&levelScore, 10000 + (10000 - ((int)timer.seconds * 50) - ((int)timer.minutes * 3000)) - deaths * 100, &isCleared);
 		isCleared = 1;
+		// if cleared for the first time, unlock the next level
+		if (levels[levelNumber-1].isCleared == 0) {
+			levels[levelNumber-1].isCleared = 1;
+			levels[levelNumber].isUnlocked = 1;
+		}
+		// update high score if current score is greater than previous high score
+		if (levelScore > levels[levelNumber - 1].score) {
+			levels[levelNumber - 1].score = levelScore;
+		}
+		// update the values in LevelSelect.txt
+		FILE* file2= fopen("Assets/LevelSelect.txt", "w");
+		for (int i = 0; i < num_levels; i++) {
+			fprintf_s(file2, "%d %d %d %d %d\n", levels[i].level_no, levels[i].isUnlocked, levels[i].isCleared, levels[i].score, levels[i].time);
+		}
+		fclose(file2);
 	}
 
 	// HAZARD DRAWING
@@ -341,15 +370,15 @@ void L1_Update(void)
 	// TIMER DRAWING
 	char time[16] = { 0 };
 	sprintf_s(time, 16, "TIME: %02d:%02d:%02d", (int)timer.minutes, (int)timer.seconds, (int)timer.millis);
-	CP_Font_DrawText(time, 1250, 100);
+	CP_Font_DrawText(time, 1200, 100);
 
 	// SCORE DRAWING
 	char score[20] = { 0 };
-	sprintf_s(score, 20, "SCORE: %d", levelScore);
-	CP_Font_DrawText(score, 1250, 50);
+	sprintf_s(score, 20, "HIGH SCORE: %d", levels[levelNumber-1].score);
+	CP_Font_DrawText(score, 1200, 50);
 
 	// PAUSE PAGE
-	if (isPaused == 1) {
+	if (isPaused == 1 && isCleared == 0) {
 		CP_Settings_RectMode(CP_POSITION_CENTER);
 		CP_Settings_Fill(pausebg);
 		CP_Graphics_DrawRect(width / 2, height / 2, width, height);
@@ -382,6 +411,76 @@ void L1_Update(void)
 				CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit);
 			}
 		}
+		CP_Settings_RectMode(CP_POSITION_CORNER);
+	}
+
+	// LEVEL COMPLETE PAGE
+	if (isCleared == 1) {
+		CP_Settings_RectMode(CP_POSITION_CENTER);
+		CP_Settings_Fill(pausebg);
+		CP_Graphics_DrawRect(width / 2, height / 2, width, height);
+		CP_Settings_Fill(plat);
+		CP_Graphics_DrawRect(width / 2, height / 2, 1200, 700);
+		CP_Settings_Fill(black);
+		CP_Settings_TextSize(100);
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Font_DrawText("LEVEL COMPLETE", width / 2, 200);
+
+		CP_Settings_TextSize(50);
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
+
+		// Score labels (on the left side)
+		CP_Font_DrawText("GOAL BONUS", 300, 300);
+		CP_Font_DrawText("TIME BONUS", 300, 400);
+		CP_Font_DrawText("DEATH PENALTIES", 300, 500);
+		CP_Font_DrawText("TOTAL SCORE", 300, 600);
+
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_MIDDLE);
+
+		// Score values (on the right side)
+		// GOAL SCORE CALCULATION
+		char scoreText[20] = { 0 };
+		sprintf_s(scoreText, 20, "%d", IncrementScore(0, 10000, &timeElapsed, dt));
+		CP_Font_DrawText(scoreText, 1200, 300);
+
+		// TIMER DRAWING
+		char time[20] = { 0 };
+		sprintf_s(time, 20, "%d", IncrementScore(0, 10000 - (int)timer.seconds * 50 - (int)timer.minutes * 3000, &timeElapsed, dt));
+		CP_Font_DrawText(time, 1200, 400);
+
+		// DEATH DRAWING
+		char deathcount[20] = { 0 };
+		sprintf_s(deathcount, 20, "%d", IncrementScore(0, deaths * -100, &timeElapsed, dt));
+		CP_Font_DrawText(deathcount, 1200, 500);
+
+		// SCORE DRAWING
+		char score[20] = { 0 };
+		sprintf_s(score, 20, "%d", IncrementScore(0, levelScore, &timeElapsed, dt));
+		CP_Font_DrawText(score, 1200, 600);
+
+		CP_Settings_TextSize(50);
+		// draw resume button
+		TextBoxCreate(600, 720, 250, 100, "NEXT LEVEL", red);
+		int ResumeClick = IsAreaClicked(600, 720, 250, 100, mouseX, mouseY); //if mouse is over button
+		if (ResumeClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+			CP_Graphics_DrawRect(600, 720, 250, 100);
+			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit);
+			}
+		}
+
+		// draw quit button
+		TextBoxCreate(1000, 720, 250, 100, "QUIT", red);
+		int QuitClick = IsAreaClicked(1000, 720, 250, 100, mouseX, mouseY); //if mouse is over button
+		if (QuitClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+			CP_Graphics_DrawRect(1000, 720, 250, 100);
+			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit);
+			}
+		}
+
 		CP_Settings_RectMode(CP_POSITION_CORNER);
 	}
 #pragma endregion
