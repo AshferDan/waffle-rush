@@ -356,7 +356,7 @@ void Game_Update(void)
 		Draw_Player_Transitioning_Sprite(player, transit_anim, movestate);
 	}
 
-	printf("player_movex %f, player_movey %f, dt %f\n", player.movex, player.movey, dt);
+	printf("player_x %f | ply_y %f\n", player.x, player.y, dt);
 	// Stamina Bar
 	if (!(movestate == OnPlat && player.stamina >= 100.0f)) {
 		CP_Settings_Fill(stamina);

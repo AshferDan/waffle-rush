@@ -371,7 +371,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		float py = (p.y + p.height / 2);
 		// how much the player goes into the platform
 		float leftcoll = (abs)((px + p.width/2) - plt.x1);
-		float rightcoll = (abs)(plt.x2 - (px + p.width/2));
+		float rightcoll = (abs)(plt.x2 - (px - p.width/2));
 		float topcoll = (abs)((py + p.height/2) - plt.y1);
 		float botcoll = (abs)(plt.y2 - (py - p.height/2));
 
