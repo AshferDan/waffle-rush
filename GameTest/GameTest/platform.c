@@ -57,9 +57,13 @@ MoveState transition(Player* ply, MoveState movestate, float dt) {
 	// End of transitioning, return movestate to continue movement
 	if (ply->transition_time >= 1) {
 		if (movestate == EnterPlat) {
+			ply->state = Idle;
+			ply->direction = InDown;
 			return InPlat;
 		}
 		if (movestate == ExitPlat) {
+			ply->state = Idle;
+			ply->direction = OnRight;
 			return OnPlat;
 		}
 	}
@@ -67,14 +71,18 @@ MoveState transition(Player* ply, MoveState movestate, float dt) {
 }
 
 void movement(Player* ply, MoveState movestate, float speed, float dt) {
-	float accel = 3000.0f;
-	float accel2 = 1500.0f;
+	float accel = 3000.0f * dt;
+	float accel2 = 1500.0f * dt;
 	float speed2 = speed/2;
+
+	PlayerDirection tempdirV = Null;
+	PlayerDirection tempdirH = Null;
 
 	// OnPlat movement
 	if (movestate == OnPlat) {
+		tempdirH = Null;
 		// Gravity and terminal velocity
-		if (ply->movey < 1000.0f) {
+		if (ply->movey < 1000.0f && ply->onplatform == 0) {
 			ply->movey += 1800.0f * dt;
 		}
 		// jump!
@@ -82,26 +90,33 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			ply->movey = -speed;
 		}
 		// left
-		if (CP_Input_KeyDown(KEY_A) && (ply->movex > -speed)) {
-			ply->movex -= accel * dt;
-			ply->direction = OnLeft;
+		if (CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D)) && (ply->movex > -speed)) {
+			ply->movex -= accel;
+			tempdirH = OnLeft;
 		}
-		else if ((ply->movex < 100.f) && !(CP_Input_KeyDown(KEY_A))) {
-			ply->movex += accel * dt;
+		else if ((ply->movex < 100.f) && (!(CP_Input_KeyDown(KEY_A))|| ((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))))) {
+			ply->movex += accel;
 		};
 		// right
-		if (CP_Input_KeyDown(KEY_D) && (ply->movex < speed)) {
-			ply->movex += accel * dt;
-			ply->direction = OnRight;
+		if (CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A)) && (ply->movex < speed)) {
+			ply->movex += accel;
+			tempdirH = OnRight;
 		}
-		else if ((ply->movex > 100.f) && !(CP_Input_KeyDown(KEY_D))) {
-			ply->movex -= accel * dt;
+		else if ((ply->movex > 100.f) && (!(CP_Input_KeyDown(KEY_A)) || ((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))))) {
+			ply->movex -= accel;
 		};
-		if ((!((CP_Input_KeyDown(KEY_A)) || (CP_Input_KeyDown(KEY_D))) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
+		if (((((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))) || !((CP_Input_KeyDown(KEY_A)) || (CP_Input_KeyDown(KEY_D)))) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
 			ply->movex = 0;
 		}
 
+		// Speed clamp
+		ply->movex = CP_Math_ClampFloat(ply->movex, -speed, speed);
+
 		// anim state
+		if (tempdirH != Null) {
+			ply->direction = tempdirH;
+		}
+
 		if (ply->onplatform == 1) {
 			ply->state = Idle;
 			if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D)) {
@@ -114,49 +129,102 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	}
 	// InPlat movement
 	if (movestate == InPlat) {
-		// up
-		if (CP_Input_KeyDown(KEY_W)) {
+		ply->state = Idle;
+
+		// WASD keys
+		// W - Up
+		if (CP_Input_KeyDown(KEY_W) && !CP_Input_KeyDown(KEY_S)) {
+			ply->state = Crawling;
+			tempdirV = InUp;
 			if (ply->movey > -speed2) {
-				ply->movey -= accel2 * dt;
+				ply->movey -= accel2;
 			}
 		}
-		else if (ply->movey < 0) {
-			ply->movey += accel2 * dt;
-		}
-		// down
-		if (CP_Input_KeyDown(KEY_S)) {
-			if (ply->movey < speed2) {
-				ply->movey += accel2 * dt;
-			}
-		}
-		else if (ply->movey > 0) {
-			ply->movey -= accel2 * dt;
-		}
-		// left
-		if (CP_Input_KeyDown(KEY_A)) {
+		// A - Left
+		if (CP_Input_KeyDown(KEY_A) && !CP_Input_KeyDown(KEY_D)) {
+			ply->state = Crawling;
+			tempdirH = InLeft;
 			if (ply->movex > -speed2) {
-				ply->movex -= accel2 * dt;
+				ply->movex -= accel2;
 			}
 		}
-		else if (ply->movex < 0) {
-			ply->movex += accel2 * dt;
+		// S - Down
+		if (CP_Input_KeyDown(KEY_S) && !CP_Input_KeyDown(KEY_W)) {
+			ply->state = Crawling;
+			tempdirV = InDown;
+			if (ply->movey < speed2) {
+				ply->movey += accel2;
+
+			}
 		}
-		// right
-		if (CP_Input_KeyDown(KEY_D)) {
+		// D - Right
+		if (CP_Input_KeyDown(KEY_D) && !CP_Input_KeyDown(KEY_A)) {
+			ply->state = Crawling;
+			tempdirH = InRight;
 			if (ply->movex < speed2) {
-				ply->movex += accel2 * dt;
+				ply->movex += accel2;
 			}
 		}
-		else if (ply->movex > 0) {
-			ply->movex -= accel2 * dt;
+
+		// Idle decel and brake
+		if (tempdirH == Null) {
+			if (ply->movex < 0) {
+				ply->movex += accel2;
+			}
+			else {
+				ply->movex -= accel2;
+			}
+			if (ply->movex <= 50.f && ply->movex >= -50.f) {
+				ply->movex = 0;
+			}
 		}
-		// idle brake
-		if (!(CP_Input_KeyDown(KEY_W) || CP_Input_KeyDown(KEY_S))&& (ply->movey <= 50.f && ply->movey >= -50.f)) {
-			ply->movey = 0;
+		if (tempdirV == Null) {
+			if (ply->movey < 50) {
+				ply->movey += accel2;
+			}
+			else if (ply->movey > 50) {
+				ply->movey -= accel2;
+			}
+			if (ply->movey <= 50.f && ply->movey >= -50.f) {
+				ply->movey = 0;
+			}
 		}
-		if (!(CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D)) && (ply->movex <= 50.f && ply->movex >= -50.f)) {
-			ply->movex = 0;
+
+		// Speed clamps
+		ply->movex = CP_Math_ClampFloat(ply->movex, -speed2, speed2);
+		ply->movey = CP_Math_ClampFloat(ply->movey, -speed2, speed2);
+
+		// Direction
+		// Diagonal check if there are both horizontal and vertical inputs
+		if (tempdirH != Null && tempdirV != Null) {
+			if (tempdirV == InUp) {
+				if (tempdirH == InLeft) {
+					ply->direction = InUpLeft;
+				}
+				else {
+					ply->direction = InUpRight;
+				}
+			}
+			else {
+				if (tempdirH == InLeft) {
+					ply->direction = InDownLeft;
+				}
+				else {
+					ply->direction = InDownRight;
+				}
+			}
 		}
+		// If no inputs, or only one directional input
+		if (tempdirV == Null && tempdirH == Null) {
+			ply->direction = ply->direction;
+		} 
+		else if (tempdirV == Null) {
+			ply->direction = tempdirH;
+		}
+		else if (tempdirH == Null) {
+			ply->direction = tempdirV;
+		}
+
 	}
 
 	// Update movement only if InPlat/OnPlat, ignore transition
@@ -195,9 +263,6 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		Platform[plat_index].onblocks[block_index] = (platblocks){ x1-15, x2+15, y1-15, y2+15, (x2+15) - (x1-15), (y2+15) - (y1-15) };
 	}
 
-	/*void platblock_coordinates(int plat_index, int block_index, platform* plt, float x, float y) {
-		plt[plat_index].onblocks[block_index]->x1 = x;
-	}*/
 	// assigns platform horizontal hitboxes, used in hitbox function below
 	void horizontalhitbox(int coord_index, platform* plt) {
 		// Left to right
@@ -306,7 +371,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		float py = (p.y + p.height / 2);
 		// how much the player goes into the platform
 		float leftcoll = (abs)((px + p.width/2) - plt.x1);
-		float rightcoll = (abs)((px - p.width) - plt.x2);
+		float rightcoll = (abs)(plt.x2 - (px - p.width/2));
 		float topcoll = (abs)((py + p.height/2) - plt.y1);
 		float botcoll = (abs)(plt.y2 - (py - p.height/2));
 
@@ -436,26 +501,69 @@ void DrawPlatform(int plat_index) {
 	CP_Graphics_EndShape();
 }
 
-void Draw_Player(CP_Image player_sprite, Player player, float *spr_x, float *spr_y) {
+void Draw_Player(CP_Image player_sprite, Player player, float* spr_x, float* spr_y) {
+	float rot = 0;
 	switch (player.direction) {
 	case OnLeft:
 		*spr_y = 0;
 		break;
 	case OnRight:
-		*spr_y = 480;
+		*spr_y = 180;
+		break;
+	case InUp:
+		*spr_y = 360;
+		rot = 0;
+		break;
+	case InUpLeft:
+		*spr_y = 360;
+		rot = 315;
+		break;
+	case InLeft:
+		*spr_y = 360;
+		rot = 270;
+		break;
+	case InDownLeft:
+		*spr_y = 360;
+		rot = 225;
+		break;
+	case InDown:
+		*spr_y = 360;
+		rot = 180;
+		break;
+	case InDownRight:
+		*spr_y = 360;
+		rot = 135;
+		break;
+	case InRight:
+		*spr_y = 360;
+		rot = 90;
+		break;
+	case InUpRight:
+		*spr_y = 360;
+		rot = 45;
 		break;
 	}
 	switch (player.state) {
 	case Idle:
-		*spr_x = (player.anim < 10) ? 0 : 480;
+		*spr_x = (player.anim < 10) ? 0 : 180;
 		break;
 	case Running:
-		*spr_x = ((int)player.anim % 2 == 0) ? 960 : 1440;
+	case Crawling:
+		*spr_x = ((int)player.anim % 2 == 0) ? 360 : 540;
 		break;
 	case Jumping:
-		*spr_x = 1920;
+		*spr_x = 720;
 		break;
 	}
+	CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, *spr_x+5, *spr_y+5, *spr_x + 170, *spr_y + 170, 255, rot);
+}
 
-	CP_Image_DrawSubImage(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, *spr_x, *spr_y, *spr_x + 480, *spr_y + 480, 255);
+void Draw_Player_Transitioning_Sprite(Player player, float transit_time, MoveState movestate) {
+	float transit_sprite_x, transit_sprite_y;
+	transit_sprite_y = (movestate == EnterPlat) ? 360 : 0;
+
+	transit_sprite_x = ((int)transit_time / 1) * 180;
+	if (movestate == EnterPlat || movestate == ExitPlat) {
+		CP_Image_DrawSubImage(transition_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, transit_sprite_x + 5, transit_sprite_y + 5, transit_sprite_x + 170, transit_sprite_y + 350, 255);
+	}
 }

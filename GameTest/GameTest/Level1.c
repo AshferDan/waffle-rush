@@ -264,6 +264,7 @@ void L1_Update(void)
 	// RENDER
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
+
 	// Platforms
 	CP_Settings_Fill(plat);
 	for (int i = 0; i < numplats; i++) {
