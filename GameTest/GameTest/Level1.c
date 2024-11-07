@@ -11,6 +11,8 @@
 #include "Level1.h"
 #include "hazard.h"
 
+int crusherstate = 0;
+
 void L1_Init(void)
 {
 	// ASSET LOADS
@@ -86,17 +88,36 @@ void L1_Init(void)
 	//HAZARDS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Hazard
-	FILE* file1 = fopen("Assets/Level1hazard.txt", "r");
-	fscanf_s(file1, "%d", &numberoftraps);
+	FILE* file2 = fopen("Assets/Level1hazard.txt", "r");
+	fscanf_s(file2, "%d", &numberoftraps);
 
-	for (int i = 0; i < numberoftraps; ++i) {
-		for (int j = 0; j < 3; ++j) {
-			fscanf_s(file1, "%d %d", &traps[i].x[j], &traps[i].y[j]);
+	for (int i = 0; i < numberoftraps; ++i)
+	{
+		fscanf_s(file2, "%d", &traps[i].type);
+		switch (traps[i].type)
+		{
+		case 0:
+		{
+			int j = 0;
+			for (; j < 3; ++j)
+			{
+				fscanf_s(file2, "%d %d", &traps[i].x[j], &traps[i].y[j]);
+			}
+			break;
 		}
-		fscanf_s(file1, "%d", &traps[i].type);
-	}
+		case 1:
+		{
+			int j = 0;
+			for (; j < 3; ++j)
+			{
+				fscanf_s(file2, "%d %d", &traps[i].x[j], &traps[i].y[j]);
+			}
+			break;
+		}
 
-	fclose(file1);
+		}
+	}
+	fclose(file2);
 #pragma endregion
 #pragma endregion
 	// PLAYER INITS
@@ -275,7 +296,13 @@ void L1_Update(void)
 	// Hazard
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
-	
+	if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
+		player.x = spawnx;
+		player.y = spawny;
+		movestate = OnPlat;
+		player.movey = 0;
+		deaths++;
+	}
 //placeholder
 #pragma endregion
 
@@ -300,13 +327,47 @@ void L1_Update(void)
 		AddScore(&levelScore, 1000, &isCleared);
 		isCleared = 1;
 	}
+	//CRUSHER MOVEMENT
+	// crusherstate = 0 if going down and crusherstate = 1 when going up
+	float crushervely;
+	if (crusherstate == 0) {
+		crushervely = 100.f * dt;
+		traps[4].y[2] += crushervely;
+		traps[4].y[0] += crushervely;
+		if (traps[4].y[2] >= 600 ) {
+			crusherstate = 1;
+		}
+	}
+	if (crusherstate == 1) {
+		crushervely = 10.f * dt;
+		traps[4].y[2] -= crushervely;
+		traps[4].y[0] -= crushervely;
+		if (traps[4].y[0] <= 450) {
+			crusherstate = 0;
+		}
+	}
 
 	// HAZARD DRAWING
 	CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
-	for (int i = 0; i < numberoftraps; ++i) {
-		CP_Graphics_DrawTriangle(traps[i].x[0], traps[i].y[0], traps[i].x[1], traps[i].y[1], traps[i].x[2], traps[i].y[2]);
+	for (int i = 0; i < numberoftraps; ++i)
+	{
+		switch (traps[i].type)
+		{
+		case 0:
+		{
+			CP_Graphics_DrawTriangle(traps[i].x[0], traps[i].y[0], traps[i].x[1], traps[i].y[1], traps[i].x[2], traps[i].y[2]);
+			break;
+		}
+		case 1:
+		{
+			CP_Graphics_DrawRect(traps[i].x[0], traps[i].y[0], traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
+			break;
+		}
+
+		}
 	}
 
+	
 	// Player
 	Draw_Player(player_sprite, player, &sprite_x, &sprite_y);
 
