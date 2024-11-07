@@ -482,15 +482,20 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			}// end if collision check
 		}
 	}
-
-	void Reset_Player(Player* player, MoveState* movestate, int* deaths) {
+	void Kill_Player(Player* player, int* deaths) {
+		player->state = Dead;
+		player->death_time = 0;
+		++*deaths;
+	}
+	void Reset_Player(Player* player, MoveState* movestate) {
 		player->x = spawnx;
 		player->y = spawny;
 		*movestate = OnPlat;
 		player->state = Idle;
+		player->anim = 0;
 		player->direction = OnRight;
+		player->movex = 0;
 		player->movey = 0;
-		*deaths += 1;
 	}
 #pragma endregion
 
@@ -510,79 +515,89 @@ void DrawPlatform(int plat_index) {
 
 void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 	// Normal Player
-	float sprite_x, sprite_y;
+	float sprite_x = 0;
+	float sprite_y = 0;
 	float rot = 0;
-	if (movestate == InPlat || movestate == OnPlat) {
+	if (player.state != Dead) {
+		if (movestate == InPlat || movestate == OnPlat) {
+			switch (player.direction) {
+			case OnLeft:
+				sprite_y = 0;
+				break;
+			case OnRight:
+				sprite_y = 180;
+				break;
+			case InUp:
+				sprite_y = 360;
+				rot = 0;
+				break;
+			case InUpLeft:
+				sprite_y = 360;
+				rot = 315;
+				break;
+			case InLeft:
+				sprite_y = 360;
+				rot = 270;
+				break;
+			case InDownLeft:
+				sprite_y = 360;
+				rot = 225;
+				break;
+			case InDown:
+				sprite_y = 360;
+				rot = 180;
+				break;
+			case InDownRight:
+				sprite_y = 360;
+				rot = 135;
+				break;
+			case InRight:
+				sprite_y = 360;
+				rot = 90;
+				break;
+			case InUpRight:
+				sprite_y = 360;
+				rot = 45;
+				break;
+			}
+			switch (player.state) {
+			case Idle:
+				sprite_x = (player.anim < 10) ? 0 : 180;
+				break;
+			case Running:
+			case Crawling:
+				sprite_x = ((int)player.anim % 2 == 0) ? 360 : 540;
+				break;
+			case Jumping:
+				sprite_x = 720;
+				break;
+			}
+			CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, sprite_x + 5, sprite_y + 5, sprite_x + 170, sprite_y + 170, 255, rot);
+		}
+		else
+		{
+			sprite_y = (movestate == EnterPlat) ? 360 : 0;
+
+			sprite_x = ((int)player.transition_time / 1) * 180;
+			CP_Image_DrawSubImage(transition_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 5, sprite_y + 5, sprite_x + 170, sprite_y + 350, 255);
+		}
+	}
+	else {
 		switch (player.direction) {
-		case OnLeft:
-			sprite_y = 0;
+		case OnLeft: sprite_y = 0;
 			break;
-		case OnRight:
-			sprite_y = 180;
+		case OnRight: sprite_y = 360;
 			break;
-		case InUp:
-			sprite_y = 360;
-			rot = 0;
-			break;
-		case InUpLeft:
-			sprite_y = 360;
-			rot = 315;
-			break;
-		case InLeft:
-			sprite_y = 360;
-			rot = 270;
-			break;
-		case InDownLeft:
-			sprite_y = 360;
-			rot = 225;
-			break;
-		case InDown:
-			sprite_y = 360;
-			rot = 180;
-			break;
-		case InDownRight:
-			sprite_y = 360;
-			rot = 135;
-			break;
-		case InRight:
-			sprite_y = 360;
-			rot = 90;
-			break;
-		case InUpRight:
-			sprite_y = 360;
-			rot = 45;
-			break;
+		default: sprite_y = 0;
 		}
-		switch (player.state) {
-		case Idle:
-			sprite_x = (player.anim < 10) ? 0 : 180;
-			break;
-		case Running:
-		case Crawling:
-			sprite_x = ((int)player.anim % 2 == 0) ? 360 : 540;
-			break;
-		case Jumping:
-			sprite_x = 720;
-			break;
+		sprite_x = ((int)player.death_time/1)*180;
+		if (!player.onplatform) {
+			sprite_x += 3060;
 		}
-		CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, sprite_x + 5, sprite_y + 5, sprite_x + 170, sprite_y + 170, 255, rot);
-	}
-	else 
-	{
-		sprite_y = (movestate == EnterPlat) ? 360 : 0;
-
-		sprite_x = ((int)player.transition_time / 1) * 180;
-		CP_Image_DrawSubImage(transition_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 5, sprite_y + 5, sprite_x + 170, sprite_y + 350, 255);
+		CP_Image_DrawSubImage(death_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30)*2, sprite_x + 5, sprite_y + 5, sprite_x + 170, sprite_y + 350, 255);
 	}
 }
 
-void Draw_Player_Transitioning_Sprite(Player player) {
-	float transit_sprite_x, transit_sprite_y;
-	transit_sprite_y = (movestate == EnterPlat) ? 360 : 0;
 
-	transit_sprite_x = ((int)player.transition_time / 1) * 180;
-	CP_Image_DrawSubImage(transition_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, transit_sprite_x + 5, transit_sprite_y + 5, transit_sprite_x + 170, transit_sprite_y + 350, 255);
-
-}
 
 #pragma endregion

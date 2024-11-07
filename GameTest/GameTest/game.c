@@ -19,8 +19,9 @@ void Game_Init(void)
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
 	// load player sprite
-	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
-	transition_sprite = CP_Image_Load("Assets/transition.png");
+	player_sprite		= CP_Image_Load("Assets/Player_Sprites.png");
+	transition_sprite	= CP_Image_Load("Assets/transition.png");
+	death_sprite		= CP_Image_Load("Assets/Burnt.png");
 #pragma endregion
 
 	// MAP INIT
@@ -114,12 +115,11 @@ void Game_Init(void)
 	// movement
 	player.movex = 0;
 	player.movey = 0;
-	// transit variables
+	// anim timers
 	player.transition_time = 15;
+	player.death_time = 17;
 	// health
 	player.stamina = 100.0f;
-	// color
-	player.color = CP_Color_Create(150, 150, 200, 255);
 	// anim state
 	player.state = Idle;
 	player.anim = 0;
@@ -146,8 +146,6 @@ void Game_Init(void)
 	// score
 	levelScore = 0;
 
-	// transition animation timer
-	transit_anim = 15;
 	// transition sprite coordinates
 	transit_sprite_x = 0;
 	transit_sprite_y = 0;
@@ -210,6 +208,7 @@ void Game_Update(void)
 	}
 
 
+
 	// MOVEMENT 
 	/*  Contents:
 	- Pause check
@@ -222,7 +221,10 @@ void Game_Update(void)
 	*/
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Movement
+	
+	if (player.state == Dead) {
 
+	}
 	// Pause check
 	if (isPaused == 0) {
 
@@ -231,21 +233,28 @@ void Game_Update(void)
 		if (player.anim >= 20) {
 			player.anim = 0;
 		}
-		if (transit_anim < 13) {
-			transit_anim += 20 * dt;
-		}
-		if (transit_anim > 13) {
-			transit_anim = 13;
-		}
 		if (player.transition_time < 13) {
 			player.transition_time += 20 * dt;
 		}
 		if (player.transition_time > 13) {
 			player.transition_time = 13;
 		}
-
+		if (player.death_time < 17) {
+			player.death_time += 17 * dt;
+		}
+		if (player.death_time >= 17) {
+			if (player.state == Dead) {
+				Reset_Player(&player, &movestate);
+				player.movex = 0;
+			}
+			player.death_time = 17;
+		}
+		printf("movex %f, movey %f\n", player.movex, player.movey);
 	// Movement logics
-		movement(&player, movestate, speed, dt);
+		if (player.state != Dead) 
+		{
+			movement(&player, movestate, speed, dt);
+		}
 
 	// Collision against platforms
 		if (movestate == OnPlat) {
@@ -286,10 +295,14 @@ void Game_Update(void)
 		}
 
 	// reset with R or touch ground while movestate OnPlat
-		if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)) {
-			Reset_Player(&player, &movestate, &deaths);
+		if (CP_Input_KeyTriggered(KEY_R) || ((player.stamina == 0) && player.state != Dead)) {
+			//Reset_Player(&player, &movestate);
+			Kill_Player(&player, &deaths);
 		}
-
+		if ((player.y >= height - player.height) && movestate == OnPlat) {
+			Reset_Player(&player, &movestate);
+			deaths++;
+		}
 
 	}
 #pragma endregion
@@ -404,4 +417,5 @@ void Game_Exit(void)
 {
 	CP_Image_Free(player_sprite);
 	CP_Image_Free(transition_sprite);
+	CP_Image_Free(death_sprite);
 }

@@ -40,13 +40,13 @@ int highScore; // level high score
 int levelNumber; // level number
 
 // Graphics
-CP_Image player_sprite, transition_sprite;
+CP_Image player_sprite, transition_sprite, death_sprite;
 
 float player_sprite_x, player_sprite_y;
 float transit_sprite_x, transit_sprite_y;
+float death_sprite_x, death_sprite_y;
 
 // Anim timer
-float transit_anim;
 
 
 CP_Font text;
@@ -131,6 +131,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			Running,
 			Jumping,
 			Crawling,
+			Dead,
 		} PlayerState;
 		
 		typedef enum PlayerDirection {
@@ -155,11 +156,15 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			float stamina; //stamina for InPlat
 			float width; //width
 			float height; //height
-			float transition_time; //transition timer
+
+			// Animation timers
+			float transition_time;
+			float death_time;
+
+			// Condition checks
 			int onplatform;
 			int withinx;
 			int leaveplatform;
-			CP_Color color; //color
 			PlayerState state;
 			PlayerDirection direction;
 			float anim; //sprite animation timer
@@ -214,7 +219,8 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 	#pragma endregion 
 	
 	// Reset Player
-	void Reset_Player(Player* player, MoveState* movestate, int* deaths);
+	void Kill_Player(Player* player, int* deaths);
+	void Reset_Player(Player* player, MoveState* movestate);
 
 	// Draw Platforms
 	void DrawPlatform(int plat_index);
@@ -222,6 +228,5 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 	// Draw Player
 	void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate);
 
-	void Draw_Player_Transitioning_Sprite(Player player);
 
 #pragma endregion

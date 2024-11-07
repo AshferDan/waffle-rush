@@ -125,8 +125,6 @@ void L1_Init(void)
 	player.transition_time = 1.0f;
 	// health
 	player.stamina = 100.0f;
-	// color
-	player.color = CP_Color_Create(150, 150, 200, 255);
 	// anim state
 	player.state = Idle;
 	player.anim = 0;
@@ -233,12 +231,6 @@ void L1_Update(void)
 		if (player.anim >= 20) {
 			player.anim = 0;
 		}
-		if (transit_anim < 13) {
-			transit_anim += 20 * dt;
-		}
-		if (transit_anim > 13) {
-			transit_anim = 13;
-		}
 		if (player.transition_time < 13) {
 			player.transition_time += 20 * dt;
 		}
@@ -289,7 +281,7 @@ void L1_Update(void)
 
 		// reset with R or touch ground while movestate OnPlat
 		if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)) {
-			Reset_Player(&player, &movestate, &deaths);
+			Reset_Player(&player, &movestate);
 		}
 
 
