@@ -9,9 +9,18 @@
 //---------------------------------------------------------
 
 #include "Level1.h"
+#include "camera.h"
+Camera camera;
+float screenX;
+float screenY;
+float offsetX;
+float offsetY;
+int CollDetect;
+
 
 void L2_Init(void)
 {
+#pragma region im not using these
 	// ASSET LOADS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Assets
@@ -21,8 +30,6 @@ void L2_Init(void)
 	// load player sprite
 	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
 #pragma endregion
-
-
 	// MAP INIT
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region MAP
@@ -163,6 +170,27 @@ void L2_Init(void)
 	CP_Settings_ImageMode(CP_POSITION_CORNER);
 #pragma endregion
 
+#pragma endregion
+
+	// CAMERA INIT
+		/*---------------------------------------------------------------------------------------------------------------------*/
+#pragma region Camera
+	float screenX = CP_System_GetWindowWidth();
+	float screenY = CP_System_GetWindowHeight();
+	camera.limitleftx = screenX * 1.0f / 10.0f;
+	camera.limitrightx = screenX * 4.0f / 10.0f;
+	camera.limitheight1 = screenY * 0.3f;
+	camera.limitheight2 = screenY * 0.8f;
+	camera.width = camera.limitrightx - camera.limitleftx;
+	camera.height = camera.limitheight2 - camera.limitheight1;
+	camera.contactLeft = 0b01;
+	camera.contactRight = 0b10;
+	offsetX = 0;
+	offsetY = 0;
+	CollDetect = 0;
+	
+	
+#pragma endregion
 }
 
 void L2_Update(void)
@@ -261,6 +289,9 @@ void L2_Update(void)
 	}
 #pragma endregion
 
+	// CAMERA 
+	/*---------------------------------------------------------------------------------------------------------------------*/
+
 	// RENDER
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
@@ -283,12 +314,6 @@ void L2_Update(void)
 		isCleared = 1;
 	}
 
-	// HAZARD DRAWING
-	CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
-	for (int i = 0; i < numberoftraps; ++i) {
-		CP_Graphics_DrawTriangle(traps[i].x[0], traps[i].y[0], traps[i].x[1], traps[i].y[1], traps[i].x[2], traps[i].y[2]);
-	}
-
 	// Player
 	Draw_Player(player_sprite, player, &sprite_x, &sprite_y);
 
@@ -299,28 +324,6 @@ void L2_Update(void)
 	}
 	DrawStatBar(player.x - 15, player.y - 30, player.x + 35, player.y - 23, player.stamina, 100);
 
-	// DEATHS DRAWING
-	CP_Settings_Fill(black);
-	CP_Settings_TextSize(50);
-	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
-	char deathcount[20] = { 0 };
-	if (deaths < 100) {
-		sprintf_s(deathcount, 20, "Deaths: %d", deaths);
-		CP_Font_DrawText(deathcount, 50, 50);
-	}
-	else {
-		CP_Font_DrawText("Bruh", 50, 50);
-	}
-
-	// TIMER DRAWING
-	char time[16] = { 0 };
-	sprintf_s(time, 16, "TIME: %02d:%02d:%02d", (int)timer.minutes, (int)timer.seconds, (int)timer.millis);
-	CP_Font_DrawText(time, 1250, 100);
-
-	// SCORE DRAWING
-	char score[20] = { 0 };
-	sprintf_s(score, 20, "SCORE: %d", levelScore);
-	CP_Font_DrawText(score, 1250, 50);
 
 	// PAUSE PAGE
 	if (isPaused == 1) {
@@ -359,9 +362,25 @@ void L2_Update(void)
 		CP_Settings_RectMode(CP_POSITION_CORNER);
 	}
 #pragma endregion
+	
+#pragma region Camera
 
+	printf("limitleftx %f| limitrightx %f\n", camera.limitleftx, camera.limitheight1);
+
+	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 128));
+	CP_Settings_NoFill();
+	CP_Settings_RectMode(CP_POSITION_CORNER);
+	CP_Graphics_DrawRect(camera.limitleftx + offsetX, camera.limitheight1-offsetY, camera.width, camera.height);
+
+
+
+
+
+
+#pragma endregion
 	// Back to main menu
 	if (CP_Input_KeyDown(KEY_Q)) { CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit); };
+
 }
 
 void L2_Exit(void)

@@ -11,6 +11,7 @@
 #pragma once
 #include "mainmenu.h"
 #include "platform.h"
+#include "camera.h"
 
 
 void L2_Init(void);
