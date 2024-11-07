@@ -453,43 +453,6 @@ void L1_Update(void)
 		sprintf_s(score, 20, "HIGH SCORE: %d", levels[levelNumber - 1].score);
 		CP_Font_DrawText(score, 1200, 50);
 
-		// PAUSE PAGE
-		if (isPaused == 1 && isCleared == 0) {
-			CP_Settings_RectMode(CP_POSITION_CENTER);
-			CP_Settings_Fill(pausebg);
-			CP_Graphics_DrawRect(width / 2, height / 2, width, height);
-			CP_Settings_Fill(plat);
-			CP_Graphics_DrawRect(width / 2, height / 2, 1200, 600);
-			CP_Settings_Fill(black);
-			CP_Settings_TextSize(150);
-			CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
-			CP_Font_DrawText("PAUSED", width / 2, 300);
-
-			CP_Settings_TextSize(100);
-			// draw resume button
-			TextBoxCreate(500, 2 * height / 3, 350, 200, "RESUME", red);
-			int ResumeClick = IsAreaClicked(500, 2 * height / 3, 350, 200, mouseX, mouseY); //if mouse is over button
-			if (ResumeClick) {
-				CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
-				CP_Graphics_DrawRect(500, 2 * height / 3, 350, 200);
-				if (CP_Input_MouseClicked()) { //if LMB1 pressed
-					isPaused = 0;
-				}
-			}
-
-			// draw quit button
-			TextBoxCreate(1100, 2 * height / 3, 350, 200, "QUIT", red);
-			int QuitClick = IsAreaClicked(1100, 2 * height / 3, 350, 200, mouseX, mouseY); //if mouse is over button
-			if (QuitClick) {
-				CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
-				CP_Graphics_DrawRect(1100, 2 * height / 3, 350, 200);
-				if (CP_Input_MouseClicked()) { //if LMB1 pressed
-					CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit);
-				}
-			}
-			CP_Settings_RectMode(CP_POSITION_CORNER);
-		}
-
 		// LEVEL COMPLETE PAGE
 		if (isCleared == 1) {
 			CP_Settings_RectMode(CP_POSITION_CENTER);
@@ -559,6 +522,43 @@ void L1_Update(void)
 
 			CP_Settings_RectMode(CP_POSITION_CORNER);
 		}
+	}
+
+	// PAUSE PAGE
+	if (isPaused == 1 && isCleared == 0) {
+		CP_Settings_RectMode(CP_POSITION_CENTER);
+		CP_Settings_Fill(pausebg);
+		CP_Graphics_DrawRect(width / 2, height / 2, width, height);
+		CP_Settings_Fill(plat);
+		CP_Graphics_DrawRect(width / 2, height / 2, 1200, 600);
+		CP_Settings_Fill(black);
+		CP_Settings_TextSize(150);
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Font_DrawText("PAUSED", width / 2, 300);
+
+		CP_Settings_TextSize(100);
+		// draw resume button
+		TextBoxCreate(500, 2 * height / 3, 350, 200, "RESUME", red);
+		int ResumeClick = IsAreaClicked(500, 2 * height / 3, 350, 200, mouseX, mouseY); //if mouse is over button
+		if (ResumeClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+			CP_Graphics_DrawRect(500, 2 * height / 3, 350, 200);
+			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				isPaused = 0;
+			}
+		}
+
+		// draw quit button
+		TextBoxCreate(1100, 2 * height / 3, 350, 200, "QUIT", red);
+		int QuitClick = IsAreaClicked(1100, 2 * height / 3, 350, 200, mouseX, mouseY); //if mouse is over button
+		if (QuitClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+			CP_Graphics_DrawRect(1100, 2 * height / 3, 350, 200);
+			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit);
+			}
+		}
+		CP_Settings_RectMode(CP_POSITION_CORNER);
 	}
 #pragma endregion
 
