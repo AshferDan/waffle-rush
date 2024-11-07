@@ -164,3 +164,17 @@ void AddScore(int *totalScore, int addScore, int *isCleared) {
 		*totalScore += addScore;
 	}
 }
+
+int IncrementScore(int startScore, int endScore, float *timeElapsed, float dt) {
+	*timeElapsed += dt;
+	float duration = 5.0f;
+	int score = 0;
+	if (*timeElapsed < duration) {
+		startScore = (int)((*timeElapsed / duration) * endScore);
+	}
+	else {
+		startScore = endScore;
+	}
+	score = startScore;
+	return score;
+}
