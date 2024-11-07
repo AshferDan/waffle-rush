@@ -1,16 +1,16 @@
 //---------------------------------------------------------
-// file:	Level1.c
+// file:	MainMenu1.c
 // author:	AVID WAFFLE ENJOYERS
 // email:	-
 //
-// brief:   Level 1 stage
+// brief:   Playable Main Menu
 //
 // Copyright © 2020 DigiPen, All rights reserved.
 //---------------------------------------------------------
 
 /*ASHFER WIP DONT TOUCH OR ELSE I TOUCH U*/
 
-#include "Level1.h"
+#include "MainMenu1.h"
 
 CP_Color bg, red, green, hpcol, button_color; //colors
 float speed; //speed

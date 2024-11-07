@@ -1,5 +1,5 @@
 //---------------------------------------------------------
-// file:	Level1.h
+// file:	MainMenu1.h
 // author:	AVID WAFFLE ENJOYERS
 // email:	-
 //
@@ -15,8 +15,8 @@
 #include "platform.h"
 
 
-void L1_Init(void);
+void MainMenu1_Init(void);
 
-void L1_Update(void);
+void MainMenu1_Update(void);
 
-void L1_Exit(void);
+void MainMenu1_Exit(void);
