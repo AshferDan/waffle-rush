@@ -215,10 +215,10 @@ void L1_Update(void)
 	mouseY = CP_Input_GetMouseY();
 
 	// pause/resume game with Esc
-	if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 0) {
+	if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 0 && isCleared == 0) {
 		isPaused = 1;
 	}
-	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 1) {
+	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 1 && isCleared == 0) {
 		isPaused = 0;
 	}
 
