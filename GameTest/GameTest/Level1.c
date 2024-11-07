@@ -246,14 +246,23 @@ void L1_Update(void)
 		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
 
 		// reset with R or touch ground while movestate OnPlat
+
 		Point squareTopLeft = { player.x, player.y };
-		Point A = { traps[2].x[0], traps[2].y[0] }, B = { traps[2].x[1], traps[2].y[1] }, C = { traps[2].x[2], traps[2].y[2] };
-		if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)|| check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C)) {
-			player.x = spawnx;
-			player.y = spawny;
-			movestate = OnPlat;
-			player.movey = 0;
-			deaths++;
+		// Point A = { traps[2].x[0], traps[2].y[0] },
+		// B = { traps[2].x[1], traps[2].y[1] }, 
+		// C = { traps[2].x[2], traps[2].y[2] };
+		for (int i = 0; i < 4; i++) {
+			Point A = { traps[i].x[0], traps[i].y[0] };
+			Point B = { traps[i].x[1], traps[i].y[1] };
+			Point C = { traps[i].x[2], traps[i].y[2] };
+
+			if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0) || check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C)) {
+				player.x = spawnx;
+				player.y = spawny;
+				movestate = OnPlat;
+				player.movey = 0;
+				deaths++;
+			}
 		}
 
 		// animation timer update

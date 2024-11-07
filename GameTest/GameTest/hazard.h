@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #define MAX_TRAPS 100
 
+//
 typedef enum hazardstype {
 	spike,
 }hazardstype;
@@ -32,7 +33,7 @@ hazard traps[MAX_TRAPS];
 int numberoftraps;
 
 bool is_point_in_square(Point p, Point squareTopLeft, float width, float height);
-float area_of_triangle(Point A, Point B, Point C);
-bool is_point_in_triangle(Point p, Point A, Point B, Point C);
+int orientation(Point a, Point b, Point c);
+bool lines_intersect(Point p1, Point q1, Point p2, Point q2);
 bool check_square_triangle_collision(Point squareTopLeft, float width, float height,
 	Point A, Point B, Point C);
