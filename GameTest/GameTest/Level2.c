@@ -10,19 +10,31 @@
 
 #include "Level1.h"
 #include "camera.h"
-Camera camera;
-float screenX;
-float screenY;
-float offsetX;
+Camera camera; //allows your to work with anything that the camera requires
+
+
+float screenX; //full screen width
+float screenY; //full screen height
+float offsetX; //how much we need to offset everything
 float offsetY;
-int CollDetect;
+int overDetect; //checks if player is over the camera
+int Right;	//checks if player is on the right side of the camera
+int Left; //checks if the player is on the left side of the camera
+
 
 
 void L2_Init(void)
 {
+	
 #pragma region im not using these
 	// ASSET LOADS
 	/*---------------------------------------------------------------------------------------------------------------------*/
+#pragma region some code that i wished could work
+	//camera.overLeft = 0b01;
+	//camera.overRight = 0b10;
+	//OverDetector = 0b00;
+#pragma endregion
+
 #pragma region Assets
 	// load font
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
@@ -174,22 +186,20 @@ void L2_Init(void)
 
 	// CAMERA INIT
 		/*---------------------------------------------------------------------------------------------------------------------*/
-#pragma region Camera
+#pragma region Camera Init
 	float screenX = CP_System_GetWindowWidth();
 	float screenY = CP_System_GetWindowHeight();
-	camera.limitleftx = screenX * 1.0f / 10.0f;
-	camera.limitrightx = screenX * 4.0f / 10.0f;
-	camera.limitheight1 = screenY * 0.3f;
-	camera.limitheight2 = screenY * 0.8f;
-	camera.width = camera.limitrightx - camera.limitleftx;
-	camera.height = camera.limitheight2 - camera.limitheight1;
-	camera.contactLeft = 0b01;
-	camera.contactRight = 0b10;
-	offsetX = 0;
-	offsetY = 0;
-	CollDetect = 0;
-	
-	
+	offsetX = 20; //later, if on right you add this offset until the player is inside of the camera
+	offsetY = player.movey;//im not sure if this is already linked to dt but we'll figure it out
+
+	camera.limitleftx = screenX * 1.0f / 10.0f; //
+	camera.limitrightx = screenX * 4.0f / 10.0f; //
+	camera.limittop = screenY * 0.3f; //
+	camera.limitbase = screenY * 0.8f; //  
+	camera.width = camera.limitrightx - camera.limitleftx; //
+	camera.height = camera.limitbase - camera.limittop; //since base is a bigger number than the top number.
+
+
 #pragma endregion
 }
 
@@ -197,15 +207,7 @@ void L2_Update(void)
 {
 	// background
 	CP_Graphics_ClearBackground(bg);
-
-	// getdt
 	float dt = CP_System_GetDt();
-
-	// get mouse coords
-	mouseX = CP_Input_GetMouseX();
-	mouseY = CP_Input_GetMouseY();
-
-
 	// pause/resume game with Esc
 	if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 0) {
 		isPaused = 1;
@@ -214,7 +216,6 @@ void L2_Update(void)
 	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 1) {
 		isPaused = 0;
 	}
-
 	// Timer update
 	if (isPaused == 0 && isCleared == 0) {
 		timer.seconds += dt;
@@ -224,7 +225,6 @@ void L2_Update(void)
 		}
 		timer.millis = (int)(timer.seconds * 100) % 100;
 	}
-
 	// MOVEMENT 
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Movement
@@ -289,9 +289,12 @@ void L2_Update(void)
 	}
 #pragma endregion
 
-	// CAMERA 
+	// CAMERA UPDATE
 	/*---------------------------------------------------------------------------------------------------------------------*/
-
+	
+	//implement the below logic later. do the main camera first.
+	//camera.limitleftx =  camera.limitleftx  + offsetX;
+	//camera.limitrightx = camera.limitrightx + offsetX;
 	// RENDER
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
@@ -364,19 +367,42 @@ void L2_Update(void)
 #pragma endregion
 	
 #pragma region Camera
+	float playerR = player.x + player.width; //the right side of a player
+	//here we check if player is pushing over the camera box.
+	if (playerR > camera.limitrightx) {
+		printf("too far right");
+		offsetX = playerR - camera.limitrightx; //this is the distance between player and border
+		camera.limitrightx += offsetX;
+		camera.width = camera.limitrightx - camera.limitleftx;
+		//printf("%f", camera.limitrightx); //why is it static? perhaps offset is satic? perhaps somewhere it is not updating the values of limitrightx
+		//printf("offsetX = %f", offsetX); //why is it static? perhaps offset is satic? perhaps somewhere it is not updating the values of limitrightx
+	}
 
-	printf("limitleftx %f| limitrightx %f\n", camera.limitleftx, camera.limitheight1);
+	else if (player.x < camera.limitleftx) {
+		printf("too far left");
+		offsetX = camera.limitleftx - player.x; //this is the distance between player and border
+		camera.limitleftx -= offsetX;
+		camera.width = camera.limitrightx - camera.limitleftx;
+	}
 
-	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 128));
+
+	//camera.limitleftx = screenX * 1.0f / 10.0f + offsetX;
+	//camera.limitrightx = screenX * 4.0f / 10.0f + offsetX;
+	printf("limitleftx %f| limitrightx %f\n", camera.limitleftx, camera.limitrightx);
 	CP_Settings_NoFill();
 	CP_Settings_RectMode(CP_POSITION_CORNER);
-	CP_Graphics_DrawRect(camera.limitleftx + offsetX, camera.limitheight1-offsetY, camera.width, camera.height);
+	CP_Graphics_DrawRect(camera.limitleftx, camera.limittop, camera.width /*camera.limitrightx - camera.limitleftx*/, camera.height);
 
-
-
-
-
-
+	//printf("overdetect: %d",overDetect); //1 for left, 2 for right
+	//overDetect = ((player.x < camera.limitleftx) ? Left : ((player.x + player.width > camera.limitrightx) ? Right : 0));
+	//if (overDetect == Left) {
+	//	printf("player too far left\n");
+	//}
+	//else if (overDetect == Right) {
+	//	printf("player too far right\n");
+	//}
+	//else
+	//	offsetX = 0;
 #pragma endregion
 	// Back to main menu
 	if (CP_Input_KeyDown(KEY_Q)) { CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit); };

@@ -17,25 +17,14 @@
 
 
 typedef struct camera {
-	float limitleftx; //invis border
+	float limitleftx;
 	float limitrightx;
 	float width;
 	float height;
-	float limitheight1;
-	float limitheight2;
+	float limittop;
+	float limitbase;
 	float worldshiftx;
 	float worldshifty;
-	int contactLeft;
-	int contactRight;
-	int contactUp;
-	int contactDown;
-
-
-
 } Camera;
 
 Camera camera;
-
-void Camera_Init(Camera * camera);
-void Camera_Update(Camera* camera);
-void Camera_Exit(void);
