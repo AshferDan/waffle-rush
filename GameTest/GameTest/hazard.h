@@ -32,6 +32,7 @@ typedef struct Point {
 hazard traps[MAX_TRAPS];
 
 int numberoftraps;
+int crusherstate;
 
 bool is_point_in_square(Point p, Point squareTopLeft, float width, float height);
 int orientation(Point a, Point b, Point c);

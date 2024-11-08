@@ -34,3 +34,8 @@ void Game_Exit(void);
 void L1_Init(void);
 void L1_Update(void);
 void L1_Exit(void);
+
+
+void L2_Init(void);
+void L2_Update(void);
+void L2_Exit(void);

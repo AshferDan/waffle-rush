@@ -14,8 +14,6 @@
 level levels[num_levels];
 float timeElapsed;
 
-int crusherstate = 0;
-
 void L1_Init(void)
 {
 	// ASSET LOADS
@@ -124,6 +122,8 @@ void L1_Init(void)
 		}
 	}
 	fclose(file2);
+
+	crusherstate = 0;
 #pragma endregion
 #pragma endregion
 	// PLAYER INITS

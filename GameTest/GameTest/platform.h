@@ -12,6 +12,7 @@
 #pragma once
 #include "utils.h"
 #include "hazard.h"
+#include "camera.h"
 
 
 #define max_coords 16
