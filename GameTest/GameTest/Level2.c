@@ -369,6 +369,11 @@ void L2_Update(void)
 //		//placeholder
 //#pragma endregion
 
+		
+
+
+
+
 	// CAMERA UPDATE
 	/*---------------------------------------------------------------------------------------------------------------------*/
 	
@@ -376,42 +381,22 @@ void L2_Update(void)
 	//camera.limitleftx =  camera.limitleftx  + offsetX;
 	//camera.limitrightx = camera.limitrightx + offsetX;
 #pragma region Camera
-		float playerR = player.x + player.width; //the right side of a player
-		//here we check if player is pushing over the camera box.
-		if (playerR > camera.limitrightx) {
-			printf("too far right");
-			offsetX = playerR - camera.limitrightx; //this is the distance between player and border
-			camera.limitrightx += offsetX;
-			camera.limitleftx += offsetX;
-			//printf("%f", camera.limitrightx); //why is it static? perhaps offset is satic? perhaps somewhere it is not updating the values of limitrightx
-			//printf("offsetX = %f", offsetX); //why is it static? perhaps offset is satic? perhaps somewhere it is not updating the values of limitrightx
-		}
+		playerCamColl(&player, &camera); //functionised my camera shift. 
+		//where worldshiftx is now the modifyable for all objects
 
-		else if (player.x < camera.limitleftx) {
-			printf("too far left");
-			offsetX = camera.limitleftx - player.x; //this is the distance between player and border
-			camera.limitleftx -= offsetX;
-			camera.limitrightx -= offsetX;
-		}
-
-
-		//camera.limitleftx = screenX * 1.0f / 10.0f + offsetX;
-		//camera.limitrightx = screenX * 4.0f / 10.0f + offsetX;
 		printf("limitleftx %f| limitrightx %f\n", camera.limitleftx, camera.limitrightx);
 		CP_Settings_NoFill();
 		CP_Settings_RectMode(CP_POSITION_CORNER);
 		CP_Graphics_DrawRect(camera.limitleftx, camera.limittop, camera.width /*camera.limitrightx - camera.limitleftx*/, camera.height);
 
-		//printf("overdetect: %d",overDetect); //1 for left, 2 for right
-		//overDetect = ((player.x < camera.limitleftx) ? Left : ((player.x + player.width > camera.limitrightx) ? Right : 0));
-		//if (overDetect == Left) {
-		//	printf("player too far left\n");
-		//}
-		//else if (overDetect == Right) {
-		//	printf("player too far right\n");
-		//}
-		//else
-		//	offsetX = 0;
+		
+
+
+
+
+
+
+
 #pragma endregion
 	// RENDER
 	/*---------------------------------------------------------------------------------------------------*/
