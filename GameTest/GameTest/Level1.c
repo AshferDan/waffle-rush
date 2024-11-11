@@ -25,9 +25,11 @@ void L1_Init(void)
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
 	// load player sprite
-	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
-	transition_sprite = CP_Image_Load("Assets/transition.png");
-	death_sprite = CP_Image_Load("Assets/Burnt.png");
+	player_sprite		= CP_Image_Load("Assets/Player_Sprites.png");
+	transition_sprite	= CP_Image_Load("Assets/transition.png");
+	burn_sprite			= CP_Image_Load("Assets/Burnt.png");
+	fall_sprite			= CP_Image_Load("Assets/Fall_Sprite.png");
+	crush_sprite		= CP_Image_Load("Assets/Crush_Sprite.png");
 #pragma endregion
 
 	// LEVEL INIT
@@ -54,7 +56,7 @@ void L1_Init(void)
 
 	if (file == NULL) {
 		printf("Failed to open platform file! Check if file exists\n");
-		CP_Engine_Terminate;
+		CP_Engine_Terminate();
 	}
 	// read how many platforms in level
 	fscanf_s(file, "%d", &numplats);
@@ -200,16 +202,18 @@ void L1_Init(void)
 
 	// Initialize colors
 	pausebg = CP_Color_Create(0, 0, 0, 100);
-	bg = CP_Color_Create(100, 100, 100, 255); //background
+	bg = CP_Color_Create(135, 200, 220, 255); //background
 	black = CP_Color_Create(0, 0, 0, 255); //black
 	red = CP_Color_Create(200, 50, 50, 255); //red
 	green = CP_Color_Create(50, 200, 50, 255); //green
-	plat = CP_Color_Create(255, 150, 150, 255); //platform colour
+	plat = CP_Color_Create(200, 200, 200, 255); //platform colour
 	stamina = CP_Color_Create(255, 255, 40, 255); //stamina colour
 
 	// Corner drawing
 	CP_Settings_RectMode(CP_POSITION_CORNER);
 	CP_Settings_ImageMode(CP_POSITION_CORNER);
+
+	CP_Settings_ImageFilterMode(CP_IMAGE_FILTER_NEAREST);
 
 #pragma endregion
 
@@ -222,7 +226,7 @@ void L1_Update(void)
 
 	// getdt
 	float dt = CP_System_GetDt();
-	dt = CP_Math_ClampFloat(dt, 0, 0.05); //prevent excess lagspike clipping
+	dt = CP_Math_ClampFloat(dt, 0.0f, 0.05f); //prevent excess lagspike clipping
 
 	// get mouse coords
 	mouseX = CP_Input_GetMouseX();
@@ -263,7 +267,7 @@ void L1_Update(void)
 	// Pause check
 	if (isPaused == 0) {
 
-		// Animation Timer
+	// Animation Timer
 		player.anim += 10 * dt;
 		if (player.anim >= 20) {
 			player.anim = 0;
@@ -275,7 +279,14 @@ void L1_Update(void)
 			player.transition_time = 13;
 		}
 		if (player.death_time < 17) {
-			player.death_time += 17 * dt;
+			if (player.deathcause != Fall) {
+				player.death_time += 17 * dt;
+			}
+			else if (player.y <= height - player.height) {
+				player.movey += 1800.0f * dt;
+				player.y += player.movey * dt;
+			}
+			else player.death_time = 17;
 		}
 		if (player.death_time >= 17) {
 			if (player.state == Dead) {
@@ -285,39 +296,42 @@ void L1_Update(void)
 			player.death_time = 17;
 		}
 
-		// Movement logics
-		movement(&player, movestate, speed, dt);
+	// Movement logics
+	movement(&player, movestate, speed, dt);
 
-		// Collision against platforms
-		if (movestate == OnPlat) {
+	// Collision against platforms
+		if (movestate == OnPlat && player.deathcause != Fall) {
 			player.stamina += 40.0f * dt;
 			for (int plat_index = 0; plat_index < numplats; plat_index++) {
 				CollOnPlatforms(plat_index, Platform[plat_index], &player, player);
 			}
 		}
 
-		else if (movestate == InPlat) {
+		else if (movestate == InPlat && player.deathcause != Fall) {
 			player.stamina -= 20.0f * dt;
 			for (int plat_index = 0; plat_index < numplats; plat_index++) {
 				CollPlatforms(plat_index, Platform[plat_index], &player, player);
 			}
+			if (player.stamina <= 0) {
+				Kill_Player(&player, Fall, &deaths);
+			}
 		}
 		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
 
-		// window clamps
+	// window clamps
 		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
 		if (player.y + player.height > height || player.y < 0) {
 			player.movey = 0;
 		}
-		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
+		player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);
 
-		// change movestate
-			/*
-			OnPlat	  - on platform
-			InPlat	  - inside platform
-			EnterPlat - from OnPlat to InPlat
-			ExitPlat  - from InPlat to OnPlat
-			*/
+	// change movestate
+		/*
+		OnPlat	  - on platform
+		InPlat	  - inside platform
+		EnterPlat - from OnPlat to InPlat
+		ExitPlat  - from InPlat to OnPlat
+		*/
 		if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
 			start_transition(&player, &movestate);
 		}
@@ -326,13 +340,13 @@ void L1_Update(void)
 			end_transition(&player, &movestate);
 		}
 
-		// reset with R or touch ground while movestate OnPlat
-		if (CP_Input_KeyTriggered(KEY_R) || ((player.stamina == 0) && player.state != Dead)) {
-			Kill_Player(&player, &deaths);
+	// reset with R or touch ground while movestate OnPlat
+		if (CP_Input_KeyTriggered(KEY_R) && player.state != Dead) {
+			CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
+			Kill_Player(&player, reset, &deaths);
 		}
-		if ((player.y >= height - player.height) && movestate == OnPlat) {
-			Reset_Player(&player, &movestate);
-			deaths++;
+		if ((player.y >= height - player.height) && movestate == OnPlat && player.deathcause != Fall) {
+			Kill_Player(&player, Fall, &deaths);
 		}
 
 		Point squareTopLeft = { player.x, player.y };
@@ -345,7 +359,7 @@ void L1_Update(void)
 			Point C = { traps[i].x[2], traps[i].y[2] };
 
 			if (check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C)) {
-				Kill_Player(&player, &deaths);
+				Kill_Player(&player, Burn, &deaths);
 			}
 		}
 
@@ -354,8 +368,8 @@ void L1_Update(void)
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
-		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
-			Kill_Player(&player, &deaths);
+		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])&&player.onplatform) {
+			Kill_Player(&player, Crush, &deaths);
 		}
 		//placeholder
 #pragma endregion
@@ -366,9 +380,11 @@ void L1_Update(void)
 
 	// Platforms
 		CP_Settings_Fill(plat);
+		CP_Settings_Stroke(CP_Color_Create(100, 100, 100, 255));
 		for (int i = 0; i < numplats; i++) {
 			DrawPlatform(i);
 		}
+		CP_Settings_Stroke(black);
 
 		// Goal
 		CP_Settings_Fill(green);
@@ -589,5 +605,7 @@ void L1_Exit(void)
 {
 	CP_Image_Free(player_sprite);
 	CP_Image_Free(transition_sprite);
-	CP_Image_Free(death_sprite);
+	CP_Image_Free(burn_sprite);
+	CP_Image_Free(fall_sprite);
+	CP_Image_Free(crush_sprite);
 }

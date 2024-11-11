@@ -484,10 +484,12 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			}// end if collision check
 		}
 	}
-	void Kill_Player(Player* player, int* deaths) {
+	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths) {
 		if (player->state != Dead) {
 			player->state = Dead;
+			player->deathcause = deathcause;
 			player->death_time = 0;
+			player->movey = (deathcause != Fall) ? 0 : -300;
 			++*deaths;
 		}
 	}
@@ -500,6 +502,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		player->direction = OnRight;
 		player->movex = 0;
 		player->movey = 0;
+		player->deathcause = Reset;
 	}
 #pragma endregion
 
@@ -529,76 +532,100 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 				sprite_y = 0;
 				break;
 			case OnRight:
-				sprite_y = 180;
+				sprite_y = 18;
 				break;
 			case InUp:
-				sprite_y = 360;
+				sprite_y = 36;
 				rot = 0;
 				break;
 			case InUpLeft:
-				sprite_y = 360;
+				sprite_y = 36;
 				rot = 315;
 				break;
 			case InLeft:
-				sprite_y = 360;
+				sprite_y = 36;
 				rot = 270;
 				break;
 			case InDownLeft:
-				sprite_y = 360;
+				sprite_y = 36;
 				rot = 225;
 				break;
 			case InDown:
-				sprite_y = 360;
+				sprite_y = 36;
 				rot = 180;
 				break;
 			case InDownRight:
-				sprite_y = 360;
+				sprite_y = 36;
 				rot = 135;
 				break;
 			case InRight:
-				sprite_y = 360;
+				sprite_y = 36;
 				rot = 90;
 				break;
 			case InUpRight:
-				sprite_y = 360;
+				sprite_y = 36;
 				rot = 45;
 				break;
 			}
 			switch (player.state) {
 			case Idle:
-				sprite_x = (player.anim < 10) ? 0 : 180;
+				sprite_x = (player.anim < 10) ? 0 : 18;
 				break;
 			case Running:
 			case Crawling:
-				sprite_x = ((int)player.anim % 2 == 0) ? 360 : 540;
+				sprite_x = ((int)player.anim % 2 == 0) ? 36 : 54;
 				break;
 			case Jumping:
-				sprite_x = 720;
+				sprite_x = 72;
 				break;
 			}
-			CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, sprite_x + 5, sprite_y + 5, sprite_x + 170, sprite_y + 170, 255, rot);
+			CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 255, rot);
 		}
 		else
 		{
-			sprite_y = (movestate == EnterPlat) ? 360 : 0;
+			sprite_y = (movestate == EnterPlat) ? 36 : 0;
 
-			sprite_x = ((int)player.transition_time / 1) * 180;
-			CP_Image_DrawSubImage(transition_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 5, sprite_y + 5, sprite_x + 170, sprite_y + 350, 255);
+			sprite_x = ((int)player.transition_time / 1) * 18;
+			CP_Image_DrawSubImage(transition_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
 		}
 	}
 	else {
-		switch (player.direction) {
-		case OnLeft: sprite_y = 0;
+		CP_Image death_sprite;
+		switch (player.deathcause) {
+		case Burn: {
+			death_sprite = burn_sprite;
+
+			switch (player.direction) {
+			case OnLeft: sprite_y = 0;
+				break;
+			case OnRight: sprite_y = 36;
+				break;
+			default: sprite_y = 0;
+			}
+			sprite_x = ((int)player.death_time) * 18;
+			if (!player.onplatform) {
+				sprite_x += 306;
+			}
 			break;
-		case OnRight: sprite_y = 360;
+		}
+		case Fall: 
+			death_sprite = fall_sprite;
+			sprite_x = ((int)(player.anim) % 2 == 0) ? 0 : 18;
+			sprite_y = 0;
 			break;
-		default: sprite_y = 0;
+
+		case Crush: 
+			death_sprite = crush_sprite;
+			sprite_x = ((int)player.death_time < 3) ? (int)player.death_time * 18 : 52;
+			sprite_y = (player.direction == OnLeft) ? 36 : 0;
+			break;
+		
+		default:
+			death_sprite = burn_sprite;
+		
 		}
-		sprite_x = ((int)player.death_time/1)*180;
-		if (!player.onplatform) {
-			sprite_x += 3060;
-		}
-		CP_Image_DrawSubImage(death_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30)*2, sprite_x + 5, sprite_y + 5, sprite_x + 170, sprite_y + 350, 255);
+
+		CP_Image_DrawSubImage(death_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
 	}
 }
 

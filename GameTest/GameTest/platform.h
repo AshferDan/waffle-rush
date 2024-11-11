@@ -31,7 +31,7 @@ MoveState movestate;
 int numplats;
 int deaths;
 float speed; //speed
-float width, height; //window width/height
+int width, height; //window width/height
 float spawnx, spawny, goalx, goaly; // spawn and goal position
 int isPaused; // check if game paused
 int isCleared; // check if level cleared (player touches goal)
@@ -40,7 +40,7 @@ int highScore; // level high score
 int levelNumber; // level number
 
 // Graphics
-CP_Image player_sprite, transition_sprite, death_sprite;
+CP_Image player_sprite, transition_sprite, burn_sprite, fall_sprite, crush_sprite;
 
 float player_sprite_x, player_sprite_y;
 float transit_sprite_x, transit_sprite_y;
@@ -148,6 +148,13 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			Null,
 		} PlayerDirection;
 
+		typedef enum CauseOfDeath {
+			Burn,
+			Fall,
+			Crush,
+			Reset,
+		} CauseOfDeath;
+
 		typedef struct Player {
 			float x; //posx
 			float y; //posy
@@ -167,6 +174,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			int leaveplatform;
 			PlayerState state;
 			PlayerDirection direction;
+			CauseOfDeath deathcause;
 			float anim; //sprite animation timer
 		} Player;
 
@@ -219,7 +227,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 	#pragma endregion 
 	
 	// Reset Player
-	void Kill_Player(Player* player, int* deaths);
+	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths);
 	void Reset_Player(Player* player, MoveState* movestate);
 
 	// Draw Platforms

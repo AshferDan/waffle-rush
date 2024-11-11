@@ -21,7 +21,9 @@ void Game_Init(void)
 	// load player sprite
 	player_sprite		= CP_Image_Load("Assets/Player_Sprites.png");
 	transition_sprite	= CP_Image_Load("Assets/transition.png");
-	death_sprite		= CP_Image_Load("Assets/Burnt.png");
+	burn_sprite			= CP_Image_Load("Assets/Burnt.png");
+	fall_sprite			= CP_Image_Load("Assets/Fall_Sprite.png");
+	crush_sprite		= CP_Image_Load("Assets/Crush_Sprite.png");
 #pragma endregion
 
 	// MAP INIT
@@ -41,7 +43,7 @@ void Game_Init(void)
 
 	if (file == NULL) {
 		printf("Failed to open platform file! Check if file exists\n");
-		CP_Engine_Terminate;
+		CP_Engine_Terminate();
 	}
 	// read how many platforms in level
 	fscanf_s(file, "%d", &numplats);
@@ -124,6 +126,7 @@ void Game_Init(void)
 	player.state = Idle;
 	player.anim = 0;
 	player.direction = OnRight;
+	player.deathcause = Reset;
 
 	// initialize deaths
 	deaths = 0;
@@ -172,6 +175,8 @@ void Game_Init(void)
 	// Corner drawing
 	CP_Settings_RectMode(CP_POSITION_CORNER);
 	CP_Settings_ImageMode(CP_POSITION_CORNER);
+
+	CP_Settings_ImageFilterMode(CP_IMAGE_FILTER_NEAREST);
 #pragma endregion
 
 }
@@ -183,7 +188,7 @@ void Game_Update(void)
 
 	// getdt
 	float dt = CP_System_GetDt();
-	dt = CP_Math_ClampFloat(dt, 0, 0.05); //prevent excess lagspike clipping
+	dt = CP_Math_ClampFloat(dt, 0.0f, 0.05f); //prevent excess lagspike clipping
 
 	// get mouse coords
 	mouseX = CP_Input_GetMouseX();
@@ -236,7 +241,14 @@ void Game_Update(void)
 			player.transition_time = 13;
 		}
 		if (player.death_time < 17) {
-			player.death_time += 17 * dt;
+			if (player.deathcause != Fall) {
+				player.death_time += 17 * dt;
+			}
+			else if (player.y <= height-player.height) {
+				player.movey += 1800.0f * dt;
+				player.y += player.movey * dt;
+			}
+			else player.death_time = 17;
 		}
 		if (player.death_time >= 17) {
 			if (player.state == Dead) {
@@ -250,17 +262,20 @@ void Game_Update(void)
 	movement(&player, movestate, speed, dt);
 	
 	// Collision against platforms
-		if (movestate == OnPlat) {
+		if (movestate == OnPlat && player.deathcause != Fall) {
 			player.stamina += 40.0f * dt;
 			for (int plat_index = 0; plat_index < numplats; plat_index++) {
 				CollOnPlatforms(plat_index, Platform[plat_index], &player, player);
 			}
 		}
 
-		else if (movestate == InPlat) {
+		else if (movestate == InPlat && player.deathcause != Fall) {
 			player.stamina -= 20.0f * dt;
 			for (int plat_index = 0; plat_index < numplats; plat_index++) {
 				CollPlatforms(plat_index, Platform[plat_index], &player, player);
+			}
+			if (player.stamina <= 0) {
+				Kill_Player(&player, Fall, &deaths);
 			}
 		}
 		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
@@ -270,7 +285,7 @@ void Game_Update(void)
 		if (player.y + player.height > height || player.y < 0) {
 			player.movey = 0;
 		}
-		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
+		player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);
 
 	// change movestate
 		/*
@@ -288,12 +303,14 @@ void Game_Update(void)
 		}
 
 	// reset with R or touch ground while movestate OnPlat
-		if (CP_Input_KeyTriggered(KEY_R) || ((player.stamina == 0) && player.state != Dead)) {
-			Kill_Player(&player, &deaths);
+		if (CP_Input_KeyTriggered(KEY_R) && player.state != Dead) {
+			CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
+			Kill_Player(&player, reset, &deaths);
 		}
-		if ((player.y >= height - player.height) && movestate == OnPlat) {
-			Reset_Player(&player, &movestate);
-			deaths++;
+		if ((player.y >= height - player.height) && movestate == OnPlat && player.deathcause != Fall) {
+			/*Reset_Player(&player, &movestate);
+			deaths++;*/
+			Kill_Player(&player, Fall, &deaths);
 		}
 
 	}
@@ -313,7 +330,7 @@ void Game_Update(void)
 	CP_Settings_Fill(green);
 	CP_Graphics_DrawRect(goalx, goaly, 50, 50);
 
-	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly, 50, 50)) {
+	if (player.state != Dead && AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly, 50, 50)) {
 		CP_Settings_Fill(green);
 		CP_Settings_TextSize(100);
 		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
@@ -409,5 +426,7 @@ void Game_Exit(void)
 {
 	CP_Image_Free(player_sprite);
 	CP_Image_Free(transition_sprite);
-	CP_Image_Free(death_sprite);
+	CP_Image_Free(burn_sprite);
+	CP_Image_Free(fall_sprite);
+	CP_Image_Free(crush_sprite);
 }
