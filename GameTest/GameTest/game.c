@@ -208,7 +208,6 @@ void Game_Update(void)
 	}
 
 
-
 	// MOVEMENT 
 	/*  Contents:
 	- Pause check
@@ -249,13 +248,10 @@ void Game_Update(void)
 			}
 			player.death_time = 17;
 		}
-		printf("movex %f, movey %f\n", player.movex, player.movey);
-	// Movement logics
-		if (player.state != Dead) 
-		{
-			movement(&player, movestate, speed, dt);
-		}
 
+	// Movement logics
+	movement(&player, movestate, speed, dt);
+	
 	// Collision against platforms
 		if (movestate == OnPlat) {
 			player.stamina += 40.0f * dt;
@@ -296,7 +292,6 @@ void Game_Update(void)
 
 	// reset with R or touch ground while movestate OnPlat
 		if (CP_Input_KeyTriggered(KEY_R) || ((player.stamina == 0) && player.state != Dead)) {
-			//Reset_Player(&player, &movestate);
 			Kill_Player(&player, &deaths);
 		}
 		if ((player.y >= height - player.height) && movestate == OnPlat) {

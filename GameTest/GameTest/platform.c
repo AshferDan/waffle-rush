@@ -59,170 +59,172 @@ void end_transition(Player* player, MoveState* movestate) {
 void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	float accel = 3000.0f * dt;
 	float accel2 = 1500.0f * dt;
-	float speed2 = speed/2;
+	float speed2 = speed / 2;
 
 	PlayerDirection tempdirV = Null;
 	PlayerDirection tempdirH = Null;
 
-	// OnPlat movement
-	if (movestate == OnPlat) {
-		tempdirH = Null;
-		// Gravity and terminal velocity
-		if (ply->movey < 1000.0f && ply->onplatform == 0) {
-			ply->movey += 1800.0f * dt;
-		}
-		// jump!
-		if (CP_Input_KeyTriggered(KEY_SPACE) && ply->onplatform == 1) {
-			ply->movey = -speed;
-		}
-		// left
-		if (CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D)) && (ply->movex > -speed)) {
-			ply->movex -= accel;
-			tempdirH = OnLeft;
-		}
-		else if ((ply->movex < 100.f) && (!(CP_Input_KeyDown(KEY_A))|| ((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))))) {
-			ply->movex += accel;
-		};
-		// right
-		if (CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A)) && (ply->movex < speed)) {
-			ply->movex += accel;
-			tempdirH = OnRight;
-		}
-		else if ((ply->movex > 100.f) && (!(CP_Input_KeyDown(KEY_A)) || ((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))))) {
-			ply->movex -= accel;
-		};
-		if (((((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))) || !((CP_Input_KeyDown(KEY_A)) || (CP_Input_KeyDown(KEY_D)))) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
-			ply->movex = 0;
-		}
-
-		// Speed clamp
-		ply->movex = CP_Math_ClampFloat(ply->movex, -speed, speed);
-
-		// anim state
-		if (tempdirH != Null) {
-			ply->direction = tempdirH;
-		}
-
-		if (ply->onplatform == 1) {
-			ply->state = Idle;
-			if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D)) {
-				ply->state = Running;
+	if (ply->state != Dead) {
+		// OnPlat movement
+		if (movestate == OnPlat) {
+			tempdirH = Null;
+			// Gravity and terminal velocity
+			if (ply->movey < 1000.0f && ply->onplatform == 0) {
+				ply->movey += 1800.0f * dt;
 			}
-		}
-		if (ply->onplatform == 0) {
-			ply->state = Jumping;
-		}
-	}
-	// InPlat movement
-	if (movestate == InPlat) {
-		ply->state = Idle;
-
-		// WASD keys
-		// W - Up
-		if (CP_Input_KeyDown(KEY_W) && !CP_Input_KeyDown(KEY_S)) {
-			ply->state = Crawling;
-			tempdirV = InUp;
-			if (ply->movey > -speed2) {
-				ply->movey -= accel2;
+			// jump!
+			if (CP_Input_KeyTriggered(KEY_SPACE) && ply->onplatform == 1) {
+				ply->movey = -speed;
 			}
-		}
-		// A - Left
-		if (CP_Input_KeyDown(KEY_A) && !CP_Input_KeyDown(KEY_D)) {
-			ply->state = Crawling;
-			tempdirH = InLeft;
-			if (ply->movex > -speed2) {
-				ply->movex -= accel2;
+			// left
+			if (CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D)) && (ply->movex > -speed)) {
+				ply->movex -= accel;
+				tempdirH = OnLeft;
 			}
-		}
-		// S - Down
-		if (CP_Input_KeyDown(KEY_S) && !CP_Input_KeyDown(KEY_W)) {
-			ply->state = Crawling;
-			tempdirV = InDown;
-			if (ply->movey < speed2) {
-				ply->movey += accel2;
-
+			else if ((ply->movex < 100.f) && (!(CP_Input_KeyDown(KEY_A)) || ((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))))) {
+				ply->movex += accel;
+			};
+			// right
+			if (CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A)) && (ply->movex < speed)) {
+				ply->movex += accel;
+				tempdirH = OnRight;
 			}
-		}
-		// D - Right
-		if (CP_Input_KeyDown(KEY_D) && !CP_Input_KeyDown(KEY_A)) {
-			ply->state = Crawling;
-			tempdirH = InRight;
-			if (ply->movex < speed2) {
-				ply->movex += accel2;
-			}
-		}
-
-		// Idle decel and brake
-		if (tempdirH == Null) {
-			if (ply->movex < 0) {
-				ply->movex += accel2;
-			}
-			else {
-				ply->movex -= accel2;
-			}
-			if (ply->movex <= 50.f && ply->movex >= -50.f) {
+			else if ((ply->movex > 100.f) && (!(CP_Input_KeyDown(KEY_A)) || ((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))))) {
+				ply->movex -= accel;
+			};
+			if (((((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))) || !((CP_Input_KeyDown(KEY_A)) || (CP_Input_KeyDown(KEY_D)))) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
 				ply->movex = 0;
 			}
-		}
-		if (tempdirV == Null) {
-			if (ply->movey < 50) {
-				ply->movey += accel2;
-			}
-			else if (ply->movey > 50) {
-				ply->movey -= accel2;
-			}
-			if (ply->movey <= 50.f && ply->movey >= -50.f) {
-				ply->movey = 0;
-			}
-		}
 
-		// Speed clamps
-		ply->movex = CP_Math_ClampFloat(ply->movex, -speed2, speed2);
-		ply->movey = CP_Math_ClampFloat(ply->movey, -speed2, speed2);
+			// Speed clamp
+			ply->movex = CP_Math_ClampFloat(ply->movex, -speed, speed);
 
-		// Direction
-		// Diagonal check if there are both horizontal and vertical inputs
-		if (tempdirH != Null && tempdirV != Null) {
-			if (tempdirV == InUp) {
-				if (tempdirH == InLeft) {
-					ply->direction = InUpLeft;
+			// anim state
+			if (tempdirH != Null) {
+				ply->direction = tempdirH;
+			}
+
+			if (ply->onplatform == 1) {
+				ply->state = Idle;
+				if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D)) {
+					ply->state = Running;
+				}
+			}
+			if (ply->onplatform == 0) {
+				ply->state = Jumping;
+			}
+		}
+		// InPlat movement
+		if (movestate == InPlat) {
+			ply->state = Idle;
+
+			// WASD keys
+			// W - Up
+			if (CP_Input_KeyDown(KEY_W) && !CP_Input_KeyDown(KEY_S)) {
+				ply->state = Crawling;
+				tempdirV = InUp;
+				if (ply->movey > -speed2) {
+					ply->movey -= accel2;
+				}
+			}
+			// A - Left
+			if (CP_Input_KeyDown(KEY_A) && !CP_Input_KeyDown(KEY_D)) {
+				ply->state = Crawling;
+				tempdirH = InLeft;
+				if (ply->movex > -speed2) {
+					ply->movex -= accel2;
+				}
+			}
+			// S - Down
+			if (CP_Input_KeyDown(KEY_S) && !CP_Input_KeyDown(KEY_W)) {
+				ply->state = Crawling;
+				tempdirV = InDown;
+				if (ply->movey < speed2) {
+					ply->movey += accel2;
+
+				}
+			}
+			// D - Right
+			if (CP_Input_KeyDown(KEY_D) && !CP_Input_KeyDown(KEY_A)) {
+				ply->state = Crawling;
+				tempdirH = InRight;
+				if (ply->movex < speed2) {
+					ply->movex += accel2;
+				}
+			}
+
+			// Idle decel and brake
+			if (tempdirH == Null) {
+				if (ply->movex < 0) {
+					ply->movex += accel2;
 				}
 				else {
-					ply->direction = InUpRight;
+					ply->movex -= accel2;
+				}
+				if (ply->movex <= 50.f && ply->movex >= -50.f) {
+					ply->movex = 0;
 				}
 			}
-			else {
-				if (tempdirH == InLeft) {
-					ply->direction = InDownLeft;
+			if (tempdirV == Null) {
+				if (ply->movey < 50) {
+					ply->movey += accel2;
+				}
+				else if (ply->movey > 50) {
+					ply->movey -= accel2;
+				}
+				if (ply->movey <= 50.f && ply->movey >= -50.f) {
+					ply->movey = 0;
+				}
+			}
+
+			// Speed clamps
+			ply->movex = CP_Math_ClampFloat(ply->movex, -speed2, speed2);
+			ply->movey = CP_Math_ClampFloat(ply->movey, -speed2, speed2);
+
+			// Direction
+			// Diagonal check if there are both horizontal and vertical inputs
+			if (tempdirH != Null && tempdirV != Null) {
+				if (tempdirV == InUp) {
+					if (tempdirH == InLeft) {
+						ply->direction = InUpLeft;
+					}
+					else {
+						ply->direction = InUpRight;
+					}
 				}
 				else {
-					ply->direction = InDownRight;
+					if (tempdirH == InLeft) {
+						ply->direction = InDownLeft;
+					}
+					else {
+						ply->direction = InDownRight;
+					}
 				}
 			}
-		}
-		// If no inputs, or only one directional input
-		if (tempdirV == Null && tempdirH == Null) {
-			ply->direction = ply->direction;
-		} 
-		else if (tempdirV == Null) {
-			ply->direction = tempdirH;
-		}
-		else if (tempdirH == Null) {
-			ply->direction = tempdirV;
+			// If no inputs, or only one directional input
+			if (tempdirV == Null && tempdirH == Null) {
+				ply->direction = ply->direction;
+			}
+			else if (tempdirV == Null) {
+				ply->direction = tempdirH;
+			}
+			else if (tempdirH == Null) {
+				ply->direction = tempdirV;
+			}
+
 		}
 
+		// Update movement only if InPlat/OnPlat, ignore transition
+		if (movestate == InPlat || movestate == OnPlat) {
+			ply->x += ply->movex * dt;
+			ply->y += ply->movey * dt;
+		}
+
+		// reset checks for jumping and entering
+		ply->onplatform = 0;
+		ply->withinx = 0;
+		ply->leaveplatform = 0;
 	}
-
-	// Update movement only if InPlat/OnPlat, ignore transition
-	if (movestate == InPlat || movestate == OnPlat) {
-		ply->x += ply->movex * dt;
-		ply->y += ply->movey * dt;
-	}
-
-	// reset checks for jumping and entering
-	ply->onplatform = 0;
-	ply->withinx = 0;
-	ply->leaveplatform = 0;
 }
 #pragma endregion
 
