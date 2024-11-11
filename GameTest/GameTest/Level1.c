@@ -334,11 +334,16 @@ void L1_Update(void)
 			Reset_Player(&player, &movestate);
 			deaths++;
 		}
+		
+#pragma endregion
+		// Hazard
+		/*---------------------------------------------------------------------------------------------------*/
+#pragma region Hazard stuff
+		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
+			Kill_Player(&player, &deaths);
+		}
 
 		Point squareTopLeft = { player.x, player.y };
-		// Point A = { traps[2].x[0], traps[2].y[0] },
-		// B = { traps[2].x[1], traps[2].y[1] }, 
-		// C = { traps[2].x[2], traps[2].y[2] };
 		for (int i = 0; i < 4; i++) {
 			Point A = { traps[i].x[0], traps[i].y[0] };
 			Point B = { traps[i].x[1], traps[i].y[1] };
@@ -349,15 +354,6 @@ void L1_Update(void)
 			}
 		}
 
-
-#pragma endregion
-		// Hazard
-		/*---------------------------------------------------------------------------------------------------*/
-#pragma region Hazard stuff
-		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
-			Kill_Player(&player, &deaths);
-		}
-		//placeholder
 #pragma endregion
 
 	// RENDER
