@@ -21,20 +21,25 @@ void L1_Init(void)
 	// ASSET LOADS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Assets
-	// load font
+// load font
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
 	// load player sprite
 	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
 	transition_sprite = CP_Image_Load("Assets/transition.png");
+	death_sprite = CP_Image_Load("Assets/Burnt.png");
 #pragma endregion
 
-	// time elapsed (for level complete screen)
-	timeElapsed = 0.0f;
-
-	// MAP INIT
+	// LEVEL INIT
 	/*---------------------------------------------------------------------------------------------------------------------*/
-#pragma region MAP
+#pragma region LEVEL
+	// Initialize level variables
+	FILE* file2 = fopen("Assets/LevelSelect.txt", "r");
+	for (int i = 0; i < num_levels; i++) {
+		fscanf_s(file2, "%d %d %d %d %d\n", &levels[i].level_no, &levels[i].isUnlocked, &levels[i].isCleared, &levels[i].score, &levels[i].time);
+	}
+	fclose(file2);
+
 	// initialize spawn location
 	spawnx = 150;
 	spawny = 200;
@@ -142,12 +147,11 @@ void L1_Init(void)
 	// movement
 	player.movex = 0;
 	player.movey = 0;
-	// transit variables
-	player.transition_time = 1.0f;
+	// anim timers
+	player.transition_time = 15;
+	player.death_time = 17;
 	// health
 	player.stamina = 100.0f;
-	// color
-	player.color = CP_Color_Create(150, 150, 200, 255);
 	// anim state
 	player.state = Idle;
 	player.anim = 0;
@@ -165,6 +169,9 @@ void L1_Init(void)
 	// timer
 	timer = (Timer){ 0,0,0 };
 
+	// time elapsed (for level complete screen)
+	timeElapsed = 0.0f;
+
 	// game pause
 	isPaused = 0;
 
@@ -176,6 +183,13 @@ void L1_Init(void)
 
 	// score
 	levelScore = 0;
+
+	// transition sprite coordinates
+	transit_sprite_x = 0;
+	transit_sprite_y = 0;
+	player_sprite_x = 0;
+	player_sprite_y = 0;
+
 #pragma endregion
 	// Misc settings
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -254,17 +268,21 @@ void L1_Update(void)
 		if (player.anim >= 20) {
 			player.anim = 0;
 		}
-		if (transit_anim < 13) {
-			transit_anim += 20 * dt;
-		}
-		if (transit_anim > 13) {
-			transit_anim = 13;
-		}
 		if (player.transition_time < 13) {
 			player.transition_time += 20 * dt;
 		}
 		if (player.transition_time > 13) {
 			player.transition_time = 13;
+		}
+		if (player.death_time < 17) {
+			player.death_time += 17 * dt;
+		}
+		if (player.death_time >= 17) {
+			if (player.state == Dead) {
+				Reset_Player(&player, &movestate);
+				player.movex = 0;
+			}
+			player.death_time = 17;
 		}
 
 		// Movement logics
@@ -309,8 +327,12 @@ void L1_Update(void)
 		}
 
 		// reset with R or touch ground while movestate OnPlat
-		if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)) {
-			Reset_Player(&player, &movestate, &deaths);
+		if (CP_Input_KeyTriggered(KEY_R) || ((player.stamina == 0) && player.state != Dead)) {
+			Kill_Player(&player, &deaths);
+		}
+		if ((player.y >= height - player.height) && movestate == OnPlat) {
+			Reset_Player(&player, &movestate);
+			deaths++;
 		}
 
 		Point squareTopLeft = { player.x, player.y };
@@ -352,11 +374,6 @@ void L1_Update(void)
 		CP_Settings_Fill(green);
 		CP_Graphics_DrawRect(goalx, goaly, 50, 50);
 
-		FILE* file2 = fopen("Assets/LevelSelect.txt", "r");
-		for (int i = 0; i < num_levels; i++) {
-			fscanf_s(file2, "%d %d %d %d %d\n", &levels[i].level_no, &levels[i].isUnlocked, &levels[i].isCleared, &levels[i].score, &levels[i].time);
-		}
-		fclose(file2);
 
 		if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly, 50, 50)) {
 			// calculate score and mark the level as cleared
@@ -572,4 +589,5 @@ void L1_Exit(void)
 {
 	CP_Image_Free(player_sprite);
 	CP_Image_Free(transition_sprite);
+	CP_Image_Free(death_sprite);
 }
