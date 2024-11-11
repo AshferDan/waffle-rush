@@ -99,12 +99,12 @@ void L1_Init(void)
 	//HAZARDS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Hazard
-	FILE* file2 = fopen("Assets/Level1hazard.txt", "r");
-	fscanf_s(file2, "%d", &numberoftraps);
+	FILE* HazardFile = fopen("Assets/Level1hazard.txt", "r");
+	fscanf_s(HazardFile, "%d", &numberoftraps);
 
 	for (int i = 0; i < numberoftraps; ++i)
 	{
-		fscanf_s(file2, "%d", &traps[i].type);
+		fscanf_s(HazardFile, "%d", &traps[i].type);
 		switch (traps[i].type)
 		{
 		case 0:
@@ -112,7 +112,7 @@ void L1_Init(void)
 			int j = 0;
 			for (; j < 3; ++j)
 			{
-				fscanf_s(file2, "%d %d", &traps[i].x[j], &traps[i].y[j]);
+				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
 			}
 			break;
 		}
@@ -121,14 +121,14 @@ void L1_Init(void)
 			int j = 0;
 			for (; j < 3; ++j)
 			{
-				fscanf_s(file2, "%d %d", &traps[i].x[j], &traps[i].y[j]);
+				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
 			}
 			break;
 		}
 
 		}
 	}
-	fclose(file2);
+	fclose(HazardFile);
 #pragma endregion
 #pragma endregion
 	// PLAYER INITS
@@ -345,7 +345,7 @@ void L1_Update(void)
 			Point C = { traps[i].x[2], traps[i].y[2] };
 
 			if (check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C)) {
-				Reset_Player(&player, &movestate, &deaths);
+				Kill_Player(&player, &deaths);
 			}
 		}
 
@@ -355,7 +355,7 @@ void L1_Update(void)
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
 		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
-			Reset_Player(&player, &movestate, &deaths);
+			Kill_Player(&player, &deaths);
 		}
 		//placeholder
 #pragma endregion
@@ -389,11 +389,11 @@ void L1_Update(void)
 				levels[levelNumber - 1].score = levelScore;
 			}
 			// update the values in LevelSelect.txt
-			FILE* file2 = fopen("Assets/LevelSelect.txt", "w");
+			FILE* LevelFile = fopen("Assets/LevelSelect.txt", "w");
 			for (int i = 0; i < num_levels; i++) {
-				fprintf_s(file2, "%d %d %d %d %d\n", levels[i].level_no, levels[i].isUnlocked, levels[i].isCleared, levels[i].score, levels[i].time);
+				fprintf_s(LevelFile, "%d %d %d %d %d\n", levels[i].level_no, levels[i].isUnlocked, levels[i].isCleared, levels[i].score, levels[i].time);
 			}
-			fclose(file2);
+			fclose(LevelFile);
 		}
 		//CRUSHER MOVEMENT
 		// crusherstate = 0 if going down and crusherstate = 1 when going up

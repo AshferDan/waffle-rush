@@ -221,9 +221,6 @@ void Game_Update(void)
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Movement
 	
-	if (player.state == Dead) {
-
-	}
 	// Pause check
 	if (isPaused == 0) {
 

@@ -12,7 +12,7 @@
 #include "mainmenu.h"
 #include "platform.h"
 
-// leevl struct
+// level struct
 typedef struct level {
 	int level_no;
 	int isUnlocked;

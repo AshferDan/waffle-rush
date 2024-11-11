@@ -485,9 +485,11 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		}
 	}
 	void Kill_Player(Player* player, int* deaths) {
-		player->state = Dead;
-		player->death_time = 0;
-		++*deaths;
+		if (player->state != Dead) {
+			player->state = Dead;
+			player->death_time = 0;
+			++*deaths;
+		}
 	}
 	void Reset_Player(Player* player, MoveState* movestate) {
 		player->x = spawnx;
