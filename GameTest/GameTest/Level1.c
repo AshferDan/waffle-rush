@@ -355,7 +355,7 @@ void L1_Update(void)
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
 		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
-			Kill_Player(&player, &deaths);
+			Kill_Player(&player, Crush, &deaths);
 		}
 
 		Point squareTopLeft = { player.x, player.y };
@@ -370,14 +370,7 @@ void L1_Update(void)
 		}
 
 #pragma endregion
-		// Hazard
-		/*---------------------------------------------------------------------------------------------------*/
-#pragma region Hazard stuff
-		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])&&player.onplatform) {
-			Kill_Player(&player, Crush, &deaths);
-		}
-		//placeholder
-#pragma endregion
+
 
 	// RENDER
 	/*---------------------------------------------------------------------------------------------------*/
