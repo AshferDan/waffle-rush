@@ -235,7 +235,22 @@ void L1_Init(void)
 	CP_Settings_ImageFilterMode(CP_IMAGE_FILTER_NEAREST);
 
 #pragma endregion
+	// CAMERA INIT
+		/*---------------------------------------------------------------------------------------------------------------------*/
+#pragma region Camera Init
+	float screenX = CP_System_GetWindowWidth();
+	float screenY = CP_System_GetWindowHeight();
 
+	camera.limitleftx = screenX * 1.0f / 10.0f; //
+	camera.limitrightx = screenX * 9.0f / 10.0f; //
+	camera.limittop = screenY * 0.3f; //
+	camera.limitbase = screenY * 0.8f; //  
+	camera.width = camera.limitrightx - camera.limitleftx; //
+	camera.height = camera.limitbase - camera.limittop; //since base is a bigger number than the top number.
+	camera.worldshiftx = 0;
+
+
+#pragma endregion
 }
 
 void L1_Update(void)

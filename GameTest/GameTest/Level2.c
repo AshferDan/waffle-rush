@@ -23,12 +23,12 @@ void L2_Init(void)
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
 	// load player sprite
-	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
-	transition_sprite = CP_Image_Load("Assets/transition.png");
-	burn_sprite = CP_Image_Load("Assets/Burnt.png");
-	fall_sprite = CP_Image_Load("Assets/Fall_Sprite.png");
-	crush_sprite = CP_Image_Load("Assets/Crush_Sprite.png");
-	goal_sprite = CP_Image_Load("Assets/Plate.png");
+	player_sprite		= CP_Image_Load("Assets/Player_Sprites.png");
+	transition_sprite	= CP_Image_Load("Assets/transition.png");
+	burn_sprite			= CP_Image_Load("Assets/Burnt.png");
+	fall_sprite			= CP_Image_Load("Assets/Fall_Sprite.png");
+	crush_sprite		= CP_Image_Load("Assets/Crush_Sprite.png");
+	goal_sprite			= CP_Image_Load("Assets/Plate.png");
 #pragma endregion
 
 	// LEVEL INIT
@@ -215,7 +215,7 @@ void L2_Init(void)
 	player_sprite_y = 0;
 
 	// Misc settings
-		/*---------------------------------------------------------------------------------------------------------------------*/
+	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Misc inits and settings
 	// Window size
 	width = CP_System_GetWindowWidth();
@@ -239,7 +239,7 @@ void L2_Init(void)
 #pragma endregion
 
 	// CAMERA INIT
-		/*---------------------------------------------------------------------------------------------------------------------*/
+	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Camera Init
 	float screenX = CP_System_GetWindowWidth();
 	float screenY = CP_System_GetWindowHeight();
