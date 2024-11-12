@@ -61,6 +61,17 @@ void Main_Menu_Update(void)
 		}
 	}
 
+	//options button
+	TextBoxCreate(3 * width / 4, 5 * height / 9, 150, 150, "0p", button_color);
+	int OptionsClick = IsAreaClicked(3 * width / 4, 5 * height / 9, 150, 150, mouseX, mouseY); //if mouse is over button
+	if (OptionsClick) {
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
+		CP_Graphics_DrawRect(3 * width / 4, 5 * height / 9, 150, 150);
+		if (CP_Input_MouseClicked()) { //if LMB1 pressed
+			CP_Engine_SetNextGameState(Options_Init, Options_Update, Options_Exit); //go to test stage
+		}
+	}
+
 	//credits button
 	TextBoxCreate(width / 2, 5 * height / 9, 500, 150, "CREDITS", button_color);
 	int CreditsClick = IsAreaClicked(width / 2, 5 * height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
