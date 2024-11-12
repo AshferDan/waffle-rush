@@ -42,11 +42,12 @@ int highScore; // level high score
 int levelNumber; // level number
 
 // Graphics
-CP_Image player_sprite, transition_sprite, burn_sprite, fall_sprite, crush_sprite;
+CP_Image player_sprite, transition_sprite, burn_sprite, fall_sprite, crush_sprite, goal_sprite;
 
 float player_sprite_x, player_sprite_y;
 float transit_sprite_x, transit_sprite_y;
 float death_sprite_x, death_sprite_y;
+float clear_timer;
 
 // Anim timer
 

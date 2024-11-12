@@ -28,6 +28,7 @@ void L2_Init(void)
 	burn_sprite = CP_Image_Load("Assets/Burnt.png");
 	fall_sprite = CP_Image_Load("Assets/Fall_Sprite.png");
 	crush_sprite = CP_Image_Load("Assets/Crush_Sprite.png");
+	goal_sprite = CP_Image_Load("Assets/Plate.png");
 #pragma endregion
 
 	// LEVEL INIT
@@ -45,8 +46,8 @@ void L2_Init(void)
 	spawnx = 150;
 	spawny = 200;
 	// initialize test goal
-	goalx = 2520;
-	goaly = 550;
+	goalx = 2500;
+	goaly = 500;
 
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -178,6 +179,8 @@ void L2_Init(void)
 	player.anim = 0;
 	player.direction = OnRight;
 
+	clear_timer = 0;
+
 	// initialize deaths
 	deaths = 0;
 #pragma endregion
@@ -242,7 +245,7 @@ void L2_Init(void)
 	float screenY = CP_System_GetWindowHeight();
 	
 	camera.limitleftx = screenX * 1.0f / 10.0f; //
-	camera.limitrightx = screenX * 4.0f / 10.0f; //
+	camera.limitrightx = screenX * 9.0f / 10.0f; //
 	camera.limittop = screenY * 0.3f; //
 	camera.limitbase = screenY * 0.8f; //  
 	camera.width = camera.limitrightx - camera.limitleftx; //
@@ -331,7 +334,9 @@ void L2_Update(void)
 		}
 
 		// Movement logics
-		movement(&player, movestate, speed, dt);
+		if (isCleared == 0) {
+			movement(&player, movestate, speed, dt);
+		}
 
 		// Collision against platforms
 		if (movestate == OnPlat && player.deathcause != Fall) {
@@ -408,12 +413,12 @@ void L2_Update(void)
 #pragma endregion
 
 
-	// CAMERA UPDATE
-	/*---------------------------------------------------------------------------------------------------------------------*/
-	
-	//implement the below logic later. do the main camera first.
-	//camera.limitleftx =  camera.limitleftx  + offsetX;
-	//camera.limitrightx = camera.limitrightx + offsetX;
+		// CAMERA UPDATE
+		/*---------------------------------------------------------------------------------------------------------------------*/
+
+		//implement the below logic later. do the main camera first.
+		//camera.limitleftx =  camera.limitleftx  + offsetX;
+		//camera.limitrightx = camera.limitrightx + offsetX;
 #pragma region Camera
 		playerCamColl(&player, &camera); //functionised my camera shift. 
 		//where worldshiftx is now the modifyable for all objects
@@ -423,7 +428,7 @@ void L2_Update(void)
 		CP_Settings_RectMode(CP_POSITION_CORNER);
 		CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop, camera.width, camera.height); //code for rectangle
 
-		
+
 #pragma endregion
 		// RENDER
 		/*---------------------------------------------------------------------------------------------------*/
@@ -438,10 +443,21 @@ void L2_Update(void)
 		CP_Settings_Stroke(black);
 
 		// Goal
-		CP_Settings_Fill(green);
-		CP_Graphics_DrawRect(goalx-camera.worldshiftx, goaly, 50, 50);
+		/*CP_Settings_Fill(green);
+		CP_Graphics_DrawRect(goalx-camera.worldshiftx, goaly, 50, 50);*/
+		if (!isCleared) {
+			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly, 100, 100, 0, 0, 32, 32, 255);
+		}
+		else {
+			if (clear_timer <= 3) {
+				clear_timer += 6*dt;
+			}
+			int sprite_x = 32 + (32 * (int)clear_timer);
+			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly, 100, 100, sprite_x, 0, sprite_x + 32, 32, 255);
+		}
 
-		if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly, 50, 50)) {
+
+		if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly+70, 100, 30)) {
 			// calculate score and mark the level as cleared
 			AddScore(&levelScore, 10000 + (10000 - ((int)timer.seconds * 50) - ((int)timer.minutes * 3000)) - deaths * 100, &isCleared);
 			isCleared = 1;
@@ -523,7 +539,9 @@ void L2_Update(void)
 
 
 		// Player
-		Draw_Player(player_sprite, player, movestate);
+		if (isCleared == 0) {
+			Draw_Player(player_sprite, player, movestate);
+		}
 
 		// Stamina Bar
 		if (player.stamina < 100.0f) {
@@ -678,4 +696,5 @@ void L2_Exit(void)
 	CP_Image_Free(burn_sprite);
 	CP_Image_Free(fall_sprite);
 	CP_Image_Free(crush_sprite);
+	CP_Image_Free(goal_sprite);
 }
