@@ -41,6 +41,7 @@
     <Text Include="..\Assets\Level1hazard.txt" />
     <Text Include="..\Assets\Level1wall.txt" />
     <Text Include="..\Assets\Level2.txt" />
+    <Text Include="..\Assets\Level2wall.txt" />
     <Text Include="..\Assets\LevelSelect.txt" />
     <Text Include="..\Assets\Options.txt" />
     <Text Include="..\Assets\testhazard.txt" />

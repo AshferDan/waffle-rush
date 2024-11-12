@@ -622,14 +622,14 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 				sprite_x = 72;
 				break;
 			}
-			CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 255, rot);
+			CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15 - camera.worldshiftx, player.y - 15, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 255, rot);
 		}
 		else
 		{
 			sprite_y = (movestate == EnterPlat) ? 36 : 0;
 
 			sprite_x = ((int)player.transition_time / 1) * 18;
-			CP_Image_DrawSubImage(transition_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
+			CP_Image_DrawSubImage(transition_sprite, player.x - 15 - camera.worldshiftx, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
 		}
 	}
 	else {
@@ -668,7 +668,7 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 		
 		}
 
-		CP_Image_DrawSubImage(death_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
+		CP_Image_DrawSubImage(death_sprite, player.x - 15 - camera.worldshiftx, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
 	}
 }
 

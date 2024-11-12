@@ -104,7 +104,7 @@ void LSelect_Update(void)
 	if (levels[1].isUnlocked == 1) {
 		if (L2Click) {
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-			CP_Graphics_DrawRect(width / 4, height / 3, 150, 150);
+			CP_Graphics_DrawRect(width / 4+200, height / 3, 150, 150);
 			CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
 			CP_Settings_TextSize(100);
 			CP_Font_DrawText("LEVEL 2 STATS", width / 2, height / 2);
@@ -133,7 +133,7 @@ void LSelect_Update(void)
 	if (levels[2].isUnlocked == 1) {
 		if (L3Click) {
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-			CP_Graphics_DrawRect(width / 4, height / 3, 150, 150);
+			CP_Graphics_DrawRect(width / 2, height / 3, 150, 150);
 			CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
 			CP_Settings_TextSize(100);
 			CP_Font_DrawText("LEVEL 3 STATS", width / 2, height / 2);
@@ -162,7 +162,7 @@ void LSelect_Update(void)
 	if (levels[3].isUnlocked == 1) {
 		if (L4Click) {
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-			CP_Graphics_DrawRect(width / 4, height / 3, 150, 150);
+			CP_Graphics_DrawRect(width / 2 + 200, height / 3, 150, 150);
 			CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
 			CP_Settings_TextSize(100);
 			CP_Font_DrawText("LEVEL 4 STATS", width / 2, height / 2);
@@ -191,7 +191,7 @@ void LSelect_Update(void)
 	if (levels[4].isUnlocked == 1) {
 		if (L5Click) {
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-			CP_Graphics_DrawRect(width / 4, height / 3, 150, 150);
+			CP_Graphics_DrawRect(3 * width / 4, height / 3, 150, 150);
 			CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
 			CP_Settings_TextSize(100);
 			CP_Font_DrawText("LEVEL 5 STATS", width / 2, height / 2);

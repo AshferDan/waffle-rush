@@ -10,63 +10,55 @@
 
 #include "LevelSelect.h"
 
-Camera camera; //allows your to work with anything that the camera requires
-
-
-float screenX; //full screen width
-float screenY; //full screen height
-float offsetX; //how much we need to offset everything
-float offsetY;
-int overDetect; //checks if player is over the camera
-int Right;	//checks if player is on the right side of the camera
-int Left; //checks if the player is on the left side of the camera
-
 #define num_levels 5
 level levels[num_levels];
 float timeElapsed;
 
-
 void L2_Init(void)
 {
-	
-#pragma region im not using these
 	// ASSET LOADS
 	/*---------------------------------------------------------------------------------------------------------------------*/
-#pragma region some code that i wished could work
-	//camera.overLeft = 0b01;
-	//camera.overRight = 0b10;
-	//OverDetector = 0b00;
-#pragma endregion
-
 #pragma region Assets
-	// load font
+// load font
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
 	// load player sprite
 	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
 	transition_sprite = CP_Image_Load("Assets/transition.png");
+	burn_sprite = CP_Image_Load("Assets/Burnt.png");
+	fall_sprite = CP_Image_Load("Assets/Fall_Sprite.png");
+	crush_sprite = CP_Image_Load("Assets/Crush_Sprite.png");
 #pragma endregion
-	// MAP INIT
+
+	// LEVEL INIT
 	/*---------------------------------------------------------------------------------------------------------------------*/
-#pragma region MAP
+#pragma region LEVEL
+	// Initialize level variables
+	FILE* file2 = fopen("Assets/LevelSelect.txt", "r");
+	for (int i = 0; i < num_levels; i++) {
+		fscanf_s(file2, "%d %d %d %d %02d:%02d:%02d\n", &levels[i].level_no, &levels[i].isUnlocked, &levels[i].isCleared, &levels[i].score,
+			&levels[i].time.minutes, &levels[i].time.seconds, &levels[i].time.millis);
+	}
+	fclose(file2);
+
 	// initialize spawn location
 	spawnx = 150;
 	spawny = 200;
 	// initialize test goal
-	goalx = 1520;
-	goaly = 250;
+	goalx = 2520;
+	goaly = 550;
 
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
-	FILE* file = fopen("Assets/Level2.txt", "r");
+	FILE* PlatformFile = fopen("Assets/Level2.txt", "r");
 
-	if (file == NULL) {
+	if (PlatformFile == NULL) {
 		printf("Failed to open platform file! Check if file exists\n");
-		CP_Engine_Terminate;
+		CP_Engine_Terminate();
 	}
 	// read how many platforms in level
-	fscanf_s(file, "%d", &numplats);
+	fscanf_s(PlatformFile, "%d", &numplats);
 
 	// plat_index - platform index
 	// plat_coord_index - platform coordinate index
@@ -74,28 +66,29 @@ void L2_Init(void)
 	while (plat_index < numplats) {
 		// coordinate ints to read
 		// scan how many coordinates
-		fscanf_s(file, "%d", &Platform[plat_index].numcoords);
+
+		fscanf_s(PlatformFile, "%d", &Platform[plat_index].numcoords);
 		// for how many coordinates in platform
 		while (plat_coord_index < Platform[plat_index].numcoords) {
 			int x, y;
 			// scan coordinates
-			fscanf_s(file, "%d %d", &x, &y);
+			fscanf_s(PlatformFile, "%d %d", &x, &y);
 			// assign coordinates to array
 			platform_coordinates(plat_index, plat_coord_index, x, y);
 			plat_coord_index++;
 		}
 		plat_coord_index = 0;
-		fscanf_s(file, "%d", &Platform[plat_index].numblocks);
+		fscanf_s(PlatformFile, "%d", &Platform[plat_index].numblocks);
 		while (plat_coord_index < Platform[plat_index].numblocks) {
 			int x1, y1, x2, y2;
-			fscanf_s(file, "%d %d %d %d", &x1, &y1, &x2, &y2);
+			fscanf_s(PlatformFile, "%d %d %d %d", &x1, &y1, &x2, &y2);
 			platform_onblocks(plat_index, plat_coord_index, x1, y1, x2, y2);
 			plat_coord_index++;
 		}
 		plat_coord_index = 0;
 		plat_index++;
 	}
-	fclose(file);
+	fclose(PlatformFile);
 
 	// initialize all platform hitboxes
 	for (int plat_index = 0; plat_index < numplats; plat_index++) {
@@ -103,17 +96,36 @@ void L2_Init(void)
 	}
 
 
+	// Walls
+	FILE* WallFile = fopen("Assets/Level2wall.txt", "r");
+
+	if (WallFile == NULL) {
+		printf("Failed to open wall file! Check if file exists\n");
+		CP_Engine_Terminate();
+	}
+
+	fscanf_s(WallFile, "%d", &numwalls);
+
+	for (int wall_index = 0; wall_index < numwalls; wall_index++) {
+		int x1, y1, x2, y2;
+		fscanf_s(WallFile, "%d %d %d %d", &x1, &y1, &x2, &y2);
+		walls[wall_index] = (platblocks){ x1 - 15, x2 + 15, y1 - 15, y2 + 15, (x2 + 15) - (x1 - 15), (y2 + 15) - (y1 - 15) };
+	}
+
+	fclose(WallFile);
+
+
 #pragma endregion
 
 //	//HAZARDS
 //	/*---------------------------------------------------------------------------------------------------------------------*/
 //#pragma region Hazard
-//	FILE* file2 = fopen("Assets/Level1hazard.txt", "r");
-//	fscanf_s(file2, "%d", &numberoftraps);
+//	FILE* HazardFile = fopen("Assets/Level2hazard.txt", "r");
+//	fscanf_s(HazardFile, "%d", &numberoftraps);
 //
 //	for (int i = 0; i < numberoftraps; ++i)
 //	{
-//		fscanf_s(file2, "%d", &traps[i].type);
+//		fscanf_s(HazardFile, "%d", &traps[i].type);
 //		switch (traps[i].type)
 //		{
 //		case 0:
@@ -121,7 +133,7 @@ void L2_Init(void)
 //			int j = 0;
 //			for (; j < 3; ++j)
 //			{
-//				fscanf_s(file2, "%d %d", &traps[i].x[j], &traps[i].y[j]);
+//				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
 //			}
 //			break;
 //		}
@@ -130,18 +142,15 @@ void L2_Init(void)
 //			int j = 0;
 //			for (; j < 3; ++j)
 //			{
-//				fscanf_s(file2, "%d %d", &traps[i].x[j], &traps[i].y[j]);
+//				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
 //			}
 //			break;
 //		}
 //
 //		}
 //	}
-//	fclose(file2);
-//
-//	crusherstate = 0;
+//	fclose(HazardFile);
 //#pragma endregion
-
 #pragma endregion
 	// PLAYER INITS
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -159,12 +168,15 @@ void L2_Init(void)
 	// movement
 	player.movex = 0;
 	player.movey = 0;
-	// transit variables
-	player.transition_time = 1.0f;
+	// anim timers
+	player.transition_time = 15;
+	player.death_time = 17;
 	// health
 	player.stamina = 100.0f;
-	// color
-	player.color = CP_Color_Create(150, 150, 200, 255);
+	// anim state
+	player.state = Idle;
+	player.anim = 0;
+	player.direction = OnRight;
 
 	// initialize deaths
 	deaths = 0;
@@ -178,6 +190,9 @@ void L2_Init(void)
 	// timer
 	timer = (Timer){ 0,0,0 };
 
+	// time elapsed (for level complete screen)
+	timeElapsed = 0.0f;
+
 	// game pause
 	isPaused = 0;
 
@@ -189,9 +204,15 @@ void L2_Init(void)
 
 	// score
 	levelScore = 0;
-#pragma endregion
+
+	// transition sprite coordinates
+	transit_sprite_x = 0;
+	transit_sprite_y = 0;
+	player_sprite_x = 0;
+	player_sprite_y = 0;
+
 	// Misc settings
-	/*---------------------------------------------------------------------------------------------------------------------*/
+		/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Misc inits and settings
 	// Window size
 	width = CP_System_GetWindowWidth();
@@ -199,18 +220,18 @@ void L2_Init(void)
 
 	// Initialize colors
 	pausebg = CP_Color_Create(0, 0, 0, 100);
-	bg = CP_Color_Create(100, 100, 100, 255); //background
+	bg = CP_Color_Create(135, 200, 220, 255); //background
 	black = CP_Color_Create(0, 0, 0, 255); //black
 	red = CP_Color_Create(200, 50, 50, 255); //red
 	green = CP_Color_Create(50, 200, 50, 255); //green
-	plat = CP_Color_Create(255, 150, 150, 255); //platform colour
+	plat = CP_Color_Create(200, 200, 200, 255); //platform colour
 	stamina = CP_Color_Create(255, 255, 40, 255); //stamina colour
 
 	// Corner drawing
 	CP_Settings_RectMode(CP_POSITION_CORNER);
 	CP_Settings_ImageMode(CP_POSITION_CORNER);
 
-#pragma endregion
+	CP_Settings_ImageFilterMode(CP_IMAGE_FILTER_NEAREST);
 
 #pragma endregion
 
@@ -219,15 +240,14 @@ void L2_Init(void)
 #pragma region Camera Init
 	float screenX = CP_System_GetWindowWidth();
 	float screenY = CP_System_GetWindowHeight();
-	offsetX = 0; //later, if on right you add this offset until the player is inside of the camera
-	offsetY = 0;//im not sure if this is already linked to dt but we'll figure it out
-
+	
 	camera.limitleftx = screenX * 1.0f / 10.0f; //
 	camera.limitrightx = screenX * 4.0f / 10.0f; //
 	camera.limittop = screenY * 0.3f; //
 	camera.limitbase = screenY * 0.8f; //  
 	camera.width = camera.limitrightx - camera.limitleftx; //
 	camera.height = camera.limitbase - camera.limittop; //since base is a bigger number than the top number.
+	camera.worldshiftx = 0;
 
 
 #pragma endregion
@@ -240,7 +260,7 @@ void L2_Update(void)
 
 	// getdt
 	float dt = CP_System_GetDt();
-	dt = CP_Math_ClampFloat(dt, 0, 0.05); //prevent excess lagspike clipping
+	dt = CP_Math_ClampFloat(dt, 0.0f, 0.05f); //prevent excess lagspike clipping
 
 	// get mouse coords
 	mouseX = CP_Input_GetMouseX();
@@ -264,6 +284,7 @@ void L2_Update(void)
 		timer.millis = (int)(timer.seconds * 100) % 100;
 	}
 
+
 	// MOVEMENT 
 	/*  Contents:
 	- Pause check
@@ -285,44 +306,61 @@ void L2_Update(void)
 		if (player.anim >= 20) {
 			player.anim = 0;
 		}
-		if (transit_anim < 13) {
-			transit_anim += 20 * dt;
-		}
-		if (transit_anim > 13) {
-			transit_anim = 13;
-		}
 		if (player.transition_time < 13) {
 			player.transition_time += 20 * dt;
 		}
 		if (player.transition_time > 13) {
 			player.transition_time = 13;
 		}
+		if (player.death_time < 17) {
+			if (player.deathcause != Fall) {
+				player.death_time += 17 * dt;
+			}
+			else if (player.y <= height - player.height) {
+				player.movey += 1800.0f * dt;
+				player.y += player.movey * dt;
+			}
+			else player.death_time = 17;
+		}
+		if (player.death_time >= 17) {
+			if (player.state == Dead) {
+				Reset_Player(&player, &movestate);
+				player.movex = 0;
+			}
+			player.death_time = 17;
+		}
 
 		// Movement logics
 		movement(&player, movestate, speed, dt);
 
 		// Collision against platforms
-		if (movestate == OnPlat) {
+		if (movestate == OnPlat && player.deathcause != Fall) {
 			player.stamina += 40.0f * dt;
 			for (int plat_index = 0; plat_index < numplats; plat_index++) {
 				CollOnPlatforms(plat_index, Platform[plat_index], &player, player);
 			}
 		}
 
-		else if (movestate == InPlat) {
+		else if (movestate == InPlat && player.deathcause != Fall) {
 			player.stamina -= 20.0f * dt;
 			for (int plat_index = 0; plat_index < numplats; plat_index++) {
 				CollPlatforms(plat_index, Platform[plat_index], &player, player);
 			}
+			if (player.stamina <= 0) {
+				Kill_Player(&player, Fall, &deaths);
+			}
 		}
 		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
 
+		// Collision against walls
+		CollWalls(walls, numwalls, &player, player);
+
 		// window clamps
-		//player.x = CP_Math_ClampFloat(player.x,0, width); //changed player clamp
+		/*player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
 		if (player.y + player.height > height || player.y < 0) {
 			player.movey = 0;
 		}
-		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
+		player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);*/
 
 		// change movestate
 			/*
@@ -340,38 +378,34 @@ void L2_Update(void)
 		}
 
 		// reset with R or touch ground while movestate OnPlat
-		if (CP_Input_KeyTriggered(KEY_R) || ((player.y >= height - player.height) && movestate == OnPlat) || (player.stamina == 0)) {
-			Reset_Player(&player, &movestate, &deaths);
+		if (CP_Input_KeyTriggered(KEY_R) && player.state != Dead) {
+			CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
+			Kill_Player(&player, reset, &deaths);
+		}
+		if ((player.y >= height - player.height) && movestate == OnPlat && player.deathcause != Fall) {
+			Kill_Player(&player, Fall, &deaths);
+		}
+
+#pragma endregion
+		// Hazard
+		/*---------------------------------------------------------------------------------------------------*/
+#pragma region Hazard stuff
+		/*if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
+			Kill_Player(&player, Crush, &deaths);
 		}
 
 		Point squareTopLeft = { player.x, player.y };
-		// Point A = { traps[2].x[0], traps[2].y[0] },
-		// B = { traps[2].x[1], traps[2].y[1] }, 
-		// C = { traps[2].x[2], traps[2].y[2] };
 		for (int i = 0; i < 4; i++) {
 			Point A = { traps[i].x[0], traps[i].y[0] };
 			Point B = { traps[i].x[1], traps[i].y[1] };
 			Point C = { traps[i].x[2], traps[i].y[2] };
 
 			if (check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C)) {
-				Reset_Player(&player, &movestate, &deaths);
+				Kill_Player(&player, Burn, &deaths);
 			}
-		}
-
+		}*/
 
 #pragma endregion
-//		// Hazard
-//		/*---------------------------------------------------------------------------------------------------*/
-//#pragma region Hazard stuff
-//		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
-//			Reset_Player(&player, &movestate, &deaths);
-//		}
-//		//placeholder
-//#pragma endregion
-
-		
-
-
 
 
 	// CAMERA UPDATE
@@ -390,33 +424,22 @@ void L2_Update(void)
 		CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop, camera.width, camera.height); //code for rectangle
 
 		
-
-
-
-
-
-
-
 #pragma endregion
-	// RENDER
-	/*---------------------------------------------------------------------------------------------------*/
+		// RENDER
+		/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
 
 	// Platforms
 		CP_Settings_Fill(plat);
+		CP_Settings_Stroke(CP_Color_Create(100, 100, 100, 255));
 		for (int i = 0; i < numplats; i++) {
 			DrawPlatform(i);
 		}
+		CP_Settings_Stroke(black);
 
 		// Goal
 		CP_Settings_Fill(green);
-		CP_Graphics_DrawRect(goalx, goaly, 50, 50);
-
-		FILE* file2 = fopen("Assets/LevelSelect.txt", "r");
-		for (int i = 0; i < num_levels; i++) {
-			fscanf_s(file2, "%d %d %d %d %d\n", &levels[i].level_no, &levels[i].isUnlocked, &levels[i].isCleared, &levels[i].score, &levels[i].time);
-		}
-		fclose(file2);
+		CP_Graphics_DrawRect(goalx-camera.worldshiftx, goaly, 50, 50);
 
 		if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly, 50, 50)) {
 			// calculate score and mark the level as cleared
@@ -431,14 +454,33 @@ void L2_Update(void)
 			if (levelScore > levels[levelNumber - 1].score) {
 				levels[levelNumber - 1].score = levelScore;
 			}
-			// update the values in LevelSelect.txt
-			FILE* file2 = fopen("Assets/LevelSelect.txt", "w");
-			for (int i = 0; i < num_levels; i++) {
-				fprintf_s(file2, "%d %d %d %d %d\n", levels[i].level_no, levels[i].isUnlocked, levels[i].isCleared, levels[i].score, levels[i].time);
+			// update best time if current time is less than previous best time
+			if ((levels[levelNumber - 1].time.minutes == 0 && levels[levelNumber - 1].time.seconds == 0 &&
+				levels[levelNumber - 1].time.millis == 0) ||
+				(timer.minutes < levels[levelNumber - 1].time.minutes) ||
+				(timer.minutes == levels[levelNumber - 1].time.minutes && timer.seconds < levels[levelNumber - 1].time.seconds) ||
+				(timer.minutes == levels[levelNumber - 1].time.minutes && timer.seconds == levels[levelNumber - 1].time.seconds && timer.millis < levels[levelNumber - 1].time.millis)
+				) {
+				levels[levelNumber - 1].time.minutes = (int)timer.minutes;
+				levels[levelNumber - 1].time.seconds = (int)timer.seconds;
+				levels[levelNumber - 1].time.millis = (int)timer.millis;
 			}
-			fclose(file2);
+			// update the values in LevelSelect.txt
+			FILE* LevelFile = fopen("Assets/LevelSelect.txt", "w");
+			for (int i = 0; i < num_levels; i++) {
+				fprintf_s(LevelFile, "%d %d %d %d %02d:%02d:%02d\n", levels[i].level_no, levels[i].isUnlocked, levels[i].isCleared, levels[i].score,
+					levels[i].time.minutes, levels[i].time.seconds, levels[i].time.millis);
+			}
+			fclose(LevelFile);
 		}
-		/*
+
+
+		// Wall
+		CP_Settings_Fill(black);
+		for (int i = 0; i < numwalls; i++) {
+			CP_Graphics_DrawRect(walls[i].x1 + 15, walls[i].y1 + 15, walls[i].w - 30, walls[i].h - 30);
+		}
+
 		//CRUSHER MOVEMENT
 		// crusherstate = 0 if going down and crusherstate = 1 when going up
 		float crushervely;
@@ -460,7 +502,7 @@ void L2_Update(void)
 		}
 
 		// HAZARD DRAWING
-		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
+		/*CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
 		for (int i = 0; i < numberoftraps; ++i)
 		{
 			switch (traps[i].type)
@@ -477,8 +519,8 @@ void L2_Update(void)
 			}
 
 			}
-		}
-		*/
+		}*/
+
 
 		// Player
 		Draw_Player(player_sprite, player, movestate);
@@ -489,7 +531,7 @@ void L2_Update(void)
 			if (player.stamina <= 35.0f) {
 				CP_Settings_Fill(red);
 			}
-			DrawStatBar(player.x - 15, player.y - 30, player.x + 35, player.y - 23, player.stamina, 100);
+			DrawStatBar(player.x - 15-camera.worldshiftx, player.y - 30, player.x + 35-camera.worldshiftx, player.y - 23, player.stamina, 100);
 		}
 		// DEATHS DRAWING
 		CP_Settings_Fill(black);
@@ -623,8 +665,6 @@ void L2_Update(void)
 	}
 #pragma endregion
 	
-
-	
 	// Back to main menu
 	if (CP_Input_KeyDown(KEY_Q)) {
 		CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit);
@@ -635,4 +675,7 @@ void L2_Exit(void)
 {
 	CP_Image_Free(player_sprite);
 	CP_Image_Free(transition_sprite);
+	CP_Image_Free(burn_sprite);
+	CP_Image_Free(fall_sprite);
+	CP_Image_Free(crush_sprite);
 }
