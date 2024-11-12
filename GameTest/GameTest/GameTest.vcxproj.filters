@@ -82,5 +82,8 @@
     <Text Include="..\Assets\Credits.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="..\Assets\Level1wall.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
