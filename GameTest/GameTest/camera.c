@@ -26,16 +26,18 @@ int playerCamColl(Player *player, Camera * camera) {
 
 	if (playerR > camera->limitrightx) {
 		printf("too far right");
-		camera->worldshiftx = playerR - camera->limitrightx; //this is the distance between player and border
-		//camera->limitrightx += camera->worldshiftx;
-		//camera->limitleftx += camera->worldshiftx;
+		//camera->worldshiftx += 5; //this is the distance between player and border
+		camera->worldshiftx += playerR - camera->limitrightx; //this is the distance between player and border
+		camera->limitleftx += playerR - camera->limitrightx;
+		camera->limitrightx += playerR -camera->limitrightx;
 
 	}
 	else if (player->x < camera->limitleftx) {
 		printf("too far left");
-		camera->worldshiftx = camera->limitleftx - player->x; //this is the distance between player and border
-		//camera->limitleftx -= camera->worldshiftx;
-		//camera->limitrightx -= camera->worldshiftx;
+		//camera->worldshiftx -= 5; //this is the distance between player and border
+		camera->worldshiftx -= camera->limitleftx - player->x ; //this is the distance between player and border
+		camera->limitrightx -= camera->limitleftx - player->x;
+		camera->limitleftx -= camera->limitleftx - player->x;
 	}
 
 }

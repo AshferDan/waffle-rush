@@ -503,7 +503,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 void DrawPlatform(int plat_index) {
 	CP_Graphics_BeginShape();
 	for (int i = 0; i <= Platform[plat_index].numcoords - 1; i++) {
-		CP_Graphics_AddVertex(Platform[plat_index].platcoords[i].x, Platform[plat_index].platcoords[i].y);
+		CP_Graphics_AddVertex(Platform[plat_index].platcoords[i].x -camera.worldshiftx, Platform[plat_index].platcoords[i].y);
 	}
 	CP_Graphics_EndShape();
 }
@@ -565,7 +565,7 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 			sprite_x = 720;
 			break;
 		}
-		CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, sprite_x + 5, sprite_y + 5, sprite_x + 170, sprite_y + 170, 255, rot);
+		CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15 - camera.worldshiftx, player.y - 15 + camera.worldshifty, player.width + 30, player.height + 30, sprite_x + 5, sprite_y + 5, sprite_x + 170, sprite_y + 170, 255, rot);
 	}
 	else 
 	{

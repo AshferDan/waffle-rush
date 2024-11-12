@@ -318,7 +318,7 @@ void L2_Update(void)
 		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
 
 		// window clamps
-		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
+		//player.x = CP_Math_ClampFloat(player.x,0, width); //changed player clamp
 		if (player.y + player.height > height || player.y < 0) {
 			player.movey = 0;
 		}
@@ -387,7 +387,7 @@ void L2_Update(void)
 		printf("limitleftx %f| limitrightx %f\n", camera.limitleftx, camera.limitrightx);
 		CP_Settings_NoFill();
 		CP_Settings_RectMode(CP_POSITION_CORNER);
-		CP_Graphics_DrawRect(camera.limitleftx, camera.limittop, camera.width /*camera.limitrightx - camera.limitleftx*/, camera.height);
+		CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop, camera.width, camera.height); //code for rectangle
 
 		
 
