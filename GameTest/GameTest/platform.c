@@ -74,6 +74,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			}
 			// jump!
 			if (CP_Input_KeyTriggered(KEY_SPACE) && ply->onplatform == 1) {
+				ply->walljump = 1;
 				ply->movey = -speed;
 			}
 			// left
@@ -96,7 +97,13 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 				ply->movex = 0;
 			}
 
-			// Speed clamp
+			//// Speed clamp
+			//if (ply->movex > speed) {
+			//	ply->movex -= 2*accel;
+			//}
+			//if (ply->movex < -speed) {
+			//	ply->movex += 2*accel;
+			//}
 			ply->movex = CP_Math_ClampFloat(ply->movex, -speed, speed);
 
 			// anim state
@@ -105,6 +112,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			}
 
 			if (ply->onplatform == 1) {
+				ply->walljump = 1;
 				ply->state = Idle;
 				if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D) || CP_Input_KeyDown(KEY_LEFT) || CP_Input_KeyDown(KEY_RIGHT)) {
 					ply->state = Running;
@@ -481,6 +489,30 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 				if (collision_direction(Platform[plat_index].onblocks[block_index], ply) == 1) {
 					pply->movex = 0;
 				}
+				if (pply->x == Platform[plat_index].onblocks[block_index].x2 && CP_Input_KeyDown(KEY_A)) {
+					printf("stuckright\n");
+					pply->state = Sliding;
+					if (pply->movey >= 500) {
+						pply->movey = 500;
+					}
+					if (CP_Input_KeyTriggered(KEY_SPACE) && pply->walljump) {
+						pply->walljump = 0;
+						pply->movey = -600;
+						pply->movex = 1200;
+					}
+				}
+				else if (pply->x + pply->width == Platform[plat_index].onblocks[block_index].x1 && CP_Input_KeyDown(KEY_D)) {
+					printf("stuckleft\n");
+						pply->state = Sliding;
+						if (pply->movey >= 500) {
+							pply->movey = 500;
+					}
+					if (CP_Input_KeyTriggered(KEY_SPACE) && pply->walljump) {
+						pply->walljump = 0;
+						pply->movey = -600;
+						pply->movex = -1200;
+					}
+				}
 				
 			}// end if collision check
 		}
@@ -659,7 +691,7 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 
 		case Crush: 
 			death_sprite = crush_sprite;
-			sprite_x = ((int)player.death_time < 3) ? (int)player.death_time * 18 : 52;
+			sprite_x = ((int)player.death_time < 3) ? (int)player.death_time * 18 : 54;
 			sprite_y = (player.direction == OnLeft) ? 36 : 0;
 			break;
 		

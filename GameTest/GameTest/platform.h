@@ -137,6 +137,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			Idle,
 			Running,
 			Jumping,
+			Sliding,
 			Crawling,
 			Dead,
 		} PlayerState;
@@ -177,6 +178,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 
 			// Condition checks
 			int onplatform;
+			int walljump;
 			int withinx;
 			int leaveplatform;
 			PlayerState state;

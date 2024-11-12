@@ -333,6 +333,7 @@ void L1_Update(void)
 	// Movement logics
 	movement(&player, movestate, speed, dt);
 
+	printf("movex %f\n", player.movex);
 	// Collision against platforms
 		if (movestate == OnPlat && player.deathcause != Fall) {
 			player.stamina += 40.0f * dt;
