@@ -12,13 +12,20 @@
 #include "mainmenu.h"
 #include "platform.h"
 
+// time struct
+typedef struct time {
+	int minutes;
+	int seconds;
+	int millis;
+} time;
+
 // level struct
 typedef struct level {
 	int level_no;
 	int isUnlocked;
 	int isCleared;
 	int score;
-	int time;
+	struct time time;
 } level;
 
 void LSelect_Init(void);
