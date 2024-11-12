@@ -11,10 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="camera.c" />
     <ClCompile Include="credits.c" />
     <ClCompile Include="game.c" />
     <ClCompile Include="hazard.c" />
     <ClCompile Include="Level1.c" />
+    <ClCompile Include="Level2.c" />
     <ClCompile Include="LevelSelect.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="mainmenu.c" />
@@ -23,6 +25,7 @@
     <ClCompile Include="utils.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="credits.h" />
     <ClInclude Include="hazard.h" />
     <ClInclude Include="LevelSelect.h" />
@@ -37,6 +40,7 @@
     <Text Include="..\Assets\Level1.txt" />
     <Text Include="..\Assets\Level1hazard.txt" />
     <Text Include="..\Assets\Level1wall.txt" />
+    <Text Include="..\Assets\Level2.txt" />
     <Text Include="..\Assets\LevelSelect.txt" />
     <Text Include="..\Assets\Options.txt" />
     <Text Include="..\Assets\testhazard.txt" />

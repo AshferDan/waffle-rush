@@ -558,7 +558,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 void DrawPlatform(int plat_index) {
 	CP_Graphics_BeginShape();
 	for (int i = 0; i <= Platform[plat_index].numcoords - 1; i++) {
-		CP_Graphics_AddVertex(Platform[plat_index].platcoords[i].x, Platform[plat_index].platcoords[i].y);
+		CP_Graphics_AddVertex(Platform[plat_index].platcoords[i].x -camera.worldshiftx, Platform[plat_index].platcoords[i].y);
 	}
 	CP_Graphics_EndShape();
 }

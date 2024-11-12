@@ -14,8 +14,6 @@
 level levels[num_levels];
 float timeElapsed;
 
-int crusherstate = 0;
-
 void L1_Init(void)
 {
 	// ASSET LOADS

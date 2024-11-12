@@ -113,7 +113,7 @@ void LSelect_Update(void)
 			sprintf_s(bestTime, 20, "BEST TIME: %02d:%02d:%02d", levels[1].time.minutes, levels[1].time.seconds, levels[1].time.millis);
 			CP_Font_DrawText(bestTime, width / 2, 650);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
-				CP_Engine_SetNextGameState(L1_Init, L1_Update, L1_Exit); //go to game
+				CP_Engine_SetNextGameState(L2_Init, L2_Update, L2_Exit); //go to game
 			}
 			CP_Settings_TextSize(150);
 		}
