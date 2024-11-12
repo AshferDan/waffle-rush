@@ -527,7 +527,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		}
 	}
 
-	void Kill_Player(Player* player, int* deaths) {
+	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths) {
 		if (player->state != Dead) {
 			player->state = Dead;
 			player->deathcause = deathcause;
