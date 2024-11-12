@@ -243,7 +243,7 @@ void L2_Init(void)
 	
 	camera.limitleftx = screenX * 1.0f / 10.0f; //
 	camera.limitrightx = screenX * 4.0f / 10.0f; //
-	camera.limittop = screenY * 0.3f; //
+	camera.limittop = screenY * 0.6f; //
 	camera.limitbase = screenY * 0.8f; //  
 	camera.width = camera.limitrightx - camera.limitleftx; //
 	camera.height = camera.limitbase - camera.limittop; //since base is a bigger number than the top number.
@@ -421,7 +421,7 @@ void L2_Update(void)
 		printf("limitleftx %f| limitrightx %f\n", camera.limitleftx, camera.limitrightx);
 		CP_Settings_NoFill();
 		CP_Settings_RectMode(CP_POSITION_CORNER);
-		CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop, camera.width, camera.height); //code for rectangle
+		CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop - camera.worldshifty, camera.width, camera.height); //code for rectangle
 
 		
 #pragma endregion
@@ -439,7 +439,7 @@ void L2_Update(void)
 
 		// Goal
 		CP_Settings_Fill(green);
-		CP_Graphics_DrawRect(goalx-camera.worldshiftx, goaly, 50, 50);
+		CP_Graphics_DrawRect(goalx-camera.worldshiftx, goaly + camera.worldshifty, 50, 50);
 
 		if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly, 50, 50)) {
 			// calculate score and mark the level as cleared
@@ -531,7 +531,7 @@ void L2_Update(void)
 			if (player.stamina <= 35.0f) {
 				CP_Settings_Fill(red);
 			}
-			DrawStatBar(player.x - 15-camera.worldshiftx, player.y - 30, player.x + 35-camera.worldshiftx, player.y - 23, player.stamina, 100);
+			DrawStatBar(player.x - 15-camera.worldshiftx, player.y - 30, player.x + 35 - camera.worldshiftx, player.y - 23, player.stamina, 100);
 		}
 		// DEATHS DRAWING
 		CP_Settings_Fill(black);

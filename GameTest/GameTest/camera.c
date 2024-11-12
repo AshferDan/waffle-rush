@@ -40,6 +40,24 @@ int playerCamColl(Player *player, Camera * camera) {
 		camera->limitleftx -= camera->limitleftx - player->x;
 	}
 
+	if (player->y < camera->limittop) {
+		printf("too far up");
+		//camera->worldshifty += 5; //this is the distance between player and border
+		camera->worldshifty -=  camera->limittop - player->y ; //this is the distance between player and border
+		camera->limitbase -= camera->limittop - player->y;
+		camera->limittop -= camera->limittop - player->y;
+		//camera->limittop -= camera->limittop - player->y;
+
+	}
+	else if (player->y > camera->limitbase) {
+		printf("too far down");
+		//camera->worldshifty -= 5; //this is the distance between player and border
+		camera->worldshifty += (player->y+player->height) - camera->limitbase ; //this is the distance between player and border
+		camera->limittop += (player->y + player->height) - camera->limitbase;
+		camera->limitbase += (player->y + player->height) - camera->limitbase;
+	}
+
+
 }
 
 
