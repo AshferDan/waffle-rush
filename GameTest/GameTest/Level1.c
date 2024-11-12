@@ -126,7 +126,15 @@ void L1_Init(void)
 			}
 			break;
 		}
-
+		case 2:
+		{
+			int j = 0;
+			for (; j < 3; ++j)
+			{
+				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
+			}
+			break;
+		}
 		}
 	}
 	fclose(HazardFile);
@@ -340,10 +348,7 @@ void L1_Update(void)
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
-		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
-			Kill_Player(&player, &deaths);
-		}
-
+		//declaring top left of square for square triangle collision
 		Point squareTopLeft = { player.x, player.y };
 		for (int i = 0; i < 4; i++) {
 			Point A = { traps[i].x[0], traps[i].y[0] };
@@ -354,7 +359,40 @@ void L1_Update(void)
 				Kill_Player(&player, &deaths);
 			}
 		}
-
+		//CRUSHER MOVEMENT
+		// crusherstate = 0 if going down and crusherstate = 1 when going up
+		float crushervely;
+		if (crusherstate == 0) {
+			crushervely = 1000.f * dt;
+			traps[4].y[2] += crushervely;
+			//traps[4].y[0] += crushervely;
+			if (traps[4].y[2] > 600) {
+				traps[4].y[2] = 600;
+				crusherstate = 1;
+			}
+			//if the player hits the crusher, add death and reset
+			if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
+				Kill_Player(&player, &deaths);
+			}
+		}
+		if (crusherstate == 1) {
+			crushervely = -0.005f * dt;
+			traps[4].y[2] += crushervely;
+			//traps[4].y[0] += crushervely;
+			if (traps[4].y[2] < 450) {
+				traps[4].y[2] = 450;
+				crusherstate = 0;
+			}
+			//if the player hits the crusher as it goes up, no death but cant go in
+			if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0]) && player.x >= traps[4].x[1]) {
+				player.x = 300;
+			}
+			if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0]) && player.x <= traps[4].x[0]) {
+				player.x = 200;
+			}
+		}
+		//
+		
 #pragma endregion
 
 	// RENDER
@@ -404,25 +442,6 @@ void L1_Update(void)
 			}
 			fclose(LevelFile);
 		}
-		//CRUSHER MOVEMENT
-		// crusherstate = 0 if going down and crusherstate = 1 when going up
-		float crushervely;
-		if (crusherstate == 0) {
-			crushervely = 100.f * dt;
-			traps[4].y[2] += crushervely;
-			traps[4].y[0] += crushervely;
-			if (traps[4].y[2] >= 600) {
-				crusherstate = 1;
-			}
-		}
-		if (crusherstate == 1) {
-			crushervely = 10.f * dt;
-			traps[4].y[2] -= crushervely;
-			traps[4].y[0] -= crushervely;
-			if (traps[4].y[0] <= 450) {
-				crusherstate = 0;
-			}
-		}
 
 		// HAZARD DRAWING
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
@@ -436,6 +455,11 @@ void L1_Update(void)
 				break;
 			}
 			case 1:
+			{
+				CP_Graphics_DrawRect(traps[i].x[0], traps[i].y[0], traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
+				break;
+			}
+			case 2:
 			{
 				CP_Graphics_DrawRect(traps[i].x[0], traps[i].y[0], traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
 				break;

@@ -16,6 +16,7 @@
 typedef enum hazardstype {
 	spike,
 	crusher,
+	shooter
 }hazardstype;
 
 typedef struct hazard {
