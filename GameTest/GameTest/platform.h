@@ -16,6 +16,7 @@
 
 #define max_coords 16
 #define max_platforms 20
+#define max_walls 20
 
 // Platformer globals
 typedef enum MoveState {
@@ -120,6 +121,10 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		// platform array
 		platform Platform[max_platforms];
 
+		int numwalls;
+		platblocks walls[max_walls];
+
+
 		// coordinate struct
 	#pragma endregion Platform Structs
 
@@ -214,8 +219,10 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		float fix_collide_y(platblocks plt, Player p);
 
 		void CollPlatforms(int plat_index, platform plt, Player* p, Player ply);
-
 		void CollOnPlatforms(int plat_index, platform plt, Player* p, Player ply);
+
+		void CollWalls(platblocks walls[], int num, Player* pply, Player ply);
+
 	#pragma endregion 
 	
 	// Reset Player

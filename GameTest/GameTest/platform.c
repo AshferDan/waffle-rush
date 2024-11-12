@@ -256,6 +256,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		Platform[plat_index].onblocks[block_index] = (platblocks){ x1-15, x2+15, y1-15, y2+15, (x2+15) - (x1-15), (y2+15) - (y1-15) };
 	}
 
+
 	// assigns platform horizontal hitboxes, used in hitbox function below
 	void horizontalhitbox(int coord_index, platform* plt) {
 		// Left to right
@@ -484,6 +485,48 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			}// end if collision check
 		}
 	}
+	void CollWalls(platblocks walls[], int num, Player* pply, Player ply, MoveState movestate) {
+		// iterate through number of coordinates
+		for (int wall_index = 0; wall_index < numwalls; wall_index++) {
+			// check for collision
+			if (collision(walls[wall_index], ply)) {
+				// check if collision is from vertical and not horizontal
+				if (collision_direction(walls[wall_index], ply) == 2) { // if colliding vertically
+					if (ply.x < walls[wall_index].x2 && ply.x + ply.width > walls[wall_index].x1) {  // if player within x coords of platform 
+
+						pply->y = fix_collide_y(walls[wall_index], ply);
+
+						// check player within X corners of platform
+						/*if (ply.x >= walls[wall_index].x1 + 30 && ply.x + ply.width <= walls[wall_index].x2 - 30) {
+							pply->withinx = 1;
+						}*/
+
+						if ((pply->y + ply.height) == walls[wall_index].y1) {
+							pply->onplatform = 1; // on platform!
+						}
+						//---------------------------------------------------------
+						// two conditions to set player vertical velocity 0:
+						// 1) if player is on top of platform and travelling downwards
+						// 2) if player bumps bottom of platform and travelling upwards
+						//---------------------------------------------------------
+						if (ply.y < walls[wall_index].y1 && ply.movey > 0 || ply.y > walls[wall_index].y1 && ply.movey < 0) { pply->movey = 0; }
+
+						// end if player within x coords of platform
+					}
+					// end if colliding vertically
+				}
+				// if player is outside x coords of platform
+				// aka player is colliding from the sides
+				else {
+					pply->x = fix_collide_x(walls[wall_index], ply);
+					if ((collision_direction(walls[wall_index], ply) == 1)) {
+						pply->movex = 0;
+					}
+				}
+			}// end if collision check
+		}
+	}
+
 	void Kill_Player(Player* player, int* deaths) {
 		if (player->state != Dead) {
 			player->state = Dead;
