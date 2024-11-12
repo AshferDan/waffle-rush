@@ -58,4 +58,5 @@ typedef struct EnterLevel
 } EnterLevel; 
 
 float scaler1, scaler2, scaler3, scaler4;
-int TransitionBoxEffect(float playerX, float playerY, float boxX1, float boxX2, float boxY1, float boxY2, float scaler1, float scaler2, float scaler3, float scaler4);
+int TransitionInBoxEffect(float playerX, float playerY, float boxX1, float boxX2, float boxY1, float boxY2, float scaler1, float scaler2, float scaler3, float scaler4);
+int TransitionOutBoxEffect(float playerX, float playerY, float boxX1, float boxX2, float boxY1, float boxY2, float scaler1, float scaler2, float scaler3, float scaler4);

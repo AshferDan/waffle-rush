@@ -12,6 +12,7 @@
 #include "utils.h"
 
 EnterLevel level1, level2;
+int levelEnded;
 
 void MainMenu1_Init(void)
 {
@@ -134,6 +135,7 @@ void MainMenu1_Init(void)
 
 	//transition box reset
 	scaler1 = scaler2 = scaler3 = scaler4 = 0;
+	levelEnded = 0;
 
 	// initialize deaths
 	deaths = 0;
@@ -191,11 +193,6 @@ void MainMenu1_Update(void)
 {
 	// background
 	CP_Graphics_ClearBackground(bg);
-
-	CP_Settings_NoFill();
-	CP_Settings_StrokeWeight(10);
-	CP_Graphics_DrawCircle(200, 200, 100);
-	CP_Settings_StrokeWeight(1);
 
 	// getdt
 	float dt = CP_System_GetDt();
@@ -415,12 +412,37 @@ void MainMenu1_Update(void)
 #pragma endregion
 	//have to force player to stop moving so that the transition works smoothly
 	//scaler1,2,3,4 , respectively, control the rects moving (Left,Right,Top,Bottom) L-R, R-L, T-B, B-T
-	if (CP_Input_KeyDown(KEY_P)) {
+	//TODO - press p start whole animation sequence, press o to do opening animation
+
+	if (CP_Input_KeyTriggered(KEY_P)) {
+		levelEnded = 1;
+	}
+	if (CP_Input_KeyDown(KEY_O)) {
+		levelEnded = 2;
+	}
+
+	if (levelEnded == 1) {
 		scaler1 += player.x * dt;
 		scaler2 += (width - player.x) * dt;
 		scaler3 += player.y * dt;
 		scaler4 += (height - player.y) * dt;
-		TransitionBoxEffect(player.x, player.y, 0, width, 0, height, scaler1,scaler2, scaler3, scaler4);
+		TransitionInBoxEffect(player.x, player.y, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
+
+		if (scaler1 >= player.x) {
+			levelEnded = 2;
+		}
+	}
+
+	if (levelEnded == 2) {
+		scaler1 -= player.x * dt;
+		scaler2 -= (width - player.x) * dt;
+		scaler3 -= player.y * dt;
+		scaler4 -= (height - player.y) * dt;
+		TransitionInBoxEffect(player.x, player.y, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
+
+		if (scaler1 <= 0) {
+			levelEnded = 0;
+		}
 	}
 
 	// Back to main menu
