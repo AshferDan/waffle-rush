@@ -331,7 +331,7 @@ void L1_Update(void)
 		if ((CP_Input_KeyTriggered(KEY_R) || ((player.stamina == 0) && player.state != Dead)) && isCleared == 0) {
 			Kill_Player(&player, &deaths);
 		}
-		if ((player.y >= height - player.height) && movestate == OnPlat) {
+		if ((player.y >= height - player.height) && movestate == OnPlat && isCleared == 0) {
 			Reset_Player(&player, &movestate);
 			deaths++;
 		}
@@ -340,7 +340,7 @@ void L1_Update(void)
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
-		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
+		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0]) && isCleared == 0) {
 			Kill_Player(&player, &deaths);
 		}
 
@@ -350,7 +350,7 @@ void L1_Update(void)
 			Point B = { traps[i].x[1], traps[i].y[1] };
 			Point C = { traps[i].x[2], traps[i].y[2] };
 
-			if (check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C)) {
+			if (check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C) && isCleared == 0) {
 				Kill_Player(&player, &deaths);
 			}
 		}
