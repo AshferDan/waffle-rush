@@ -24,6 +24,7 @@ void MainMenu1_Init(void)
 	// load player sprite
 	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
 	transition_sprite = CP_Image_Load("Assets/transition.png");
+
 #pragma endregion
 
 	// MAP INIT
@@ -120,15 +121,19 @@ void MainMenu1_Init(void)
 	player.direction = OnRight;
 
 	//Level transitions set
+
 	level1.posx = 300;
-	level1.posy = 900;
+	level1.posy = 950;
 	level1.width = 200;
 	level1.height = 200;
 
 	level2.posx = 800;
-	level2.posy = 900;
+	level2.posy = 950;
 	level2.width = 200;
 	level2.height = 200;
+
+	//transition box reset
+	scaler1 = scaler2 = scaler3 = scaler4 = 0;
 
 	// initialize deaths
 	deaths = 0;
@@ -180,13 +185,17 @@ void MainMenu1_Init(void)
 	CP_Settings_RectMode(CP_POSITION_CORNER);
 	CP_Settings_ImageMode(CP_POSITION_CORNER);
 #pragma endregion
-
 }
 
 void MainMenu1_Update(void)
 {
 	// background
 	CP_Graphics_ClearBackground(bg);
+
+	CP_Settings_NoFill();
+	CP_Settings_StrokeWeight(10);
+	CP_Graphics_DrawCircle(200, 200, 100);
+	CP_Settings_StrokeWeight(1);
 
 	// getdt
 	float dt = CP_System_GetDt();
@@ -269,11 +278,12 @@ void MainMenu1_Update(void)
 		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
 
 	// window clamps
-		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
+		//!! commented out to for smooth main menu -> level transition !!
+		/*player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
 		if (player.y + player.height > height || player.y < 0) {
 			player.movey = 0;
 		}
-		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);
+		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);*/
 
 	// change movestate
 		/*
@@ -325,9 +335,11 @@ void MainMenu1_Update(void)
 	//Level Transition
 	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level1.posx, level1.posy, level1.width, level1.height)) {
 		printf("level1\n");
+		//CP_Engine_SetNextGameState(L1_Init, L1_Update, L1_Exit); //go to game
 	}
 	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level2.posx, level2.posy, level2.width, level2.height)) {
 		printf("level2\n");
+		//CP_Engine_SetNextGameState(L2_Init, L2_Update, L2_Exit); //go to game
 	}
 
 	// Player
@@ -401,6 +413,15 @@ void MainMenu1_Update(void)
 		CP_Settings_RectMode(CP_POSITION_CORNER);
 	}
 #pragma endregion
+	//have to force player to stop moving so that the transition works smoothly
+	//scaler1,2,3,4 , respectively, control the rects moving (Left,Right,Top,Bottom) L-R, R-L, T-B, B-T
+	if (CP_Input_KeyDown(KEY_P)) {
+		scaler1 += player.x * dt;
+		scaler2 += (width - player.x) * dt;
+		scaler3 += player.y * dt;
+		scaler4 += (height - player.y) * dt;
+		TransitionBoxEffect(player.x, player.y, 0, width, 0, height, scaler1,scaler2, scaler3, scaler4);
+	}
 
 	// Back to main menu
 	if (CP_Input_KeyDown(KEY_Q)) { CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit); }

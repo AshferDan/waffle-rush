@@ -179,11 +179,12 @@ int IncrementScore(int startScore, int endScore, float *timeElapsed, float dt) {
 	return score;
 }
 
-//int EnterLevel(float playerX, float playerY, float playerW, float playerH, float enterX, float enterY, float enterW, float enterH) {
-//	float widthtouch = playerX;
-//	float heighttouch = s1_h / 2 + s2_h / 2;
-//	if (abs(s2_cx - s1_cx) <= widthtouch && (abs(s2_cy - s1_cy) <= heighttouch)) {
-//		return 1;
-//	}
-//	return 0;
-//}
+int TransitionBoxEffect(float playerX, float playerY, float boxX1, float boxX2, float boxY1, float boxY2, float scaler1, float scaler2, float scaler3, float scaler4) {
+	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
+	CP_Settings_RectMode(CP_POSITION_CORNER);
+
+	CP_Graphics_DrawRect(boxX1, boxY1, scaler1, boxY2 - boxY1);
+	CP_Graphics_DrawRect(boxX2, boxY1, -scaler2, boxY2 - boxY1);
+	CP_Graphics_DrawRect(boxX1, boxY1, boxX2 - boxX1, scaler3);
+	CP_Graphics_DrawRect(boxX1, boxY2, boxX2 - boxX1, -scaler4);
+}
