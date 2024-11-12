@@ -178,3 +178,12 @@ int IncrementScore(int startScore, int endScore, float *timeElapsed, float dt) {
 	score = startScore;
 	return score;
 }
+
+//int EnterLevel(float playerX, float playerY, float playerW, float playerH, float enterX, float enterY, float enterW, float enterH) {
+//	float widthtouch = playerX;
+//	float heighttouch = s1_h / 2 + s2_h / 2;
+//	if (abs(s2_cx - s1_cx) <= widthtouch && (abs(s2_cy - s1_cy) <= heighttouch)) {
+//		return 1;
+//	}
+//	return 0;
+//}
