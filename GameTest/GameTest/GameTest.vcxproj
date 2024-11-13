@@ -22,6 +22,7 @@
     <ClCompile Include="mainmenu.c" />
     <ClCompile Include="options.c" />
     <ClCompile Include="platform.c" />
+    <ClCompile Include="playerbuff.c" />
     <ClCompile Include="utils.c" />
   </ItemGroup>
   <ItemGroup>
@@ -32,6 +33,7 @@
     <ClInclude Include="options.h" />
     <ClInclude Include="platform.h" />
     <ClInclude Include="mainmenu.h" />
+    <ClInclude Include="playerbuff.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>

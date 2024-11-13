@@ -9,6 +9,7 @@
 //---------------------------------------------------------
 
 #include "LevelSelect.h"
+#include "playerbuff.h"
 
 #define num_levels 5
 level levels[num_levels];
@@ -48,8 +49,19 @@ void L2_Init(void)
 	spawnx = 150;
 	spawny = 200;
 	// initialize test goal
+	
 	goalx = 2500;
 	goaly = 500;
+	//example of how to access buffs Buff[0].timeslowed = CP_System_GetDt();
+
+	// initialize powerups location
+	Buff[slowTime].activestate = 1; //if active,
+	Buff[slowTime].X = 100; //draw
+	Buff[slowTime].Y = 575; //draw
+	Buff[slowTime].width = 20; //draw
+	Buff[slowTime].height = 20; //draw
+	Buff[slowTime].buffduration = 20 * CP_System_GetDt();
+	
 
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -166,6 +178,7 @@ void L2_Init(void)
 	player.width = 20;
 	player.height = 20;
 	// position
+	
 	player.x = spawnx;
 	player.y = spawny;
 	// movement
@@ -398,6 +411,28 @@ void L2_Update(void)
 			}
 		}
 #pragma endregion
+
+		// Powerups
+		/*---------------------------------------------------------------------------------------------------*/
+#pragma region Powerups Update
+		
+
+
+		//checking for collision between players and buff
+		//is_colliding(Buff[slowTime].X+camera.worldshiftx, Buff[slowTime].Y+camera.worldshifty, Buff[slowTime].width, Buff[slowTime].height);
+		if (is_colliding(Buff[slowTime].X, Buff[slowTime].Y, Buff[slowTime].height, Buff[slowTime].width)) {
+			printf("colliding lmao");
+			Buff[slowTime].activestate = 0;
+			//insert playerbuff is available ie
+			//
+		}
+		
+
+
+
+
+
+#pragma endregion
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
@@ -543,6 +578,12 @@ void L2_Update(void)
 		// Player
 		if (isCleared == 0) {
 			Draw_Player(player_sprite, player, movestate);
+		}
+
+		//PowerUps drawing 
+		if (Buff[slowTime].activestate == 1) {
+			CP_Settings_Fill(CP_Color_Create(100, 100, 100, 255));
+			CP_Graphics_DrawRect(Buff[slowTime].X-camera.worldshiftx, Buff[slowTime].Y-camera.worldshifty, Buff[slowTime].width, Buff[slowTime].height);
 		}
 
 		// Stamina Bar

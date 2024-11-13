@@ -17,21 +17,21 @@ void playerCamColl(Player *player, Camera* camera) {
 	float playerB = player->y + player->height;
 
 	if (playerR > camera->limitrightx) {
-		printf("too far right");
+		//printf("too far right");
 		camera->worldshiftx += playerR - camera->limitrightx; //this is the distance between player and border
 		camera->limitleftx += playerR - camera->limitrightx;
 		camera->limitrightx += playerR -camera->limitrightx;
 
 	}
 	else if (player->x < camera->limitleftx) {
-		printf("too far left");
+		//printf("too far left");
 		camera->worldshiftx -= camera->limitleftx - player->x ; //this is the distance between player and border
 		camera->limitrightx -= camera->limitleftx - player->x;
 		camera->limitleftx -= camera->limitleftx - player->x;
 	}
 
 	if (player->y < camera->limittop) {
-		printf("too far up");
+		//printf("too far up");
 		camera->worldshifty -=  camera->limittop - player->y ; //this is the distance between playery and bordertop
 		camera->limitbase -= camera->limittop - player->y;
 		camera->limittop -= camera->limittop - player->y;
@@ -39,7 +39,7 @@ void playerCamColl(Player *player, Camera* camera) {
 
 	}
 	else if (playerB > camera->limitbase) {
-		printf("too far down");
+		//printf("too far down");
 		camera->worldshifty += playerB - camera->limitbase ; //this is the distance between player and border
 		camera->limittop += playerB - camera->limitbase;
 		camera->limitbase += playerB - camera->limitbase;

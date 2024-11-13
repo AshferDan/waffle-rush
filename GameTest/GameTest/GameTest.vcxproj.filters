@@ -48,6 +48,12 @@
     <ClCompile Include="camera.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="options.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="playerbuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainmenu.h">
@@ -68,10 +74,13 @@
     <ClInclude Include="credits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Level2.h">
+    <ClInclude Include="camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="camera.h">
+    <ClInclude Include="options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="playerbuff.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -100,5 +109,7 @@
     <Text Include="..\Assets\Level2.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="..\Assets\Level2wall.txt" />
+    <Text Include="..\Assets\Options.txt" />
   </ItemGroup>
 </Project>
