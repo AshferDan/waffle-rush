@@ -339,58 +339,62 @@ void L2_Update(void)
 		}
 
 		// Collision against platforms
-		if (movestate == OnPlat && player.deathcause != Fall) {
-			player.stamina += 40.0f * dt;
-			for (int plat_index = 0; plat_index < numplats; plat_index++) {
-				CollOnPlatforms(plat_index, Platform[plat_index], &player, player);
+		if (player.state != Dead) {
+			if (movestate == OnPlat && player.deathcause != Fall) {
+				player.stamina += 40.0f * dt;
+				for (int plat_index = 0; plat_index < numplats; plat_index++) {
+					CollOnPlatforms(plat_index, Platform[plat_index], &player, player);
+				}
 			}
-		}
 
-		else if (movestate == InPlat && player.deathcause != Fall) {
-			player.stamina -= 20.0f * dt;
-			for (int plat_index = 0; plat_index < numplats; plat_index++) {
-				CollPlatforms(plat_index, Platform[plat_index], &player, player);
+			else if (movestate == InPlat && player.deathcause != Fall) {
+				player.stamina -= 20.0f * dt;
+				for (int plat_index = 0; plat_index < numplats; plat_index++) {
+					CollPlatforms(plat_index, Platform[plat_index], &player, player);
+				}
+				if (player.stamina <= 0) {
+					Kill_Player(&player, Fall, &deaths);
+				}
 			}
-			if (player.stamina <= 0) {
+			player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
+
+			// Collision against walls
+			CollWalls(walls, numwalls, &player, player, movestate);
+
+			// Jump
+			jump(&player);
+
+			// window clamps (eventually World Clamps)
+			player.x = CP_Math_ClampFloat(player.x, 0, 2600);
+			if (player.y + player.height > height || player.y < 0) {
+				player.movey = 0;
+			}
+			player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);
+
+			// change movestate
+				/*
+				OnPlat	  - on platform
+				InPlat	  - inside platform
+				EnterPlat - from OnPlat to InPlat
+				ExitPlat  - from InPlat to OnPlat
+				*/
+			if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
+				start_transition(&player, &movestate);
+			}
+
+			if (player.transition_time >= 13) {
+				end_transition(&player, &movestate);
+			}
+
+			// reset with R or touch ground while movestate OnPlat
+			if (CP_Input_KeyTriggered(KEY_R) && player.state != Dead) {
+				CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
+				Kill_Player(&player, reset, &deaths);
+			}
+			if ((player.y >= height - player.height) && movestate == OnPlat && player.deathcause != Fall) {
 				Kill_Player(&player, Fall, &deaths);
 			}
 		}
-		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
-
-		// Collision against walls
-		CollWalls(walls, numwalls, &player, player, movestate);
-
-		// window clamps
-		/*player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
-		if (player.y + player.height > height || player.y < 0) {
-			player.movey = 0;
-		}
-		player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);*/
-
-		// change movestate
-			/*
-			OnPlat	  - on platform
-			InPlat	  - inside platform
-			EnterPlat - from OnPlat to InPlat
-			ExitPlat  - from InPlat to OnPlat
-			*/
-		if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
-			start_transition(&player, &movestate);
-		}
-
-		if (player.transition_time >= 13) {
-			end_transition(&player, &movestate);
-		}
-
-		// reset with R or touch ground while movestate OnPlat
-		if (CP_Input_KeyTriggered(KEY_R) && player.state != Dead) {
-			CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
-			Kill_Player(&player, reset, &deaths);
-		}
-		if ((player.y >= height - player.height) && movestate == OnPlat && player.deathcause != Fall) {
-			Kill_Player(&player, Fall, &deaths);
-		}
-
 #pragma endregion
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
@@ -412,10 +416,8 @@ void L2_Update(void)
 
 #pragma endregion
 
-
 		// CAMERA UPDATE
-		/*---------------------------------------------------------------------------------------------------------------------*/
-
+		/*---------------------------------------------------------------------------------------------------*/
 		//implement the below logic later. do the main camera first.
 		//camera.limitleftx =  camera.limitleftx  + offsetX;
 		//camera.limitrightx = camera.limitrightx + offsetX;
@@ -430,6 +432,7 @@ void L2_Update(void)
 
 
 #pragma endregion
+
 		// RENDER
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
@@ -443,8 +446,6 @@ void L2_Update(void)
 		CP_Settings_Stroke(black);
 
 		// Goal
-		/*CP_Settings_Fill(green);
-		CP_Graphics_DrawRect(goalx-camera.worldshiftx, goaly, 50, 50);*/
 		if (!isCleared) {
 			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly, 100, 100, 0, 0, 32, 32, 255);
 		}
@@ -455,7 +456,6 @@ void L2_Update(void)
 			int sprite_x = 32 + (32 * (int)clear_timer);
 			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly, 100, 100, sprite_x, 0, sprite_x + 32, 32, 255);
 		}
-
 
 		if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly+70, 100, 30)) {
 			// calculate score and mark the level as cleared

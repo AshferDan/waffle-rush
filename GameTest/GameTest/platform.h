@@ -205,10 +205,14 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		void end_transition(Player* player, MoveState* movestate);
 		// platformer and in platform movements
 		void movement(Player* p, MoveState movestate, float speed, float dt);
+
+		void jump(Player* player);
 		#pragma endregion
 
 	// HITBOX LOGIC (see platform.c)
 	#pragma region Hitboxes
+		// reset platform members
+		void reset_platforms(void);
 		// assign platform coordinates
 		void platform_coordinates(int plat_index, int coord_index, float x, float y);
 		// assign onblock coordinates
