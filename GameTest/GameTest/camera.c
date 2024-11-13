@@ -9,24 +9,15 @@
 // Copyright © 2020 DigiPen, All rights reserved.
 //---------------------------------------------------------
 
+#pragma once
 #include "camera.h"
 
-	////assign window width and height
-	//int winWidth = CP_System_GetWindowWidth();
-	//int winHeight = CP_System_GetWindowHeight();
-
-	//draw ur fucking camera
-	//CP_Settings_Fill(CP_Color_Create(0, 0, 0, 128));
-	//CP_Settings_NoFill(); //s allows me to draw rect without fill
-	//CP_Settings_RectMode(CP_POSITION_CORNER);//allows program to know where is
-
-
-int playerCamColl(Player *player, Camera * camera) {
+void playerCamColl(Player *player, Camera* camera) {
 	float playerR = player->x + player->width;
+	float playerB = player->y + player->height;
 
 	if (playerR > camera->limitrightx) {
 		printf("too far right");
-		//camera->worldshiftx += 5; //this is the distance between player and border
 		camera->worldshiftx += playerR - camera->limitrightx; //this is the distance between player and border
 		camera->limitleftx += playerR - camera->limitrightx;
 		camera->limitrightx += playerR -camera->limitrightx;
@@ -34,7 +25,6 @@ int playerCamColl(Player *player, Camera * camera) {
 	}
 	else if (player->x < camera->limitleftx) {
 		printf("too far left");
-		//camera->worldshiftx -= 5; //this is the distance between player and border
 		camera->worldshiftx -= camera->limitleftx - player->x ; //this is the distance between player and border
 		camera->limitrightx -= camera->limitleftx - player->x;
 		camera->limitleftx -= camera->limitleftx - player->x;
@@ -42,22 +32,18 @@ int playerCamColl(Player *player, Camera * camera) {
 
 	if (player->y < camera->limittop) {
 		printf("too far up");
-		//camera->worldshifty += 5; //this is the distance between player and border
-		camera->worldshifty -=  camera->limittop - player->y ; //this is the distance between player and border
+		camera->worldshifty -=  camera->limittop - player->y ; //this is the distance between playery and bordertop
 		camera->limitbase -= camera->limittop - player->y;
 		camera->limittop -= camera->limittop - player->y;
 		//camera->limittop -= camera->limittop - player->y;
 
 	}
-	else if (player->y > camera->limitbase) {
+	else if (playerB > camera->limitbase) {
 		printf("too far down");
-		//camera->worldshifty -= 5; //this is the distance between player and border
-		camera->worldshifty += (player->y+player->height) - camera->limitbase ; //this is the distance between player and border
-		camera->limittop += (player->y + player->height) - camera->limitbase;
-		camera->limitbase += (player->y + player->height) - camera->limitbase;
+		camera->worldshifty += playerB - camera->limitbase ; //this is the distance between player and border
+		camera->limittop += playerB - camera->limitbase;
+		camera->limitbase += playerB - camera->limitbase;
 	}
-
-
 }
 
 

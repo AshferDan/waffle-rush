@@ -74,7 +74,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			}
 			// jump!
 			if (CP_Input_KeyTriggered(KEY_SPACE) && ply->onplatform == 1) {
-				ply->movey = -speed;
+				ply->movey = -2*speed;
 			}
 			// left
 			if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_LEFT) && (!CP_Input_KeyDown(KEY_D) || !CP_Input_KeyDown(KEY_RIGHT)) && (ply->movex > -speed)) {
@@ -629,7 +629,7 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 			sprite_y = (movestate == EnterPlat) ? 36 : 0;
 
 			sprite_x = ((int)player.transition_time / 1) * 18;
-			CP_Image_DrawSubImage(transition_sprite, player.x - 15 - camera.worldshiftx, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
+			CP_Image_DrawSubImage(transition_sprite, player.x - 15 - camera.worldshiftx, player.y - 15 - camera.worldshifty, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
 		}
 	}
 	else {

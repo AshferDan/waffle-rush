@@ -16,6 +16,8 @@ float timeElapsed;
 
 void L2_Init(void)
 {
+
+	//CP_System_SetFrameRate(60);
 	// ASSET LOADS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Assets
@@ -243,7 +245,7 @@ void L2_Init(void)
 	
 	camera.limitleftx = screenX * 1.0f / 10.0f; //
 	camera.limitrightx = screenX * 4.0f / 10.0f; //
-	camera.limittop = screenY * 0.6f; //
+	camera.limittop = screenY * 0.7f; //
 	camera.limitbase = screenY * 0.8f; //  
 	camera.width = camera.limitrightx - camera.limitleftx; //
 	camera.height = camera.limitbase - camera.limittop; //since base is a bigger number than the top number.

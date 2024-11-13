@@ -29,3 +29,5 @@ typedef struct camera {
 } Camera;
 
 Camera camera;
+
+//void playerCamColl(Player* player, Camera* camera);
