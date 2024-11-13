@@ -72,31 +72,30 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			if (ply->movey < 1000.0f && ply->onplatform == 0) {
 				ply->movey += 1800.0f * dt;
 			}
-			// jump!
-			if (CP_Input_KeyTriggered(KEY_SPACE) && ply->onplatform == 1) {
-				ply->movey = -2*speed;
-			}
+
 			// left
 			if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_LEFT) && (!CP_Input_KeyDown(KEY_D) || !CP_Input_KeyDown(KEY_RIGHT)) && (ply->movex > -speed)) {
 				ply->movex -= accel;
 				tempdirH = OnLeft;
 			}
-			else if ((ply->movex < 100.f) && (!(CP_Input_KeyDown(KEY_A)) || !(CP_Input_KeyDown(KEY_LEFT)) || ((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D)) || (CP_Input_KeyDown(KEY_LEFT) && CP_Input_KeyDown(KEY_RIGHT))))) {
-				ply->movex += accel;
-			};
+
 			// right
 			if (CP_Input_KeyDown(KEY_D) || CP_Input_KeyDown(KEY_RIGHT) && (!CP_Input_KeyDown(KEY_A) || !CP_Input_KeyDown(KEY_LEFT)) && (ply->movex < speed)) {
 				ply->movex += accel;
 				tempdirH = OnRight;
 			}
-			else if ((ply->movex > 100.f) && (!(CP_Input_KeyDown(KEY_A)) || !(CP_Input_KeyDown(KEY_LEFT)) || ((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D)) || (CP_Input_KeyDown(KEY_LEFT) && CP_Input_KeyDown(KEY_RIGHT))))) {
-				ply->movex -= accel;
-			};
-			if (((((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))) || ((CP_Input_KeyDown(KEY_LEFT) && CP_Input_KeyDown(KEY_RIGHT))) || !((CP_Input_KeyDown(KEY_A)) || (CP_Input_KeyDown(KEY_D)) || (CP_Input_KeyDown(KEY_LEFT)) || (CP_Input_KeyDown(KEY_RIGHT)))) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
+			if (tempdirH == Null) {
+				if (ply->movex < -100) {
+					ply->movex += accel;
+				}
+				else if (ply->movex > 100) {
+					ply->movex -= accel;
+				}
+			}
+			if (((((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))) || ((CP_Input_KeyDown(KEY_LEFT) && CP_Input_KeyDown(KEY_RIGHT))) || tempdirH == Null) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
 				ply->movex = 0;
 			}
 
-			// Speed clamp
 			ply->movex = CP_Math_ClampFloat(ply->movex, -speed, speed);
 
 			// anim state
@@ -105,6 +104,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			}
 
 			if (ply->onplatform == 1) {
+				ply->walljump = 1;
 				ply->state = Idle;
 				if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D) || CP_Input_KeyDown(KEY_LEFT) || CP_Input_KeyDown(KEY_RIGHT)) {
 					ply->state = Running;
@@ -155,24 +155,24 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 
 			// Idle decel and brake
 			if (tempdirH == Null) {
-				if (ply->movex < 0) {
+				if (ply->movex < -80) {
 					ply->movex += accel2;
 				}
-				else {
+				else if (ply->movex > 80){
 					ply->movex -= accel2;
 				}
-				if (ply->movex <= 50.f && ply->movex >= -50.f) {
+				if (ply->movex <= 80.f && ply->movex >= -80.f) {
 					ply->movex = 0;
 				}
 			}
 			if (tempdirV == Null) {
-				if (ply->movey < 50) {
+				if (ply->movey < -80) {
 					ply->movey += accel2;
 				}
-				else if (ply->movey > 50) {
+				else if (ply->movey > 80) {
 					ply->movey -= accel2;
 				}
-				if (ply->movey <= 50.f && ply->movey >= -50.f) {
+				if (ply->movey <= 80.f && ply->movey >= -80.f) {
 					ply->movey = 0;
 				}
 			}
@@ -226,7 +226,27 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		ply->leaveplatform = 0;
 	}
 }
+
+void jump(Player* player) {
+	if (CP_Input_KeyTriggered(KEY_SPACE)) {
+		if (((player->onplatform == 0) && player->state == Sliding && player->walljump == 1)) {
+			player->walljump = 0;
+			player->movey = -500;
+			if (player->direction == OnLeft) {
+				player->movex = 600;
+			}
+			else if (player->direction == OnRight) {
+				player->movex = -600;
+			}
+		}
+		if (player->onplatform) {
+			player->movey = -600;
+		}
+	}
+}
 #pragma endregion
+
+
 
 
 // HITBOX LOGIC
@@ -246,6 +266,19 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	//	Offset +15 for both top and bottom
 	// This ensures the collision logic will not have conflicts when corners are touched by the player
 	//---------------------------------------------------------
+
+	// Reset platform members
+	void reset_platforms(void) {
+		for (int plat_index = 0; plat_index < max_platforms; plat_index++) {
+			Platform[plat_index].numcoords = 0;
+			Platform[plat_index].numblocks = 0;
+			for (int coord_index = 0; coord_index < max_coords; coord_index++) {
+				Platform[plat_index].platcoords[coord_index] = (coords){ 0,0 };
+				Platform[plat_index].inblocks[coord_index] = (platblocks){ 0,0,0,0 };
+				Platform[plat_index].onblocks[coord_index] = (platblocks){ 0,0,0,0 };
+			}
+		}
+	}
 
 	// Initializes platform coordinates
 	void platform_coordinates(int plat_index, int coord_index, float x, float y) {
@@ -481,15 +514,39 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 				if (collision_direction(Platform[plat_index].onblocks[block_index], ply) == 1) {
 					pply->movex = 0;
 				}
+				if (!(pply->onplatform) && pply->x == Platform[plat_index].onblocks[block_index].x2 && CP_Input_KeyDown(KEY_A)) {
+					pply->state = Sliding;
+					if (pply->movey >= 400) {
+						pply->movey = 400;
+					}
+
+				}
+				else if (!(pply->onplatform) && pply->x + pply->width == Platform[plat_index].onblocks[block_index].x1 && CP_Input_KeyDown(KEY_D)) {
+					pply->state = Sliding;
+					if (pply->movey >= 400) {
+						pply->movey = 400;
+					}
+
+				}
+				else if (!(pply->onplatform)){
+					pply->state = Jumping;
+				}
+				else if (pply->onplatform && pply->state == Jumping) {
+					pply->state = Idle;
+				}
 				
 			}// end if collision check
 		}
 	}
 	void CollWalls(platblocks walls[], int num, Player* pply, Player ply, MoveState movestate) {
+		movestate = movestate;
+
+		printf("movestate %d\n", movestate);
 		// iterate through number of coordinates
 		for (int wall_index = 0; wall_index < numwalls; wall_index++) {
 			// check for collision
-			if (collision(walls[wall_index], ply)) {
+			if (collision(walls[wall_index], ply)) 
+			{
 				// check if collision is from vertical and not horizontal
 				if (collision_direction(walls[wall_index], ply) == 2) { // if colliding vertically
 					if (ply.x < walls[wall_index].x2 && ply.x + ply.width > walls[wall_index].x1) {  // if player within x coords of platform 
@@ -522,8 +579,31 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 					if ((collision_direction(walls[wall_index], ply) == 1)) {
 						pply->movex = 0;
 					}
+					if (movestate == OnPlat) {
+						if (pply->x == walls[wall_index].x2 && CP_Input_KeyDown(KEY_A)) {
+							pply->state = Sliding;
+							if (pply->movey >= 400) {
+								pply->movey = 400;
+							}
+
+						}
+						else if (pply->x + pply->width == walls[wall_index].x1 && CP_Input_KeyDown(KEY_D)) {
+							pply->state = Sliding;
+							if (pply->movey >= 400) {
+								pply->movey = 400;
+							}
+
+						}
+						else if (!(pply->onplatform)) {
+							pply->state = Jumping;
+						}
+					}
 				}
 			}// end if collision check
+		}
+
+		if (pply->onplatform && (pply->state == Jumping || pply->state == Sliding)) {
+			pply->state = Idle;
 		}
 	}
 
@@ -621,6 +701,9 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 			case Jumping:
 				sprite_x = 72;
 				break;
+			case Sliding:
+				sprite_x = 90;
+				break;
 			}
 			CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15 - camera.worldshiftx, player.y - 15 - camera.worldshifty, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 255, rot);
 		}
@@ -659,7 +742,7 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 
 		case Crush: 
 			death_sprite = crush_sprite;
-			sprite_x = ((int)player.death_time < 3) ? (int)player.death_time * 18 : 52;
+			sprite_x = ((int)player.death_time < 3) ? (int)player.death_time * 18 : 54;
 			sprite_y = (player.direction == OnLeft) ? 36 : 0;
 			break;
 		

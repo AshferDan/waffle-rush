@@ -42,11 +42,12 @@ int highScore; // level high score
 int levelNumber; // level number
 
 // Graphics
-CP_Image player_sprite, transition_sprite, burn_sprite, fall_sprite, crush_sprite;
+CP_Image player_sprite, transition_sprite, burn_sprite, fall_sprite, crush_sprite, goal_sprite;
 
 float player_sprite_x, player_sprite_y;
 float transit_sprite_x, transit_sprite_y;
 float death_sprite_x, death_sprite_y;
+float clear_timer;
 
 // Anim timer
 
@@ -136,6 +137,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			Idle,
 			Running,
 			Jumping,
+			Sliding,
 			Crawling,
 			Dead,
 		} PlayerState;
@@ -176,6 +178,8 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 
 			// Condition checks
 			int onplatform;
+			int walljump;
+			int wallhug;
 			int withinx;
 			int leaveplatform;
 			PlayerState state;
@@ -201,10 +205,14 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		void end_transition(Player* player, MoveState* movestate);
 		// platformer and in platform movements
 		void movement(Player* p, MoveState movestate, float speed, float dt);
+
+		void jump(Player* player);
 		#pragma endregion
 
 	// HITBOX LOGIC (see platform.c)
 	#pragma region Hitboxes
+		// reset platform members
+		void reset_platforms(void);
 		// assign platform coordinates
 		void platform_coordinates(int plat_index, int coord_index, float x, float y);
 		// assign onblock coordinates
@@ -230,7 +238,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		void CollPlatforms(int plat_index, platform plt, Player* p, Player ply);
 		void CollOnPlatforms(int plat_index, platform plt, Player* p, Player ply);
 
-		void CollWalls(platblocks walls[], int num, Player* pply, Player ply);
+		void CollWalls(platblocks walls[], int num, Player* pply, Player ply, MoveState movestate);
 
 	#pragma endregion 
 	

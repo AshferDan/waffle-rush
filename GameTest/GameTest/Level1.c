@@ -28,6 +28,7 @@ void L1_Init(void)
 	burn_sprite			= CP_Image_Load("Assets/Burnt.png");
 	fall_sprite			= CP_Image_Load("Assets/Fall_Sprite.png");
 	crush_sprite		= CP_Image_Load("Assets/Crush_Sprite.png");
+	goal_sprite = CP_Image_Load("Assets/Plate.png");
 #pragma endregion
 
 	// LEVEL INIT
@@ -45,12 +46,15 @@ void L1_Init(void)
 	spawnx = 150;
 	spawny = 200;
 	// initialize test goal
-	goalx = 1520;
-	goaly = 250;
+	goalx = 1500;
+	goaly = 200;
 
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
+
+	reset_platforms();
+
 	FILE* PlatformFile = fopen("Assets/Level1.txt", "r");
 
 	if (PlatformFile == NULL) {
@@ -168,6 +172,8 @@ void L1_Init(void)
 	// movement
 	player.movex = 0;
 	player.movey = 0;
+	player.walljump = 0;
+	player.wallhug = 0;
 	// anim timers
 	player.transition_time = 15;
 	player.death_time = 17;
@@ -235,6 +241,22 @@ void L1_Init(void)
 	CP_Settings_ImageFilterMode(CP_IMAGE_FILTER_NEAREST);
 
 #pragma endregion
+	// CAMERA INIT
+		/*---------------------------------------------------------------------------------------------------------------------*/
+#pragma region Camera Init
+	float screenX = CP_System_GetWindowWidth();
+	float screenY = CP_System_GetWindowHeight();
+
+	camera.limitleftx = screenX * 1.0f / 10.0f; //
+	camera.limitrightx = screenX * 9.0f / 10.0f; //
+	camera.limittop = screenY * 0.3f; //
+	camera.limitbase = screenY * 0.8f; //  
+	camera.width = camera.limitrightx - camera.limitleftx; //
+	camera.height = camera.limitbase - camera.limittop; //since base is a bigger number than the top number.
+	camera.worldshiftx = 0;
+
+#pragma endregion
+	//CP_System_SetFrameRate(30);
 
 }
 
@@ -315,10 +337,13 @@ void L1_Update(void)
 			player.death_time = 17;
 		}
 
-	// Movement logics
-	movement(&player, movestate, speed, dt);
+		// Movement logics
+		if (isCleared == 0) {
+			movement(&player, movestate, speed, dt);
+		}
 
 	// Collision against platforms
+	if (player.state != Dead) {
 		if (movestate == OnPlat && player.deathcause != Fall) {
 			player.stamina += 40.0f * dt;
 			for (int plat_index = 0; plat_index < numplats; plat_index++) {
@@ -338,22 +363,25 @@ void L1_Update(void)
 		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
 
 		// Collision against walls
-		CollWalls(walls, numwalls, &player, player);
+		CollWalls(walls, numwalls, &player, player, movestate);
 
-		// window clamps
+		// Jump
+		jump(&player);
+
+		// window clamps (eventually World Clamps)
 		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
 		if (player.y + player.height > height || player.y < 0) {
 			player.movey = 0;
 		}
 		player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);
 
-	// change movestate
-		/*
-		OnPlat	  - on platform
-		InPlat	  - inside platform
-		EnterPlat - from OnPlat to InPlat
-		ExitPlat  - from InPlat to OnPlat
-		*/
+		// change movestate
+			/*
+			OnPlat	  - on platform
+			InPlat	  - inside platform
+			EnterPlat - from OnPlat to InPlat
+			ExitPlat  - from InPlat to OnPlat
+			*/
 		if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
 			start_transition(&player, &movestate);
 		}
@@ -362,7 +390,7 @@ void L1_Update(void)
 			end_transition(&player, &movestate);
 		}
 
-	// reset with R or touch ground while movestate OnPlat
+		// reset with R or touch ground while movestate OnPlat
 		if (CP_Input_KeyTriggered(KEY_R) && player.state != Dead) {
 			CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
 			Kill_Player(&player, reset, &deaths);
@@ -370,7 +398,7 @@ void L1_Update(void)
 		if ((player.y >= height - player.height) && movestate == OnPlat && player.deathcause != Fall) {
 			Kill_Player(&player, Fall, &deaths);
 		}
-		
+	}
 #pragma endregion
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
@@ -392,6 +420,22 @@ void L1_Update(void)
 
 #pragma endregion
 
+		// CAMERA UPDATE
+		/*---------------------------------------------------------------------------------------------------*/
+		//implement the below logic later. do the main camera first.
+		//camera.limitleftx =  camera.limitleftx  + offsetX;
+		//camera.limitrightx = camera.limitrightx + offsetX;
+#pragma region Camera
+		playerCamColl(&player, &camera); //functionised my camera shift. 
+		//where worldshiftx is now the modifyable for all objects
+
+		printf("limitleftx %f| limitrightx %f\n", camera.limitleftx, camera.limitrightx);
+		CP_Settings_NoFill();
+		CP_Settings_RectMode(CP_POSITION_CORNER);
+		CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop, camera.width, camera.height); //code for rectangle
+
+
+#pragma endregion
 
 	// RENDER
 	/*---------------------------------------------------------------------------------------------------*/
@@ -406,8 +450,16 @@ void L1_Update(void)
 		CP_Settings_Stroke(black);
 
 		// Goal
-		CP_Settings_Fill(green);
-		CP_Graphics_DrawRect(goalx, goaly, 50, 50);
+		if (!isCleared) {
+			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly, 100, 100, 0, 0, 32, 32, 255);
+		}
+		else {
+			if (clear_timer <= 3) {
+				clear_timer += 6 * dt;
+			}
+			int sprite_x = 32 + (32 * (int)clear_timer);
+			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly, 100, 100, sprite_x, 0, sprite_x + 32, 32, 255);
+		}
 
 		if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly, 50, 50)) {
 			// calculate score and mark the level as cleared
@@ -446,7 +498,7 @@ void L1_Update(void)
 		// Wall
 		CP_Settings_Fill(black);
 		for (int i = 0; i < numwalls; i++) {
-			CP_Graphics_DrawRect(walls[i].x1+15, walls[i].y1+15, walls[i].w-30, walls[i].h-30);
+			CP_Graphics_DrawRect(walls[i].x1+15-camera.worldshiftx, walls[i].y1+15, walls[i].w-30, walls[i].h-30);
 		}
 
 		//CRUSHER MOVEMENT
@@ -477,12 +529,12 @@ void L1_Update(void)
 			{
 			case 0:
 			{
-				CP_Graphics_DrawTriangle(traps[i].x[0], traps[i].y[0], traps[i].x[1], traps[i].y[1], traps[i].x[2], traps[i].y[2]);
+				CP_Graphics_DrawTriangle(traps[i].x[0]-camera.worldshiftx, traps[i].y[0], traps[i].x[1] - camera.worldshiftx, traps[i].y[1], traps[i].x[2] - camera.worldshiftx, traps[i].y[2]);
 				break;
 			}
 			case 1:
 			{
-				CP_Graphics_DrawRect(traps[i].x[0], traps[i].y[0], traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
+				CP_Graphics_DrawRect(traps[i].x[0]-camera.worldshiftx, traps[i].y[0], traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
 				break;
 			}
 
@@ -491,7 +543,9 @@ void L1_Update(void)
 
 
 		// Player
-		Draw_Player(player_sprite, player, movestate);
+		if (isCleared == 0) {
+			Draw_Player(player_sprite, player, movestate);
+		}
 
 		// Stamina Bar
 		if (player.stamina < 100.0f) {
@@ -499,7 +553,7 @@ void L1_Update(void)
 			if (player.stamina <= 35.0f) {
 				CP_Settings_Fill(red);
 			}
-			DrawStatBar(player.x - 15, player.y - 30, player.x + 35, player.y - 23, player.stamina, 100);
+			DrawStatBar(player.x - 15 - camera.worldshiftx, player.y - 30, player.x + 35 - camera.worldshiftx, player.y - 23, player.stamina, 100);
 		}
 		// DEATHS DRAWING
 		CP_Settings_Fill(black);
@@ -646,4 +700,5 @@ void L1_Exit(void)
 	CP_Image_Free(burn_sprite);
 	CP_Image_Free(fall_sprite);
 	CP_Image_Free(crush_sprite);
+	CP_Image_Free(goal_sprite);
 }

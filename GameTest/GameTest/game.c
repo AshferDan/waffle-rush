@@ -54,6 +54,7 @@ void Game_Init(void)
 	while (plat_index < numplats) {
 		// coordinate ints to read
 		// scan how many coordinates
+
 		fscanf_s(file, "%d", &Platform[plat_index].numcoords);
 		// for how many coordinates in platform
 		while (plat_coord_index < Platform[plat_index].numcoords) {
@@ -260,8 +261,9 @@ void Game_Update(void)
 
 	// Movement logics
 	movement(&player, movestate, speed, dt);
-	
+
 	// Collision against platforms
+	if (player.state != Dead) {
 		if (movestate == OnPlat && player.deathcause != Fall) {
 			player.stamina += 40.0f * dt;
 			for (int plat_index = 0; plat_index < numplats; plat_index++) {
@@ -280,20 +282,26 @@ void Game_Update(void)
 		}
 		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
 
-	// window clamps
+		// Collision against walls
+		CollWalls(walls, numwalls, &player, player, movestate);
+
+		// Jump
+		jump(&player);
+
+		// window clamps (eventually World Clamps)
 		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
 		if (player.y + player.height > height || player.y < 0) {
 			player.movey = 0;
 		}
 		player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);
 
-	// change movestate
-		/*
-		OnPlat	  - on platform
-		InPlat	  - inside platform
-		EnterPlat - from OnPlat to InPlat
-		ExitPlat  - from InPlat to OnPlat
-		*/
+		// change movestate
+			/*
+			OnPlat	  - on platform
+			InPlat	  - inside platform
+			EnterPlat - from OnPlat to InPlat
+			ExitPlat  - from InPlat to OnPlat
+			*/
 		if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
 			start_transition(&player, &movestate);
 		}
@@ -302,17 +310,15 @@ void Game_Update(void)
 			end_transition(&player, &movestate);
 		}
 
-	// reset with R or touch ground while movestate OnPlat
+		// reset with R or touch ground while movestate OnPlat
 		if (CP_Input_KeyTriggered(KEY_R) && player.state != Dead) {
 			CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
 			Kill_Player(&player, reset, &deaths);
 		}
 		if ((player.y >= height - player.height) && movestate == OnPlat && player.deathcause != Fall) {
-			/*Reset_Player(&player, &movestate);
-			deaths++;*/
 			Kill_Player(&player, Fall, &deaths);
 		}
-
+	}
 	}
 #pragma endregion
 
