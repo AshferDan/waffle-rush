@@ -253,6 +253,8 @@ void L2_Init(void)
 	camera.width = camera.limitrightx - camera.limitleftx; //
 	camera.height = camera.limitbase - camera.limittop; //since base is a bigger number than the top number.
 	camera.worldshiftx = 0;
+	camera.worldshifty = 0;
+
 
 
 #pragma endregion
@@ -449,7 +451,7 @@ void L2_Update(void)
 
 		// Goal
 		if (!isCleared) {
-			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly, 100, 100, 0, 0, 32, 32, 255);
+			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly-camera.worldshifty, 100, 100, 0, 0, 32, 32, 255);
 		}
 		else {
 			if (clear_timer <= 3) {
