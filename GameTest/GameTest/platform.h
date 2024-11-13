@@ -179,6 +179,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			// Condition checks
 			int onplatform;
 			int walljump;
+			int wallhug;
 			int withinx;
 			int leaveplatform;
 			PlayerState state;
@@ -233,7 +234,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		void CollPlatforms(int plat_index, platform plt, Player* p, Player ply);
 		void CollOnPlatforms(int plat_index, platform plt, Player* p, Player ply);
 
-		void CollWalls(platblocks walls[], int num, Player* pply, Player ply);
+		void CollWalls(platblocks walls[], int num, Player* pply, Player ply, MoveState movestate);
 
 	#pragma endregion 
 	

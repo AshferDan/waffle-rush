@@ -358,7 +358,7 @@ void L2_Update(void)
 		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
 
 		// Collision against walls
-		CollWalls(walls, numwalls, &player, player);
+		CollWalls(walls, numwalls, &player, player, movestate);
 
 		// window clamps
 		/*player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);

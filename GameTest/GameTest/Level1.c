@@ -168,6 +168,8 @@ void L1_Init(void)
 	// movement
 	player.movex = 0;
 	player.movey = 0;
+	player.walljump = 0;
+	player.wallhug = 0;
 	// anim timers
 	player.transition_time = 15;
 	player.death_time = 17;
@@ -249,8 +251,9 @@ void L1_Init(void)
 	camera.height = camera.limitbase - camera.limittop; //since base is a bigger number than the top number.
 	camera.worldshiftx = 0;
 
-
 #pragma endregion
+	//CP_System_SetFrameRate(30);
+
 }
 
 void L1_Update(void)
@@ -331,10 +334,12 @@ void L1_Update(void)
 		}
 
 	// Movement logics
+
+		printf("player.movex %f | player.movey %f\n", player.movex, player.movey);
 	movement(&player, movestate, speed, dt);
 
-	printf("movex %f\n", player.movex);
 	// Collision against platforms
+	if (player.state != Dead) {
 		if (movestate == OnPlat && player.deathcause != Fall) {
 			player.stamina += 40.0f * dt;
 			for (int plat_index = 0; plat_index < numplats; plat_index++) {
@@ -354,8 +359,23 @@ void L1_Update(void)
 		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
 
 		// Collision against walls
-		CollWalls(walls, numwalls, &player, player);
+		CollWalls(walls, numwalls, &player, player, movestate);
 
+		if (CP_Input_KeyTriggered(KEY_SPACE)) {
+			if (((player.onplatform == 0) && player.state == Sliding && player.walljump == 1)) {
+				player.walljump = 0;
+				player.movey = -500;
+				if (player.direction == OnLeft) {
+					player.movex = 600;
+				}
+				else if (player.direction == OnRight) {
+					player.movex = -600;
+				}
+			}
+			if (player.onplatform) {
+				player.movey = -600;
+			}
+		}
 		// window clamps
 		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
 		if (player.y + player.height > height || player.y < 0) {
@@ -363,13 +383,13 @@ void L1_Update(void)
 		}
 		player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);
 
-	// change movestate
-		/*
-		OnPlat	  - on platform
-		InPlat	  - inside platform
-		EnterPlat - from OnPlat to InPlat
-		ExitPlat  - from InPlat to OnPlat
-		*/
+		// change movestate
+			/*
+			OnPlat	  - on platform
+			InPlat	  - inside platform
+			EnterPlat - from OnPlat to InPlat
+			ExitPlat  - from InPlat to OnPlat
+			*/
 		if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
 			start_transition(&player, &movestate);
 		}
@@ -378,7 +398,7 @@ void L1_Update(void)
 			end_transition(&player, &movestate);
 		}
 
-	// reset with R or touch ground while movestate OnPlat
+		// reset with R or touch ground while movestate OnPlat
 		if (CP_Input_KeyTriggered(KEY_R) && player.state != Dead) {
 			CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
 			Kill_Player(&player, reset, &deaths);
@@ -386,7 +406,7 @@ void L1_Update(void)
 		if ((player.y >= height - player.height) && movestate == OnPlat && player.deathcause != Fall) {
 			Kill_Player(&player, Fall, &deaths);
 		}
-		
+	}
 #pragma endregion
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
