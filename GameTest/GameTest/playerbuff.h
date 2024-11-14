@@ -22,7 +22,8 @@
 //}playerBuff;
 
 typedef struct buffs{//we use this to get the quantitative amount of these buffs
-	int activestate; //whether its there 
+	int canPickup; //whether its there
+	//int playerActive; //whether player has it
 	float X; //for drawing
 	float Y; //for drawing
 	float width; //for drawing
@@ -33,7 +34,7 @@ typedef struct buffs{//we use this to get the quantitative amount of these buffs
 	float buffduration; //duration for each buff
 }buffs;
 
-enum playerQualities  //we use this as a qualitative indicator of player powerup state
+enum playerQualities  //we use this as a qualitative indicator of player powerup state 
 {slowTime = 0b001, 
 jumpBuff = 0b010, 
 invulBuff = 0b100}; //states/bool

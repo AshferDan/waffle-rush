@@ -13,7 +13,7 @@
 #include "playerbuff.h"
 #include "platform.h"
 
-int buffstate = 0b000;  //init here, logic here, application in level2.c
+//int buffstate = 0b000;  //init here, logic here, application in level2.c
 //init collision =0;
 
 

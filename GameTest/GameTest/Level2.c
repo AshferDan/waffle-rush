@@ -14,6 +14,7 @@
 #define num_levels 5
 level levels[num_levels];
 float timeElapsed;
+int buffstate;
 
 void L2_Init(void)
 {
@@ -55,12 +56,13 @@ void L2_Init(void)
 	//example of how to access buffs Buff[0].timeslowed = CP_System_GetDt();
 
 	// initialize powerups location
-	Buff[slowTime].activestate = 1; //if active,
-	Buff[slowTime].X = 100; //draw
-	Buff[slowTime].Y = 575; //draw
-	Buff[slowTime].width = 20; //draw
-	Buff[slowTime].height = 20; //draw
-	Buff[slowTime].buffduration = 20 * CP_System_GetDt();
+	Buff[jumpBuff].canPickup = 1; //if active,
+	Buff[jumpBuff].X = 100; //draw
+	Buff[jumpBuff].Y = 575; //draw
+	Buff[jumpBuff].width = 20; //draw
+	Buff[jumpBuff].height = 20; //draw
+	Buff[jumpBuff].buffduration = 3; //seconds?
+	buffstate = 0b000;
 	
 
 	// PLATFORMS INITIALIZATION
@@ -258,8 +260,8 @@ void L2_Init(void)
 #pragma region Camera Init
 	
 	camera.limitleftx = width * 1.0f / 10.0f; //
-	camera.limitrightx = width * 9.0f / 10.0f; //
-	camera.limittop = height * 0.3f; //
+	camera.limitrightx = width * 4.0f / 10.0f; //
+	camera.limittop = height * 0.65f; //
 	camera.limitbase = height * 0.8f; //  
 	camera.width = camera.limitrightx - camera.limitleftx; //
 	camera.height = camera.limitbase - camera.limittop; //since base is a bigger number than the top number.
@@ -419,15 +421,22 @@ void L2_Update(void)
 
 
 		//checking for collision between players and buff
-		//is_colliding(Buff[slowTime].X+camera.worldshiftx, Buff[slowTime].Y+camera.worldshifty, Buff[slowTime].width, Buff[slowTime].height);
-		if (is_colliding(Buff[slowTime].X, Buff[slowTime].Y, Buff[slowTime].height, Buff[slowTime].width)) {
-			printf("colliding lmao");
-			Buff[slowTime].activestate = 0;
+		//is_colliding(Buff[jumpBuff].X+camera.worldshiftx, Buff[jumpBuff].Y+camera.worldshifty, Buff[jumpBuff].width, Buff[jumpBuff].height);
+		if (is_colliding(Buff[jumpBuff].X, Buff[jumpBuff].Y, Buff[jumpBuff].height, Buff[jumpBuff].width)) {
+			buffstate = buffstate | jumpBuff;
+			Buff[jumpBuff].canPickup = 0; //print
 			//insert playerbuff is available ie
-			//
 		}
-		
 
+		if (buffstate != 0b000 && Buff[jumpBuff].buffduration >= 0.00f) {
+			Buff[jumpBuff].buffduration -= 1 * dt;
+			printf("buff: %d\n", buffstate);
+			printf("duration: %f\n", Buff[jumpBuff].buffduration);
+		}
+		else if (buffstate != 0b000 && Buff[jumpBuff].buffduration < 0.00f) {
+			buffstate = 0b000;
+			Buff[jumpBuff].buffduration = 3; //maybe can functionise these two to reset
+		}
 
 
 
@@ -455,9 +464,6 @@ void L2_Update(void)
 
 		// CAMERA UPDATE
 		/*---------------------------------------------------------------------------------------------------*/
-		//implement the below logic later. do the main camera first.
-		//camera.limitleftx =  camera.limitleftx  + offsetX;
-		//camera.limitrightx = camera.limitrightx + offsetX;
 #pragma region Camera
 		playerCamColl(&player, &camera); //functionised my camera shift. 
 		//where worldshiftx is now the modifyable for all objects
@@ -465,7 +471,7 @@ void L2_Update(void)
 		printf("limitleftx %f| limitrightx %f\n", camera.limitleftx, camera.limitrightx);
 		CP_Settings_NoFill();
 		CP_Settings_RectMode(CP_POSITION_CORNER);
-		CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop - camera.worldshifty, camera.width, camera.height); //code for rectangle
+		//CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop - camera.worldshifty, camera.width, camera.height); //code for rectangle
 
 
 #pragma endregion
@@ -581,9 +587,9 @@ void L2_Update(void)
 		}
 
 		//PowerUps drawing 
-		if (Buff[slowTime].activestate == 1) {
+		if (Buff[jumpBuff].canPickup == 1) {
 			CP_Settings_Fill(CP_Color_Create(100, 100, 100, 255));
-			CP_Graphics_DrawRect(Buff[slowTime].X-camera.worldshiftx, Buff[slowTime].Y-camera.worldshifty, Buff[slowTime].width, Buff[slowTime].height);
+			CP_Graphics_DrawRect(Buff[jumpBuff].X-camera.worldshiftx, Buff[jumpBuff].Y-camera.worldshifty, Buff[jumpBuff].width, Buff[jumpBuff].height);
 		}
 
 		// Stamina Bar
