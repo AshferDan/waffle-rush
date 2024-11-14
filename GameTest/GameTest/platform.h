@@ -34,6 +34,7 @@ float speed; //speed
 float width, height; //window width/height
 float spawnx, spawny, goalx, goaly; // spawn and goal position
 int isPaused; // check if game paused
+int canMove;  //if player can move
 int isCleared; // check if level cleared (player touches goal)
 int levelScore; // level score
 int highScore; // level high score
@@ -42,6 +43,7 @@ int levelNumber; // level number
 // Graphics
 CP_Image player_sprite, transition_sprite;
 
+float playerLastX, playerLastY;   //last player coords recorded, mainly used in level transition sequence
 float player_sprite_x, player_sprite_y;
 float transit_sprite_x, transit_sprite_y;
 

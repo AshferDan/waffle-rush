@@ -152,6 +152,9 @@ void MainMenu1_Init(void)
 	// game pause
 	isPaused = 0;
 
+	//if the player can move
+	canMove = 1;
+
 	// check if level complete
 	isCleared = 0;
 
@@ -235,7 +238,7 @@ void MainMenu1_Update(void)
 #pragma region Movement
 
 	// Pause check
-	if (isPaused == 0) {
+	if (isPaused == 0 || canMove == 1) {
 
 	// Animation Timer
 		player.anim += 10 * dt;
@@ -256,7 +259,9 @@ void MainMenu1_Update(void)
 		}
 
 	// Movement logics
-		movement(&player, movestate, speed, dt);
+		if (canMove) {
+			movement(&player, movestate, speed, dt);
+		}
 
 	// Collision against platforms
 		if (movestate == OnPlat) {
@@ -416,33 +421,40 @@ void MainMenu1_Update(void)
 
 	if (CP_Input_KeyTriggered(KEY_P)) {
 		levelEnded = 1;
+		playerLastX = player.x;
+		playerLastY = player.y;
 	}
 	if (CP_Input_KeyDown(KEY_O)) {
 		levelEnded = 2;
 	}
 
 	if (levelEnded == 1) {
-		scaler1 += player.x * dt;
-		scaler2 += (width - player.x) * dt;
-		scaler3 += player.y * dt;
-		scaler4 += (height - player.y) * dt;
-		TransitionInBoxEffect(player.x, player.y, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
+		canMove = 0;
+		scaler1 += (playerLastX + player.width / 2) * dt;
+		scaler2 += (width - playerLastX + player.width / 2) * dt;
+		scaler3 += (playerLastY + player.height / 2) * dt;
+		scaler4 += (height - playerLastY + player.height / 2) * dt;
+		TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
 
-		if (scaler1 >= player.x) {
+		if (scaler1 >= playerLastX) {
 			levelEnded = 2;
 		}
 	}
 
 	if (levelEnded == 2) {
-		scaler1 -= player.x * dt;
-		scaler2 -= (width - player.x) * dt;
-		scaler3 -= player.y * dt;
-		scaler4 -= (height - player.y) * dt;
-		TransitionInBoxEffect(player.x, player.y, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
+		canMove = 1;
+		scaler1 -= (playerLastX + player.width/2) * dt;
+		scaler2 -= (width - playerLastX + player.width/2) * dt;
+		scaler3 -= (playerLastY + player.height/2) * dt;
+		scaler4 -= (height - playerLastY + player.height/2) * dt;
+		TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
 
-		if (scaler1 <= 0) {
+		if (scaler1 <= 0 && scaler2 <= 0 && scaler3 <= 0 && scaler4 <= 0) {
 			levelEnded = 0;
 		}
+	}
+	if (levelEnded == 0) {
+		scaler1 = scaler2 = scaler3 = scaler4 = 0;
 	}
 
 	// Back to main menu
