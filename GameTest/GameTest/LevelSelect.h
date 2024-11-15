@@ -37,6 +37,10 @@ void Game_Init(void);
 void Game_Update(void);
 void Game_Exit(void);
 
+void Tutorial_Init(void);
+void Tutorial_Update(void);
+void Tutorial_Exit(void);
+
 
 void L1_Init(void);
 void L1_Update(void);

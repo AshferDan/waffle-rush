@@ -43,8 +43,8 @@ void L1_Init(void)
 	fclose(file2);
 
 	// initialize spawn location
-	spawnx = 150;
-	spawny = 200;
+	spawn.x = 150;
+	spawn.y = 200;
 	// initialize test goal
 	goalx = 1500;
 	goaly = 200;
@@ -167,8 +167,8 @@ void L1_Init(void)
 	player.width = 20;
 	player.height = 20;
 	// position
-	player.x = spawnx;
-	player.y = spawny;
+	player.x = spawn.x;
+	player.y = spawn.y;
 	// movement
 	player.movex = 0;
 	player.movey = 0;
@@ -177,6 +177,7 @@ void L1_Init(void)
 	// anim timers
 	player.transition_time = 15;
 	player.death_time = 17;
+	player.spawn_time = 35;
 	// health
 	player.stamina = 100.0f;
 	// anim state
@@ -245,9 +246,9 @@ void L1_Init(void)
 		/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Camera Init
 
-	camera.limitleftx = width * 1.0f / 10.0f; //
-	camera.limitrightx = width * 9.0f / 10.0f; //
-	camera.limittop = height * 0.3f; //
+	camera.limitleftx = width * 2.0f / 10.0f; //
+	camera.limitrightx = width * 8.0f / 10.0f; //
+	camera.limittop = height * 0.2f; //
 	camera.limitbase = height * 0.8f; //  
 	camera.width = camera.limitrightx - camera.limitleftx; //
 	camera.height = camera.limitbase - camera.limittop; //since base is a bigger number than the top number.
@@ -368,11 +369,11 @@ void L1_Update(void)
 		jump(&player);
 
 		// window clamps (eventually World Clamps)
-		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
-		if (player.y + player.height > height || player.y < 0) {
-			player.movey = 0;
-		}
-		player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);
+		//player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
+		//if (player.y + player.height > height || player.y < 0) {
+		//	player.movey = 0;
+		//}
+		//player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);
 
 		// change movestate
 			/*
@@ -390,7 +391,7 @@ void L1_Update(void)
 		}
 
 		// reset with R or touch ground while movestate OnPlat
-		if (CP_Input_KeyTriggered(KEY_R) && player.state != Dead) {
+		if (CP_Input_KeyTriggered(KEY_R) && (player.state != Dead)) {
 			CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
 			Kill_Player(&player, reset, &deaths);
 		}
@@ -695,10 +696,10 @@ void L1_Update(void)
 
 void L1_Exit(void)
 {
-	CP_Image_Free(player_sprite);
-	CP_Image_Free(transition_sprite);
-	CP_Image_Free(burn_sprite);
-	CP_Image_Free(fall_sprite);
-	CP_Image_Free(crush_sprite);
-	CP_Image_Free(goal_sprite);
+	CP_Image_Free(&player_sprite);
+	CP_Image_Free(&transition_sprite);
+	CP_Image_Free(&burn_sprite);
+	CP_Image_Free(&fall_sprite);
+	CP_Image_Free(&crush_sprite);
+	CP_Image_Free(&goal_sprite);
 }

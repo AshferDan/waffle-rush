@@ -430,9 +430,9 @@ void Game_Update(void)
 
 void Game_Exit(void)
 {
-	CP_Image_Free(player_sprite);
-	CP_Image_Free(transition_sprite);
-	CP_Image_Free(burn_sprite);
-	CP_Image_Free(fall_sprite);
-	CP_Image_Free(crush_sprite);
+	CP_Image_Free(&player_sprite);
+	CP_Image_Free(&transition_sprite);
+	CP_Image_Free(&burn_sprite);
+	CP_Image_Free(&fall_sprite);
+	CP_Image_Free(&crush_sprite);
 }

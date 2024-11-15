@@ -514,14 +514,14 @@ void jump(Player* player) {
 				if (collision_direction(Platform[plat_index].onblocks[block_index], ply) == 1) {
 					pply->movex = 0;
 				}
-				if (!(pply->onplatform) && pply->x == Platform[plat_index].onblocks[block_index].x2 && CP_Input_KeyDown(KEY_A)) {
+				if (!(pply->onplatform) && pply->x == Platform[plat_index].onblocks[block_index].x2 && CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D))) {
 					pply->state = Sliding;
 					if (pply->movey >= 400) {
 						pply->movey = 400;
 					}
 
 				}
-				else if (!(pply->onplatform) && pply->x + pply->width == Platform[plat_index].onblocks[block_index].x1 && CP_Input_KeyDown(KEY_D)) {
+				else if (!(pply->onplatform) && pply->x + pply->width == Platform[plat_index].onblocks[block_index].x1 && CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A))) {
 					pply->state = Sliding;
 					if (pply->movey >= 400) {
 						pply->movey = 400;
@@ -541,7 +541,6 @@ void jump(Player* player) {
 	void CollWalls(platblocks walls[], int num, Player* pply, Player ply, MoveState movestate) {
 		movestate = movestate;
 
-		printf("movestate %d\n", movestate);
 		// iterate through number of coordinates
 		for (int wall_index = 0; wall_index < numwalls; wall_index++) {
 			// check for collision
@@ -580,14 +579,14 @@ void jump(Player* player) {
 						pply->movex = 0;
 					}
 					if (movestate == OnPlat) {
-						if (pply->x == walls[wall_index].x2 && CP_Input_KeyDown(KEY_A)) {
+						if (pply->x == walls[wall_index].x2 && CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D))) {
 							pply->state = Sliding;
 							if (pply->movey >= 400) {
 								pply->movey = 400;
 							}
 
 						}
-						else if (pply->x + pply->width == walls[wall_index].x1 && CP_Input_KeyDown(KEY_D)) {
+						else if (pply->x + pply->width == walls[wall_index].x1 && CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A))) {
 							pply->state = Sliding;
 							if (pply->movey >= 400) {
 								pply->movey = 400;
@@ -617,8 +616,8 @@ void jump(Player* player) {
 		}
 	}
 	void Reset_Player(Player* player, MoveState* movestate) {
-		player->x = spawnx;
-		player->y = spawny;
+		player->x = spawn.x;
+		player->y = spawn.y;
 		*movestate = OnPlat;
 		player->state = Idle;
 		player->anim = 0;
@@ -645,6 +644,8 @@ void DrawPlatform(int plat_index) {
 
 void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 	// Normal Player
+	float draw_posx = player.x - 15 - camera.worldshiftx;
+	float draw_posy = player.y - 15 - camera.worldshifty;
 	float sprite_x = 0;
 	float sprite_y = 0;
 	float rot = 0;
@@ -705,14 +706,14 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 				sprite_x = 90;
 				break;
 			}
-			CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15 - camera.worldshiftx, player.y - 15 - camera.worldshifty, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 255, rot);
+			CP_Image_DrawSubImageAdvanced(player_sprite, draw_posx, draw_posy, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 255, rot);
 		}
 		else
 		{
 			sprite_y = (movestate == EnterPlat) ? 36 : 0;
 
 			sprite_x = ((int)player.transition_time / 1) * 18;
-			CP_Image_DrawSubImage(transition_sprite, player.x - 15 - camera.worldshiftx, player.y - 15 - camera.worldshifty, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
+			CP_Image_DrawSubImage(transition_sprite, draw_posx, draw_posy, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
 		}
 	}
 	else {
@@ -751,7 +752,7 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 		
 		}
 
-		CP_Image_DrawSubImage(death_sprite, player.x - 15 - camera.worldshiftx, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
+		CP_Image_DrawSubImage(death_sprite, draw_posx, draw_posy, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
 	}
 }
 

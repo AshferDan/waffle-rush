@@ -18,6 +18,7 @@
 #define max_coords 16
 #define max_platforms 20
 #define max_walls 20
+#define max_checkpoint 4
 
 // Platformer globals
 typedef enum MoveState {
@@ -76,6 +77,10 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		typedef struct coords {
 			float x, y;
 		} coords;
+
+		coords spawn;
+
+		coords checkpoint[max_checkpoint];
 
 		// platform hitbox struct
 		typedef struct platblocks {
@@ -140,6 +145,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			Sliding,
 			Crawling,
 			Dead,
+			Spawning,
 		} PlayerState;
 		
 		typedef enum PlayerDirection {
@@ -175,6 +181,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			// Animation timers
 			float transition_time;
 			float death_time;
+			float spawn_time;
 
 			// Condition checks
 			int onplatform;
