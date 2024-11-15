@@ -32,6 +32,7 @@ MoveState movestate;
 
 // Level Variables
 int numplats;
+int numcheckpoints;
 int deaths;
 float speed; //speed
 int width, height; //window width/height
@@ -43,7 +44,7 @@ int highScore; // level high score
 int levelNumber; // level number
 
 // Graphics
-CP_Image player_sprite, transition_sprite, burn_sprite, fall_sprite, crush_sprite, goal_sprite;
+CP_Image player_sprite, transition_sprite, spawn_sprite, burn_sprite, fall_sprite, crush_sprite, goal_sprite;
 
 float player_sprite_x, player_sprite_y;
 float transit_sprite_x, transit_sprite_y;
@@ -80,7 +81,12 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 
 		coords spawn;
 
-		coords checkpoint[max_checkpoint];
+		typedef struct Checkpoint {
+			coords coordinates;
+			int active;
+		} Checkpoint;
+
+		Checkpoint checkpoint[max_checkpoint];
 
 		// platform hitbox struct
 		typedef struct platblocks {
@@ -251,6 +257,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 	
 	// Reset Player
 	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths);
+	void Spawn_Player(Player* player);
 	void Reset_Player(Player* player, MoveState* movestate);
 
 	// Draw Platforms

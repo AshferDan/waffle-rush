@@ -64,7 +64,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	PlayerDirection tempdirV = Null;
 	PlayerDirection tempdirH = Null;
 
-	if (ply->state != Dead) {
+	if (!(player.state == Dead || player.state == Spawning)) {
 		// OnPlat movement
 		if (movestate == OnPlat) {
 			tempdirH = Null;
@@ -611,19 +611,26 @@ void jump(Player* player) {
 			player->state = Dead;
 			player->deathcause = deathcause;
 			player->death_time = 0;
+			player->spawn_time = 0;
 			player->movey = (deathcause != Fall) ? 0 : -300;
 			++*deaths;
 		}
 	}
-	void Reset_Player(Player* player, MoveState* movestate) {
+
+	void Spawn_Player(Player* player) {
 		player->x = spawn.x;
 		player->y = spawn.y;
+		player->movex = 0;
+		player->movey = 0;
+		player->state = Spawning;
+	}
+
+	void Reset_Player(Player* player, MoveState* movestate) {
+		player->movey = -100;
 		*movestate = OnPlat;
 		player->state = Idle;
 		player->anim = 0;
 		player->direction = OnRight;
-		player->movex = 0;
-		player->movey = 0;
 		player->deathcause = Reset;
 	}
 #pragma endregion
@@ -649,7 +656,7 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 	float sprite_x = 0;
 	float sprite_y = 0;
 	float rot = 0;
-	if (player.state != Dead) {
+	if (!(player.state == Dead || player.state == Spawning)) {
 		if (movestate == InPlat || movestate == OnPlat) {
 			switch (player.direction) {
 			case OnLeft:
@@ -716,7 +723,7 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 			CP_Image_DrawSubImage(transition_sprite, draw_posx, draw_posy, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
 		}
 	}
-	else {
+	else if (player.state == Dead) {
 		CP_Image death_sprite;
 		switch (player.deathcause) {
 		case Burn: {

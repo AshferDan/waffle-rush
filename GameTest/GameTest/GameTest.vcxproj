@@ -44,6 +44,7 @@
     <Text Include="..\Assets\Level2.txt" />
     <Text Include="..\Assets\Level2wall.txt" />
     <Text Include="..\Assets\LevelSelect.txt" />
+    <Text Include="..\Assets\Level_Tutorial\Checkpoint.txt" />
     <Text Include="..\Assets\Level_Tutorial\Hazard.txt" />
     <Text Include="..\Assets\Level_Tutorial\Platform.txt" />
     <Text Include="..\Assets\Level_Tutorial\Wall.txt" />

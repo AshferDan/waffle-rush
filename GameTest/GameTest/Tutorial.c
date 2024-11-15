@@ -24,7 +24,8 @@ void Tutorial_Init(void)
 
 	// load player sprite
 	player_sprite		= CP_Image_Load("Assets/Player_Sprites.png");
-	transition_sprite	= CP_Image_Load("Assets/transition.png");
+	transition_sprite	= CP_Image_Load("Assets/Transition.png");
+	spawn_sprite		= CP_Image_Load("Assets/Spawn_Sprite.png");
 	burn_sprite			= CP_Image_Load("Assets/Burnt.png");
 	fall_sprite			= CP_Image_Load("Assets/Fall_Sprite.png");
 	crush_sprite		= CP_Image_Load("Assets/Crush_Sprite.png");
@@ -42,9 +43,22 @@ void Tutorial_Init(void)
 	}
 	fclose(file2);
 
+	FILE* CheckpointFile = fopen("Assets/Level_Tutorial/Checkpoint.txt", "r");
+	fscanf_s(CheckpointFile, "%d", &numcheckpoints);
+	for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
+		int x = 0;
+		int y = 0;
+		fscanf_s(CheckpointFile, "%d %d", &x, &y);
+		checkpoint[checkpoint_index].coordinates = (coords){ x, y };
+		checkpoint[checkpoint_index].active = 0;
+	}
+	fclose(CheckpointFile);
+	checkpoint[0].active = 1;
+
+
 	// initialize spawn location
-	spawn.x = 200;
-	spawn.y = 200;
+	spawn.x = checkpoint[0].coordinates.x - 10;
+	spawn.y = checkpoint[0].coordinates.y - 60;
 	// initialize test goal
 	goalx = 2400;
 	goaly = 700;
@@ -177,7 +191,7 @@ void Tutorial_Init(void)
 	// anim timers
 	player.transition_time = 15;
 	player.death_time = 17;
-	player.spawn_time = 35;
+	player.spawn_time = 34;
 	// health
 	player.stamina = 100.0f;
 	// anim state
@@ -331,10 +345,20 @@ void Tutorial_Update(void)
 		}
 		if (player.death_time >= 17) {
 			if (player.state == Dead) {
-				Reset_Player(&player, &movestate);
+				Spawn_Player(&player);
 				player.movex = 0;
 			}
 			player.death_time = 17;
+		}
+		printf("LINE 1: player.state %d | player.spawn_time %f\n", player.state, player.spawn_time);
+		if (player.spawn_time < 34 && player.state == Spawning) {
+			player.spawn_time += 34 * dt;
+
+		}
+		if (player.spawn_time > 34 && player.state == Spawning) {
+			Reset_Player(&player, &movestate);
+			player.spawn_time = 34;
+
 		}
 
 		// Movement logics
@@ -343,7 +367,7 @@ void Tutorial_Update(void)
 		}
 
 	// Collision against platforms
-	if (player.state != Dead) {
+	if (!(player.state == Dead || player.state == Spawning)) {
 		if (movestate == OnPlat && player.deathcause != Fall) {
 			player.stamina += 40.0f * dt;
 			for (int plat_index = 0; plat_index < numplats; plat_index++) {
@@ -365,6 +389,7 @@ void Tutorial_Update(void)
 		// Collision against walls
 		CollWalls(walls, numwalls, &player, player, movestate);
 
+		printf("LINE 2: player.state %d | player.spawn_time %f\n", player.state, player.spawn_time);
 		// Jump
 		jump(&player);
 
@@ -389,11 +414,9 @@ void Tutorial_Update(void)
 		if (player.transition_time >= 13) {
 			end_transition(&player, &movestate);
 		}
-		printf("playerx      %-10f | playery      %-10f\n", player.x, player.y);
-		printf("player.movex %-10f | player.movey %-10f\n", player.movex, player.movey);
 
 		// reset with R or touch ground while movestate OnPlat
-		if (CP_Input_KeyTriggered(KEY_R) && (player.state != Dead)) {
+		if (CP_Input_KeyTriggered(KEY_R) && !(player.state == Dead || player.state == Spawning)) {
 			CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
 			Kill_Player(&player, reset, &deaths);
 		}
@@ -401,6 +424,7 @@ void Tutorial_Update(void)
 			Kill_Player(&player, Fall, &deaths);
 		}
 	}
+
 #pragma endregion
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
@@ -428,9 +452,10 @@ void Tutorial_Update(void)
 		//camera.limitleftx =  camera.limitleftx  + offsetX;
 		//camera.limitrightx = camera.limitrightx + offsetX;
 #pragma region Camera
-		playerCamColl(&player, &camera); //functionised my camera shift. 
-		//where worldshiftx is now the modifyable for all objects
-
+		if (player.state != Dead) {
+			playerCamColl(&player, &camera); //functionised my camera shift. 
+			//where worldshiftx is now the modifyable for all objects
+		}
 		CP_Settings_NoFill();
 		CP_Settings_RectMode(CP_POSITION_CORNER);
 		CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop - camera.worldshifty, camera.width, camera.height); //code for rectangle
@@ -542,7 +567,19 @@ void Tutorial_Update(void)
 			}
 		}
 
+		// Checkpoint
+		for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
+			if (!checkpoint[checkpoint_index].active) {
+				CP_Image_DrawSubImage(spawn_sprite, checkpoint[checkpoint_index].coordinates.x - 50 - camera.worldshiftx, checkpoint[checkpoint_index].coordinates.y - 100 - camera.worldshifty, 100, 100, 1280, 0, 1344, 64, 255);
+			}
+			if (checkpoint[checkpoint_index].active) {
+				float spawn_sprite_x = (int)player.spawn_time * 64;
+				CP_Image_DrawSubImage(spawn_sprite, checkpoint[checkpoint_index].coordinates.x - 50 - camera.worldshiftx, checkpoint[checkpoint_index].coordinates.y - 100 - camera.worldshifty, 100, 100, spawn_sprite_x, 0, spawn_sprite_x+64, 64, 255);
+			}
+		}
 
+		 
+		
 		// Player
 		if (isCleared == 0) {
 			Draw_Player(player_sprite, player, movestate);
@@ -699,6 +736,7 @@ void Tutorial_Exit(void)
 {
 	CP_Image_Free(&player_sprite);
 	CP_Image_Free(&transition_sprite);
+	CP_Image_Free(&spawn_sprite);
 	CP_Image_Free(&burn_sprite);
 	CP_Image_Free(&fall_sprite);
 	CP_Image_Free(&crush_sprite);

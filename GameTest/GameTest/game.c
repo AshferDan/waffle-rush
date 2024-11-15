@@ -20,7 +20,7 @@ void Game_Init(void)
 
 	// load player sprite
 	player_sprite		= CP_Image_Load("Assets/Player_Sprites.png");
-	transition_sprite	= CP_Image_Load("Assets/transition.png");
+	transition_sprite	= CP_Image_Load("Assets/Transition.png");
 	burn_sprite			= CP_Image_Load("Assets/Burnt.png");
 	fall_sprite			= CP_Image_Load("Assets/Fall_Sprite.png");
 	crush_sprite		= CP_Image_Load("Assets/Crush_Sprite.png");
