@@ -106,9 +106,22 @@
     <Text Include="..\Assets\Level2.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="..\Assets\Level2wall.txt" />
-    <Text Include="..\Assets\Options.txt" />
-    <Text Include="..\Assets\Tutorial.txt">
+    <Text Include="..\Assets\Level_Tutorial\Checkpoint.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\Assets\Level_Tutorial\Hazard.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\Assets\Level2wall.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\Assets\Options.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\Assets\Level_Tutorial\Platform.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\Assets\Level_Tutorial\Wall.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

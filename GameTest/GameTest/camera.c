@@ -3,7 +3,7 @@
 // author:	AVID WAFFLE ENJOYERS
 // email:	-
 //
-// brief:	Credits page
+// brief:	Camera code
 //			
 //
 // Copyright © 2020 DigiPen, All rights reserved.
@@ -15,25 +15,26 @@
 void playerCamColl(Player *player, Camera* camera) {
 	float playerR = player->x + player->width;
 	float playerB = player->y + player->height;
+	if (player->state != Spawning) {
+		if (playerR > camera->limitrightx) {
+			camera->limitleftx += playerR - camera->limitrightx;
+			camera->limitrightx += playerR - camera->limitrightx;
 
-	if (playerR > camera->limitrightx) {
-		camera->limitleftx += playerR - camera->limitrightx;
-		camera->limitrightx += playerR -camera->limitrightx;
-
-	}
-	else if (player->x < camera->limitleftx) {
-		camera->limitrightx -= camera->limitleftx - player->x;
-		camera->limitleftx -= camera->limitleftx - player->x;
+		}
+		else if (player->x < camera->limitleftx) {
+			camera->limitrightx -= camera->limitleftx - player->x;
+			camera->limitleftx -= camera->limitleftx - player->x;
+		}
+		if (player->y < camera->limittop) {
+			camera->limitbase -= camera->limittop - player->y;
+			camera->limittop -= camera->limittop - player->y;
+		}
+		else if (playerB > camera->limitbase) {
+			camera->limittop += playerB - camera->limitbase;
+			camera->limitbase += playerB - camera->limitbase;
+		}
 	}
 	camera->worldshiftx = camera->limitleftx - camera->spawnX;
-	if (player->y < camera->limittop) {
-		camera->limitbase -= camera->limittop - player->y;
-		camera->limittop -= camera->limittop - player->y;
-	}
-	else if (playerB > camera->limitbase) {
-		camera->limittop += playerB - camera->limitbase;
-		camera->limitbase += playerB - camera->limitbase;
-	}
 	camera->worldshifty = camera->limittop - camera->spawnY;
 }
 

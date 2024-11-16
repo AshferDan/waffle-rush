@@ -373,6 +373,14 @@ void jump(Player* player) {
 			}
 		}
 	}
+
+	// Checkpoints
+	void reset_checkpoints(Checkpoint* checkpoint) {
+		for (int checkpoint_index = 0; checkpoint_index < max_checkpoints; checkpoint_index++) {
+			checkpoint->coordinates[checkpoint_index] = (coords){ 0,0 };
+		}
+		checkpoint->active = 0;
+	}
 #pragma endregion
 
 
@@ -627,12 +635,18 @@ void jump(Player* player) {
 		}
 	}
 
-	void Spawn_Player(Player* player) {
+	void Spawn_Player(Player* player, coords spawn,  Camera* camera) {
+		// Player changes
 		player->x = spawn.x;
 		player->y = spawn.y;
 		player->movex = 0;
 		player->movey = 0;
 		player->state = Spawning;
+		// Camera changes
+		camera->prespawnX = camera->limitleftx;
+		camera->prespawnY = camera->limittop;
+		camera->respawnX = spawn.x - camera->width / 2;
+		camera->respawnY = spawn.y - 3 * camera->height / 4;
 	}
 
 	void Reset_Player(Player* player, MoveState* movestate) {
@@ -659,13 +673,21 @@ void jump(Player* player) {
 // TIMER
 /*---------------------------------------------------------------------------------------------------*/
 #pragma region TIMERS
-	void player_anim_updates(Player* player, float dt, MoveState* movestate) {
+	void player_anim_updates(Player* player, float dt, MoveState* movestate, Camera* camera, coords spawn) {
 		player->anim += 10 * dt;
 		if (player->anim >= 20) {
 			player->anim = 0;
 		}
 		if (player->transition_time < 13) {
 			player->transition_time += 20 * dt;
+			if (*movestate == EnterPlat) {
+				camera->limitbase += 100 * dt;
+				camera->limittop += 100 * dt;
+			}
+			if (*movestate == ExitPlat) {
+				camera->limitbase -= 100 * dt;
+				camera->limittop -= 100 * dt;
+			}
 		}
 		if (player->transition_time > 13) {
 			player->transition_time = 13;
@@ -674,7 +696,7 @@ void jump(Player* player) {
 			if (player->deathcause != Fall) {
 				player->death_time += 17 * dt;
 			}
-			else if (player->y <= height - player->height) {
+			else if (player->y <= camera->limitbase + 400) {
 				player->movey += 1800.0f * dt;
 				player->y += player->movey * dt;
 			}
@@ -682,13 +704,17 @@ void jump(Player* player) {
 		}
 		if (player->death_time >= 17) {
 			if (player->state == Dead) {
-				Spawn_Player(player);
+				Spawn_Player(player, spawn, camera);
 				player->movex = 0;
 			}
 			player->death_time = 17;
 		}
 		if (player->spawn_time < 34 && player->state == Spawning) {
 			player->spawn_time += 34 * dt;
+			camera->limitleftx = camera->prespawnX - (player->spawn_time * ((camera->prespawnX - camera->respawnX)/34));
+			camera->limitrightx = camera->prespawnX + camera->width - (player->spawn_time * ((camera->prespawnX - camera->respawnX) / 34));
+			camera->limittop = camera->prespawnY - (player->spawn_time * ((camera->prespawnY - camera->respawnY) / 34));
+			camera->limitbase = camera->prespawnY + camera->height - (player->spawn_time * ((camera->prespawnY - camera->respawnY) / 34));
 		}
 		if (player->spawn_time > 34 && player->state == Spawning) {
 			Reset_Player(player, movestate);

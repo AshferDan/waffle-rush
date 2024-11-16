@@ -43,22 +43,23 @@ void Tutorial_Init(void)
 	}
 	fclose(file2);
 
+
+	// Initialize checkpoints and first spawn
+	reset_checkpoints(&checkpoint);
 	FILE* CheckpointFile = fopen("Assets/Level_Tutorial/Checkpoint.txt", "r");
 	fscanf_s(CheckpointFile, "%d", &numcheckpoints);
 	for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
 		int x = 0;
 		int y = 0;
 		fscanf_s(CheckpointFile, "%d %d", &x, &y);
-		checkpoint[checkpoint_index].coordinates = (coords){ x, y };
-		checkpoint[checkpoint_index].active = 0;
+		checkpoint.coordinates[checkpoint_index] = (coords){ x, y };
 	}
 	fclose(CheckpointFile);
-	checkpoint[0].active = 1;
 
 
 	// initialize spawn location
-	spawn.x = checkpoint[0].coordinates.x - 10;
-	spawn.y = checkpoint[0].coordinates.y - 60;
+	spawn.x = checkpoint.coordinates[0].x - 10;
+	spawn.y = checkpoint.coordinates[0].y - 60;
 	// initialize test goal
 	goalx = 2400;
 	goaly = 700;
@@ -323,7 +324,7 @@ void Tutorial_Update(void)
 	if (isPaused == 0) {
 
 		// Animation Timer
-		player_anim_updates(&player, dt, &movestate);
+		player_anim_updates(&player, dt, &movestate, &camera, spawn);
 		
 		// Movement logics
 		if (isCleared == 0) {
@@ -353,6 +354,15 @@ void Tutorial_Update(void)
 			// Collision against walls
 			CollWalls(walls, numwalls, &player, player, movestate);
 
+			// Update active checkpoint
+			for (int cp_index = 0; cp_index < numcheckpoints; cp_index++) {
+				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, checkpoint.coordinates[cp_index].x - 50, checkpoint.coordinates[cp_index].y - 100, 100, 100)) {
+					checkpoint.active = cp_index;
+					spawn.x = checkpoint.coordinates[cp_index].x - 10;
+					spawn.y = checkpoint.coordinates[cp_index].y - 60;
+				}
+			}
+
 			// Jump
 			jump(&player);
 
@@ -378,7 +388,7 @@ void Tutorial_Update(void)
 				end_transition(&player, &movestate);
 			}
 			// reset with R or touch ground while movestate OnPlat
-			if (CP_Input_KeyTriggered(KEY_R) && !(player.state == Dead || player.state == Spawning)) {
+			if (CP_Input_KeyTriggered(KEY_R) && !(player.state == Dead || player.state == Spawning) && !isCleared) {
 				CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
 				Kill_Player(&player, reset, &deaths);
 			}
@@ -414,7 +424,7 @@ void Tutorial_Update(void)
 		//camera.limitleftx =  camera.limitleftx  + offsetX;
 		//camera.limitrightx = camera.limitrightx + offsetX;
 #pragma region Camera
-		if (player.state != Dead) {
+		if (!(player.state == Dead /*|| player.state == Spawning*/)) {
 			playerCamColl(&player, &camera); //functionised my camera shift. 
 			//where worldshiftx is now the modifyable for all objects
 		}
@@ -503,12 +513,12 @@ void Tutorial_Update(void)
 
 		// Checkpoint
 		for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
-			if (!checkpoint[checkpoint_index].active) {
-				CP_Image_DrawSubImage(spawn_sprite, checkpoint[checkpoint_index].coordinates.x - 50 - camera.worldshiftx, checkpoint[checkpoint_index].coordinates.y - 100 - camera.worldshifty, 100, 100, 1472, 0, 1536, 64, 255);
+			if (checkpoint_index != checkpoint.active) {
+				CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50 - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, 1472, 0, 1536, 64, 255);
 			}
-			if (checkpoint[checkpoint_index].active) {
+			if (checkpoint_index == checkpoint.active) {
 				float spawn_sprite_x = (int)player.spawn_time * 64;
-				CP_Image_DrawSubImage(spawn_sprite, checkpoint[checkpoint_index].coordinates.x - 50 - camera.worldshiftx, checkpoint[checkpoint_index].coordinates.y - 100 - camera.worldshifty, 100, 100, spawn_sprite_x, 0, spawn_sprite_x+64, 64, 255);
+				CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50 - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, spawn_sprite_x, 0, spawn_sprite_x+64, 64, 255);
 			}
 		}
 
