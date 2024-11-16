@@ -108,7 +108,7 @@ void L1_Init(void)
 		fscanf_s(HazardFile, "%d", &traps[i].type);
 		switch (traps[i].type)
 		{
-		case 0:
+		case spike:
 		{
 			int j = 0;
 			for (; j < 3; ++j)
@@ -117,7 +117,7 @@ void L1_Init(void)
 			}
 			break;
 		}
-		case 1:
+		case crusher:
 		{
 			int j = 0;
 			for (; j < 3; ++j)
@@ -126,7 +126,7 @@ void L1_Init(void)
 			}
 			break;
 		}
-		case 2:
+		case shooter:
 		{
 			int j = 0;
 			for (; j < 3; ++j)
@@ -365,14 +365,32 @@ void L1_Update(void)
 		if (crusherstate == 0) {
 			crushervely = 1000.f * dt;
 			traps[4].y[2] += crushervely;
-			//traps[4].y[0] += crushervely;
 			if (traps[4].y[2] > 600) {
 				traps[4].y[2] = 600;
 				crusherstate = 1;
 			}
-			//if the player hits the crusher, add death and reset
+			//if the player hits the crusher at the bottom, add death and reset
 			if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
-				Kill_Player(&player, &deaths);
+				if (crusher_direction(traps[4], player) == 1) {
+					if (player.x >= ((traps[4].x[1] + traps[4].x[0]) / 2.f)) {
+						player.x = 300;
+						player.movex = 0;
+					}
+					else if (player.x <= ((traps[4].x[1] + traps[4].x[0]) / 2.f)) {
+						player.x = 200 - player.width;
+						player.movex = 0;
+					}
+				}
+				else if (crusher_direction(traps[4], player) == 2) {
+					player.y = traps[4].y[2];
+					player.movey = 0;
+					if ((player.y + player.height) >= 600) {
+						player.y = (600 - player.height);
+						Kill_Player(&player, &deaths);
+						printf("active\n");
+					}
+				}
+
 			}
 		}
 		if (crusherstate == 1) {
@@ -384,14 +402,25 @@ void L1_Update(void)
 				crusherstate = 0;
 			}
 			//if the player hits the crusher as it goes up, no death but cant go in
-			if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0]) && player.x >= traps[4].x[1]) {
-				player.x = 300;
-			}
-			if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0]) && player.x <= traps[4].x[0]) {
-				player.x = 200;
+			if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
+				if (crusher_direction(traps[4], player) == 1) {
+					if (player.x >= ((traps[4].x[1] + traps[4].x[0]) / 2.f)) {
+						player.x = 300;
+						player.movex = 0;
+					}
+					else if (player.x <= ((traps[4].x[1] + traps[4].x[0]) / 2.f)) {
+						player.x = 200-player.width;
+						player.movex = 0;
+					}
+				}
+				else if (crusher_direction(traps[4], player) == 2) {
+						player.y = traps[4].y[2];
+						player.movey = 0;
+				}
+				
 			}
 		}
-		//
+		
 		
 #pragma endregion
 
@@ -449,17 +478,17 @@ void L1_Update(void)
 		{
 			switch (traps[i].type)
 			{
-			case 0:
+			case spike:
 			{
 				CP_Graphics_DrawTriangle(traps[i].x[0], traps[i].y[0], traps[i].x[1], traps[i].y[1], traps[i].x[2], traps[i].y[2]);
 				break;
 			}
-			case 1:
+			case crusher:
 			{
 				CP_Graphics_DrawRect(traps[i].x[0], traps[i].y[0], traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
 				break;
 			}
-			case 2:
+			case shooter:
 			{
 				CP_Graphics_DrawRect(traps[i].x[0], traps[i].y[0], traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
 				break;
