@@ -132,7 +132,7 @@ void L1_Init(void)
 		fscanf_s(HazardFile, "%d", &traps[i].type);
 		switch (traps[i].type)
 		{
-		case 0:
+		case spike:
 		{
 			int j = 0;
 			for (; j < 3; ++j)
@@ -141,7 +141,7 @@ void L1_Init(void)
 			}
 			break;
 		}
-		case 1:
+		case crusher:
 		{
 			int j = 0;
 			for (; j < 3; ++j)
@@ -150,7 +150,15 @@ void L1_Init(void)
 			}
 			break;
 		}
-
+		case shooter:
+		{
+			int j = 0;
+			for (; j < 3; ++j)
+			{
+				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
+			}
+			break;
+		}
 		}
 	}
 	fclose(HazardFile);
@@ -403,10 +411,7 @@ void L1_Update(void)
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
-		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
-			Kill_Player(&player, Crush, &deaths);
-		}
-
+		//declaring top left of square for square triangle collision
 		Point squareTopLeft = { player.x, player.y };
 		for (int i = 0; i < 4; i++) {
 			Point A = { traps[i].x[0], traps[i].y[0] };
@@ -417,7 +422,69 @@ void L1_Update(void)
 				Kill_Player(&player, Burn, &deaths);
 			}
 		}
+		//CRUSHER MOVEMENT
+		// crusherstate = 0 if going down and crusherstate = 1 when going up
+		float crushervely;
+		if (crusherstate == 0) {
+			crushervely = 1000.f * dt;
+			traps[4].y[2] += crushervely;
+			if (traps[4].y[2] > 600) {
+				traps[4].y[2] = 600;
+				crusherstate = 1;
+			}
+			//if the player hits the crusher at the bottom, add death and reset
+			if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
+				if (crusher_direction(traps[4], player) == 1) {
+					if (player.x >= ((traps[4].x[1] + traps[4].x[0]) / 2.f)) {
+						player.x = 300;
+						player.movex = 0;
+					}
+					else if (player.x <= ((traps[4].x[1] + traps[4].x[0]) / 2.f)) {
+						player.x = 200 - player.width;
+						player.movex = 0;
+					}
+				}
+				else if (crusher_direction(traps[4], player) == 2) {
+					player.y = traps[4].y[2];
+					player.movey = 0;
+					if ((player.y + player.height) >= 600) {
+						player.y = (600 - player.height);
+						Kill_Player(&player, Crush, &deaths);
+						printf("active\n");
+					}
+				}
 
+			}
+		}
+		if (crusherstate == 1) {
+			crushervely = -0.005f * dt;
+			traps[4].y[2] += crushervely;
+			//traps[4].y[0] += crushervely;
+			if (traps[4].y[2] < 450) {
+				traps[4].y[2] = 450;
+				crusherstate = 0;
+			}
+			//if the player hits the crusher as it goes up, no death but cant go in
+			if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
+				if (crusher_direction(traps[4], player) == 1) {
+					if (player.x >= ((traps[4].x[1] + traps[4].x[0]) / 2.f)) {
+						player.x = 300;
+						player.movex = 0;
+					}
+					else if (player.x <= ((traps[4].x[1] + traps[4].x[0]) / 2.f)) {
+						player.x = 200-player.width;
+						player.movex = 0;
+					}
+				}
+				else if (crusher_direction(traps[4], player) == 2) {
+						player.y = traps[4].y[2];
+						player.movey = 0;
+				}
+				
+			}
+		}
+		
+		
 #pragma endregion
 
 		// CAMERA UPDATE
@@ -501,25 +568,7 @@ void L1_Update(void)
 			CP_Graphics_DrawRect(walls[i].x1+15-camera.worldshiftx, walls[i].y1+15 - camera.worldshifty, walls[i].w-30, walls[i].h-30);
 		}
 
-		//CRUSHER MOVEMENT
-		// crusherstate = 0 if going down and crusherstate = 1 when going up
-		float crushervely;
-		if (crusherstate == 0) {
-			crushervely = 100.f * dt;
-			traps[4].y[2] += crushervely;
-			traps[4].y[0] += crushervely;
-			if (traps[4].y[2] >= 600) {
-				crusherstate = 1;
-			}
-		}
-		if (crusherstate == 1) {
-			crushervely = 10.f * dt;
-			traps[4].y[2] -= crushervely;
-			traps[4].y[0] -= crushervely;
-			if (traps[4].y[0] <= 450) {
-				crusherstate = 0;
-			}
-		}
+
 
 		// HAZARD DRAWING
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
@@ -527,12 +576,17 @@ void L1_Update(void)
 		{
 			switch (traps[i].type)
 			{
-			case 0:
+			case spike:
 			{
 				CP_Graphics_DrawTriangle(traps[i].x[0]-camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - camera.worldshiftx, traps[i].y[1] - camera.worldshifty, traps[i].x[2] - camera.worldshiftx, traps[i].y[2] - camera.worldshifty);
 				break;
 			}
-			case 1:
+			case crusher:
+			{
+				CP_Graphics_DrawRect(traps[i].x[0], traps[i].y[0], traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
+				break;
+			}
+			case shooter:
 			{
 				CP_Graphics_DrawRect(traps[i].x[0]-camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
 				break;

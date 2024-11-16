@@ -10,12 +10,14 @@
 
 #pragma once
 #include <stdbool.h>
+#include "platform.h"
 #define MAX_TRAPS 100
 
 //
 typedef enum hazardstype {
 	spike,
 	crusher,
+	shooter
 }hazardstype;
 
 typedef struct hazard {

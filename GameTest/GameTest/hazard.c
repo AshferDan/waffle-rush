@@ -68,3 +68,22 @@ bool check_square_triangle_collision(Point squareTopLeft, float width, float hei
 
     return false;
 }
+
+int crusher_direction(hazard crusher, Player p) {
+
+		// assign player center xy coordinates
+		float px = (p.x + p.width / 2);
+		float py = (p.y + p.height / 2);
+		// how much the player goes into the platform
+		float leftcoll = (abs)((px + p.width/2) - crusher.x[0]);
+		float rightcoll = (abs)(crusher.x[1] - (px - p.width / 2));
+		float topcoll = (abs)((py + p.height/2) - crusher.y[0]);
+		float botcoll = (abs)(crusher.y[2] - (py - p.height / 2));
+
+		// return lower value for horizontal/vertical
+		float horizontal = (leftcoll < rightcoll) ? leftcoll : rightcoll;
+		float vertical = (topcoll < botcoll) ? topcoll : botcoll;
+
+		// horizontal = 1, vertical = 2
+		return (horizontal < vertical) ? 1 : 2;
+	}
