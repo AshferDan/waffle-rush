@@ -15,7 +15,7 @@
 
 
 
-typedef struct camera {
+typedef struct Camera {
 	float limitleftx;
 	float limitrightx;
 	float spawnX;

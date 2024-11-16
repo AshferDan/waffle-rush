@@ -605,7 +605,17 @@ void jump(Player* player) {
 			pply->state = Idle;
 		}
 	}
+#pragma endregion
 
+// PLAYER STATES
+/*---------------------------------------------------------------------------------------------------*/
+#pragma region Player State Changes
+	//---------------------------------------------------------
+	// Kill player
+	// Spawn player
+	// Reset player
+	// Transition player
+	//---------------------------------------------------------
 	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths) {
 		if (player->state != Dead) {
 			player->state = Dead;
@@ -633,8 +643,59 @@ void jump(Player* player) {
 		player->direction = OnRight;
 		player->deathcause = Reset;
 	}
+
+	void Transition_Player(Player *player, MoveState *movestate) {
+		if (movestate == OnPlat || movestate == InPlat) {
+			start_transition(player, movestate);
+		}
+
+		if (player->transition_time >= 13) {
+			end_transition(player, movestate);
+		}
+	}
 #pragma endregion
 
+
+// TIMER
+/*---------------------------------------------------------------------------------------------------*/
+#pragma region TIMERS
+	void player_anim_updates(Player* player, float dt, MoveState* movestate) {
+		player->anim += 10 * dt;
+		if (player->anim >= 20) {
+			player->anim = 0;
+		}
+		if (player->transition_time < 13) {
+			player->transition_time += 20 * dt;
+		}
+		if (player->transition_time > 13) {
+			player->transition_time = 13;
+		}
+		if (player->death_time < 17) {
+			if (player->deathcause != Fall) {
+				player->death_time += 17 * dt;
+			}
+			else if (player->y <= height - player->height) {
+				player->movey += 1800.0f * dt;
+				player->y += player->movey * dt;
+			}
+			else player->death_time = 17;
+		}
+		if (player->death_time >= 17) {
+			if (player->state == Dead) {
+				Spawn_Player(player);
+				player->movex = 0;
+			}
+			player->death_time = 17;
+		}
+		if (player->spawn_time < 34 && player->state == Spawning) {
+			player->spawn_time += 34 * dt;
+		}
+		if (player->spawn_time > 34 && player->state == Spawning) {
+			Reset_Player(player, movestate);
+			player->spawn_time = 34;
+		}
+	}
+#pragma endregion
 
 
 // RENDER

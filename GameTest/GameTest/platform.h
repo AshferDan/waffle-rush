@@ -252,13 +252,16 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		void CollOnPlatforms(int plat_index, platform plt, Player* p, Player ply);
 
 		void CollWalls(platblocks walls[], int num, Player* pply, Player ply, MoveState movestate);
-
 	#pragma endregion 
 	
-	// Reset Player
+	// Player States
 	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths);
 	void Spawn_Player(Player* player);
 	void Reset_Player(Player* player, MoveState* movestate);
+	void Transition_Player(Player* player, MoveState* movestate);
+
+	// Anim Updates
+	void player_anim_updates(Player* player, float dt, MoveState* movestate);
 
 	// Draw Platforms
 	void DrawPlatform(int plat_index);
