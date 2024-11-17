@@ -14,6 +14,19 @@
 level levels[num_levels];
 float timeElapsed;
 
+// Options settings ---
+
+// BGM volume bar
+float current_bgm_vol, max_bgm_vol, prev_bgm_vol;
+
+// Sound effects volume bar
+float current_se_vol, max_se_vol, prev_se_vol;
+
+// icons for volume bars
+float icon1_width, icon1_height, icon2_width, icon2_height;
+float icon_bgm_x, icon_bgm_y;
+float icon_se_x, icon_se_y;
+
 void L1_Init(void)
 {
 	// ASSET LOADS
@@ -67,7 +80,6 @@ void L1_Init(void)
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
-
 	reset_platforms();
 
 	FILE* PlatformFile = fopen("Assets/Level_1/Platform.txt", "r");
@@ -193,6 +205,9 @@ void L1_Init(void)
 	// initialize movestate
 	movestate = OnPlat;
 
+	// initialize levelstate
+	levelstate = NotPaused;
+
 	// timer
 	timer = (Timer){ 0,0,0 };
 
@@ -200,11 +215,10 @@ void L1_Init(void)
 	timeElapsed = 0.0f;
 
 	// game pause
-	isPaused = 0;
+	// isPaused = 0;
 
 	// check if level complete
-	isCleared = 0;
-	clear_timer = 0;
+	// isCleared = 0;
 
 	// initialize level number
 	levelNumber = 1;
@@ -235,6 +249,33 @@ void L1_Init(void)
 	plat		= CP_Color_Create(255, 200, 80, 255); //platform colour
 	wall		= CP_Color_Create(200, 200, 200, 255); //platform colour
 	stamina		= CP_Color_Create(255, 255, 40, 255); //stamina colour
+
+	// OPTIONS
+	// BGM volume bar
+	current_bgm_vol = 0.0f;
+	prev_bgm_vol = 0.0f;
+	max_bgm_vol = 100.0f;
+
+	// Sound effects volume bar
+	current_se_vol = 0.0f;
+	prev_se_vol = 0.0f;
+	max_se_vol = 100.0f;
+
+	// icons for volume bars
+	icon1_width = 10.0f;
+	icon1_height = 10.0f;
+	icon2_width = 20.0f;
+	icon2_height = 70.0f;
+	icon_bgm_x = 700.0f;
+	icon_bgm_y = 350.0f;
+	icon_se_x = 700.0f;
+	icon_se_y = 500.0f;
+
+	FILE* OptionsFile = fopen("Assets/Options.txt", "r");
+	fscanf_s(OptionsFile, "%f %f", &current_bgm_vol, &current_se_vol);
+	printf("BGM Volume: %lf\nSE Volume: %lf\n", current_bgm_vol, current_se_vol);
+	printf("---------------------------------------------------------------\n");
+	fclose(OptionsFile);
 
 	// Corner drawing
 	CP_Settings_RectMode(CP_POSITION_CORNER);
@@ -275,15 +316,15 @@ void L1_Update(void)
 	mouseY = CP_Input_GetMouseY();
 
 	// pause/resume game with Esc
-	if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 0 && isCleared == 0) {
-		isPaused = 1;
+	if (CP_Input_KeyTriggered(KEY_ESCAPE) && levelstate == NotPaused) {
+		levelstate = Paused;
 	}
-	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && isPaused == 1 && isCleared == 0) {
-		isPaused = 0;
+	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && levelstate == Paused) {
+		levelstate = NotPaused;
 	}
 
 	// Timer updates
-	if (isPaused == 0 && isCleared == 0) {
+	if (levelstate == NotPaused) {
 		timer.seconds += dt;
 		if (timer.seconds >= 60) {
 			timer.seconds = 0;
@@ -307,13 +348,13 @@ void L1_Update(void)
 #pragma region Movement
 
 	// Pause check
-	if (isPaused == 0) {
+	if (levelstate == NotPaused) {
 
 		// Animation Timer
 		player_anim_updates(&player, dt, &movestate, &camera, spawn);
 
 		// Movement logics
-		if (isCleared == 0) {
+		if (levelstate != Cleared) {
 			movement(&player, movestate, speed, dt);
 		}
 
@@ -384,10 +425,10 @@ void L1_Update(void)
 		}
 
 #pragma endregion
-		// Hazard
-		/*---------------------------------------------------------------------------------------------------*/
+	// Hazard
+	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
-		//declaring top left of square for square triangle collision
+	//declaring top left of square for square triangle collision
 		Point squareTopLeft = { player.x, player.y };
 		for (int trap_index = 0; trap_index < numberoftraps; trap_index++) {
 			switch (traps[trap_index].type) {
@@ -483,7 +524,7 @@ void L1_Update(void)
 		CP_Settings_RectMode(CP_POSITION_CORNER);
 		//CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop - camera.worldshifty, camera.width, camera.height); //code for rectangle
 	}
-
+	
 #pragma endregion
 
 	// RENDER
@@ -496,10 +537,16 @@ void L1_Update(void)
 		for (int i = 0; i < numplats; i++) {
 			DrawPlatform(i);
 		}
+
+		// Wall
+		CP_Settings_Fill(wall);
+		for (int i = 0; i < numwalls; i++) {
+			CP_Graphics_DrawRect(walls[i].x1 + 15 - camera.worldshiftx, walls[i].y1 + 15 - camera.worldshifty, walls[i].w - 30, walls[i].h - 30);
+		}
 		CP_Settings_Stroke(black);
 
 		// Goal
-		if (!isCleared) {
+		if (levelstate != Cleared) {
 			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, 0, 0, 32, 32, 255);
 		}
 		else {
@@ -510,10 +557,10 @@ void L1_Update(void)
 			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, sprite_x, 0, sprite_x + 32, 32, 255);
 		}
 
-		if (AreSquaresIntersecting(player.x, player.y, player.height, player.width, goalx, goaly+70, 100, 30)) {
+		if (AreSquaresIntersecting(player.x, player.y, player.height, player.width, goalx, goaly + 70, 100, 30)) {
 			// calculate score and mark the level as cleared
-			AddScore(&levelScore, 10000 + (10000 - ((int)timer.seconds * 50) - ((int)timer.minutes * 3000)) - deaths * 100, &isCleared);
-			isCleared = 1;
+			AddScore(&levelScore, 10000 + (10000 - ((int)timer.seconds * 50) - ((int)timer.minutes * 3000)) - deaths * 100, &levelstate);
+			levelstate = Cleared;
 			// if cleared for the first time, unlock the next level
 			if (levels[levelNumber - 1].isCleared == 0) {
 				levels[levelNumber - 1].isCleared = 1;
@@ -537,18 +584,12 @@ void L1_Update(void)
 			// update the values in LevelSelect.txt
 			FILE* LevelFile = fopen("Assets/LevelSelect.txt", "w");
 			for (int i = 0; i < num_levels; i++) {
-				fprintf_s(LevelFile, "%d %d %d %d %02d:%02d:%02d\n", levels[i].level_no, levels[i].isUnlocked, levels[i].isCleared, levels[i].score, 
+				fprintf_s(LevelFile, "%d %d %d %d %02d:%02d:%02d\n", levels[i].level_no, levels[i].isUnlocked, levels[i].isCleared, levels[i].score,
 					levels[i].time.minutes, levels[i].time.seconds, levels[i].time.millis);
 			}
 			fclose(LevelFile);
 		}
 
-
-		// Wall
-		CP_Settings_Fill(wall);
-		for (int i = 0; i < numwalls; i++) {
-			CP_Graphics_DrawRect(walls[i].x1+15-camera.worldshiftx, walls[i].y1+15 - camera.worldshifty, walls[i].w-30, walls[i].h-30);
-		}
 
 		// Checkpoint
 		for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
@@ -562,8 +603,17 @@ void L1_Update(void)
 		}
 
 		// Player
-		if (isCleared == 0) {
+		if (levelstate != Cleared) {
 			Draw_Player(player_sprite, player, movestate);
+		}
+
+		// Stamina Bar
+		if (player.stamina < 100.0f && !(player.state == Dead || player.state == Spawning)) {
+			CP_Settings_Fill(stamina);
+			if (player.stamina <= 35.0f) {
+				CP_Settings_Fill(red);
+			}
+			DrawStatBar(player.x - 15 - camera.worldshiftx, player.y - 30 - camera.worldshifty, player.x + 35 - camera.worldshiftx, player.y - 23 - camera.worldshifty, player.stamina, 100);
 		}
 
 		// HAZARD DRAWING
@@ -591,16 +641,6 @@ void L1_Update(void)
 			}
 		}
 
-		
-
-		// Stamina Bar
-		if (player.stamina < 100.0f && !(player.state == Dead || player.state == Spawning)) {
-			CP_Settings_Fill(stamina);
-			if (player.stamina <= 35.0f) {
-				CP_Settings_Fill(red);
-			}
-			DrawStatBar(player.x - 15 - camera.worldshiftx, player.y - 30 - camera.worldshifty, player.x + 35 - camera.worldshiftx, player.y - 23 - camera.worldshifty, player.stamina, 100);
-		}
 
 		// DEATHS DRAWING
 		CP_Settings_Fill(black);
@@ -621,7 +661,7 @@ void L1_Update(void)
 		CP_Font_DrawText(time, 1200, 50);
 
 		// LEVEL COMPLETE PAGE
-		if (isCleared == 1) {
+		if (levelstate == Cleared) {
 			CP_Settings_RectMode(CP_POSITION_CENTER);
 			CP_Settings_Fill(pausebg);
 			CP_Graphics_DrawRect(width / 2, height / 2, width, height);
@@ -691,7 +731,7 @@ void L1_Update(void)
 		}
 	
 	// PAUSE PAGE
-	if (isPaused == 1 && isCleared == 0) {
+	if (levelstate == Paused) {
 		CP_Settings_RectMode(CP_POSITION_CENTER);
 		CP_Settings_Fill(pausebg);
 		CP_Graphics_DrawRect(width / 2, height / 2, width, height);
@@ -702,37 +742,241 @@ void L1_Update(void)
 		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
 		CP_Font_DrawText("PAUSED", width / 2, 300);
 
-		CP_Settings_TextSize(100);
+		CP_Settings_TextSize(70);
 		// draw resume button
-		TextBoxCreate(500, 2 * height / 3, 350, 200, "RESUME", red);
-		int ResumeClick = IsAreaClicked(500, 2 * height / 3, 350, 200, mouseX, mouseY); //if mouse is over button
+		TextBoxCreate(400, 2 * height / 3, 300, 150, "RESUME", red);
+		int ResumeClick = IsAreaClicked(400, 2 * height / 3, 300, 150, mouseX, mouseY); //if mouse is over button
 		if (ResumeClick) {
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
-			CP_Graphics_DrawRect(500, 2 * height / 3, 350, 200);
+			CP_Graphics_DrawRect(400, 2 * height / 3, 300, 150);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
-				isPaused = 0;
+				levelstate = NotPaused;
+			}
+		}
+
+		// draw options button
+		TextBoxCreate(800, 2 * height / 3, 300, 150, "OPTIONS", red);
+		int OptionsClick = IsAreaClicked(800, 2 * height / 3, 300, 150, mouseX, mouseY); //if mouse is over button
+		if (OptionsClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+			CP_Graphics_DrawRect(800, 2 * height / 3, 300, 150);
+			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				levelstate = InOptions;
+				prev_bgm_vol = current_bgm_vol;
+				prev_se_vol = current_se_vol;
 			}
 		}
 
 		// draw quit button
-		TextBoxCreate(1100, 2 * height / 3, 350, 200, "QUIT", red);
-		int QuitClick = IsAreaClicked(1100, 2 * height / 3, 350, 200, mouseX, mouseY); //if mouse is over button
+		TextBoxCreate(1200, 2 * height / 3, 300, 150, "QUIT", red);
+		int QuitClick = IsAreaClicked(1200, 2 * height / 3, 300, 150, mouseX, mouseY); //if mouse is over button
 		if (QuitClick) {
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
-			CP_Graphics_DrawRect(1100, 2 * height / 3, 350, 200);
+			CP_Graphics_DrawRect(1200, 2 * height / 3, 300, 150);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
-				CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit);
+				levelstate = InQuit;
 			}
 		}
 		CP_Settings_RectMode(CP_POSITION_CORNER);
 	}
+
+	// OPTIONS CLICKED
+	else if (levelstate == InOptions) {
+		CP_Settings_RectMode(CP_POSITION_CENTER);
+		CP_Settings_Fill(pausebg);
+		CP_Graphics_DrawRect(width / 2, height / 2, width, height);
+		CP_Settings_Fill(wall);
+		CP_Graphics_DrawRect(width / 2, height / 2, 1200, 600);
+		CP_Settings_Fill(black);
+		CP_Settings_TextSize(100);
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Font_DrawText("OPTIONS", width / 2, 200);
+
+		// update BGM volume
+		if (current_bgm_vol > max_bgm_vol) {
+			current_bgm_vol = max_bgm_vol;
+		}
+		else if (current_bgm_vol < 0) {
+			current_bgm_vol = 0.0f;
+		}
+
+
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Settings_TextSize(70);
+		CP_Font_DrawText("BGM Volume", 250, icon_bgm_y);
+		CP_Font_DrawText("SE Volume", 250, icon_se_y);
+
+		// lower BGM volume button
+		TextBoxCreate(icon_bgm_x - 70, icon_bgm_y, 50, 50, "-", red);
+		int LowerBGMClick = IsAreaClicked(icon_bgm_x - 70, icon_bgm_y, 50, 50, mouseX, mouseY); //if mouse is over button
+		if (LowerBGMClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
+			CP_Graphics_DrawRect(icon_bgm_x - 70, icon_bgm_y, 50, 50);
+			if (CP_Input_MouseDown(MOUSE_BUTTON_LEFT)) { //if LMB1 pressed
+				current_bgm_vol -= 1;
+			}
+		}
+
+		// raise BGM volume button
+		TextBoxCreate(1350, icon_bgm_y, 50, 50, "+", red);
+		int RaiseBGMClick = IsAreaClicked(1350, icon_bgm_y, 50, 50, mouseX, mouseY); //if mouse is over button
+		if (RaiseBGMClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
+			CP_Graphics_DrawRect(1350, icon_bgm_y, 50, 50);
+			if (CP_Input_MouseDown(MOUSE_BUTTON_LEFT)) { //if LMB1 pressed
+				current_bgm_vol += 1;
+			}
+		}
+
+		// update BGM volume bar
+		if (current_bgm_vol > 0) {
+			for (float i = 0.0f; i < max_bgm_vol; i += 5.0f) {
+				CP_Settings_Fill(red);
+				if (i < current_bgm_vol) {
+					CP_Graphics_DrawRect(icon_bgm_x + 30.0f * (i / 5.0f), icon_bgm_y, icon2_width, icon2_height);
+				}
+				else {
+					CP_Graphics_DrawRect(icon_bgm_x + 30.0f * (i / 5.0f), icon_bgm_y, icon1_width, icon1_height);
+				}
+			}
+		}
+		else {
+			for (float i = 0.0f; i < max_bgm_vol; i += 5.0f) {
+				CP_Settings_Fill(red);
+				CP_Graphics_DrawRect(icon_bgm_x + 30.0f * (i / 5.0f), icon_bgm_y, icon1_width, icon1_height);
+			}
+		}
+
+		// update SE volume
+		if (current_se_vol > max_se_vol) {
+			current_se_vol = max_se_vol;
+		}
+		else if (current_se_vol < 0) {
+			current_se_vol = 0.0f;
+		}
+
+		// lower SE volume button
+		TextBoxCreate(icon_se_x - 70, icon_se_y, 50, 50, "-", red);
+		int LowerSEClick = IsAreaClicked(icon_se_x - 70, icon_se_y, 50, 50, mouseX, mouseY); //if mouse is over button
+		if (LowerSEClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
+			CP_Graphics_DrawRect(icon_se_x - 70, icon_se_y, 50, 50);
+			if (CP_Input_MouseDown(MOUSE_BUTTON_LEFT)) { //if LMB1 pressed
+				current_se_vol -= 1;
+			}
+		}
+
+		// raise SE volume button
+		TextBoxCreate(1350, icon_se_y, 50, 50, "+", red);
+		int RaiseSEClick = IsAreaClicked(1350, icon_se_y, 50, 50, mouseX, mouseY); //if mouse is over button
+		if (RaiseSEClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
+			CP_Graphics_DrawRect(1350, icon_se_y, 50, 50);
+			if (CP_Input_MouseDown(MOUSE_BUTTON_LEFT)) { //if LMB1 pressed
+				current_se_vol += 1;
+			}
+		}
+
+		// update SE volume bar
+		if (current_se_vol > 0) {
+			for (float i = 0.0f; i < max_se_vol; i += 5.0f) {
+				CP_Settings_Fill(red);
+				if (i < current_se_vol) {
+					CP_Graphics_DrawRect(icon_se_x + 30.0f * (i / 5.0f), icon_se_y, icon2_width, icon2_height);
+				}
+				else {
+					CP_Graphics_DrawRect(icon_se_x + 30.0f * (i / 5.0f), icon_se_y, icon1_width, icon1_height);
+				}
+			}
+		}
+		else {
+			for (float i = 0.0f; i < max_se_vol; i += 5.0f) {
+				CP_Settings_Fill(red);
+				CP_Graphics_DrawRect(icon_se_x + 30.0f * (i / 5.0f), icon_se_y, icon1_width, icon1_height);
+			}
+		}
+
+		//save changes button
+		TextBoxCreate(3 * width / 8, height - 250, 200, 100, "SAVE", red);
+		int SaveClick = IsAreaClicked(3 * width / 8, height - 250, 200, 100, mouseX, mouseY); //if mouse is over button
+		if (SaveClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
+			CP_Graphics_DrawRect(3 * width / 8, height - 250, 200, 100);
+			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				FILE* OptionsFile = fopen("Assets/Options.txt", "w");
+				fprintf_s(OptionsFile, "%lf %lf", current_bgm_vol, current_se_vol);
+				printf("Changes saved successfully!\nBGM Volume: %lf\nSE Volume: %lf\n", current_bgm_vol, current_se_vol);
+				prev_bgm_vol = current_bgm_vol;
+				prev_se_vol = current_se_vol;
+				fclose(OptionsFile);
+			}
+		}
+
+		//discard changes and return to main menu button
+		TextBoxCreate(5 * width / 8, height - 250, 200, 100, "BACK", red);
+		int ExitClick = IsAreaClicked(5 * width / 8, height - 250, 200, 100, mouseX, mouseY); //if mouse is over button
+		if (ExitClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
+			CP_Graphics_DrawRect(5 * width / 8, height - 250, 200, 100);
+			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				levelstate = Paused;
+				current_bgm_vol = prev_bgm_vol;
+				current_se_vol = prev_se_vol;
+			}
+		}
+
+		CP_Settings_RectMode(CP_POSITION_CORNER);
+	}
+
+	// QUIT CLICKED
+	else if (levelstate == InQuit) {
+		CP_Settings_RectMode(CP_POSITION_CENTER);
+		CP_Settings_Fill(pausebg);
+		CP_Graphics_DrawRect(width / 2, height / 2, width, height);
+		CP_Settings_Fill(wall);
+		CP_Graphics_DrawRect(width / 2, height / 2, 1200, 600);
+		CP_Settings_Fill(black);
+		CP_Settings_TextSize(100);
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Font_DrawText("Are you sure you want to quit?", width / 2, 300);
+		CP_Font_DrawText("Any progress will be lost!", width / 2, 400);
+
+		CP_Settings_TextSize(100);
+		// go back to pause menu
+		TextBoxCreate(400, 2 * height / 3, 200, 200, "no", red);
+		int GoBackClick = IsAreaClicked(400, 2 * height / 3, 200, 200, mouseX, mouseY); //if mouse is over button
+		if (GoBackClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+			CP_Graphics_DrawRect(400, 2 * height / 3, 200, 200);
+			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				levelstate = Paused;
+			}
+		}
+		// quit the level and go back to main menu
+		TextBoxCreate(1000, 2 * height / 3, 600, 200, "LET ME OUT", red);
+		int GoHomeClick = IsAreaClicked(1000, 2 * height / 3, 600, 200, mouseX, mouseY); //if mouse is over button
+		if (GoHomeClick) {
+			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+			CP_Graphics_DrawRect(1000, 2 * height / 3, 600, 200);
+			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit);
+			}
+		}
+
+		CP_Settings_RectMode(CP_POSITION_CORNER);
+	}
+
 #pragma endregion
 
 	// Back to main menu
-	if (CP_Input_KeyDown(KEY_Q)) {
-		CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit); 
+	if (CP_Input_KeyTriggered(KEY_Q) && levelstate == NotPaused) {
+		levelstate = InQuit;
+	}
+	else if (CP_Input_KeyTriggered(KEY_Q) && levelstate == InQuit) {
+		levelstate = NotPaused;
 	}
 }
+
 
 void L1_Exit(void)
 {

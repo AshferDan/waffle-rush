@@ -31,7 +31,6 @@
     <ClInclude Include="credits.h" />
     <ClInclude Include="hazard.h" />
     <ClInclude Include="LevelSelect.h" />
-    <ClInclude Include="mainmenu1.h" />
     <ClInclude Include="options.h" />
     <ClInclude Include="platform.h" />
     <ClInclude Include="mainmenu.h" />
