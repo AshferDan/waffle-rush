@@ -41,8 +41,14 @@ int is_colliding(float x, float y, float height, float width) {
 #if 0
 
 if (buffstate & jumpBuff){
-	player.movey -= 100; // or should i instead do speed *2? 
+	player.speed += 100 ; // or should i instead do speed *2? 
+
+
 }
+
+
+
+
 
 //speedboost/slowtime
 if (/*buffstate & power[i] - box)*/) {

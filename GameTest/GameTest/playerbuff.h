@@ -34,8 +34,12 @@ typedef struct buffs{//we use this to get the quantitative amount of these buffs
 	float buffduration; //duration for each buff
 }buffs;
 
+
+
 enum playerQualities  //we use this as a qualitative indicator of player powerup state 
-{slowTime = 0b001, 
+{
+baseStat = 0b000,
+slowTime = 0b001, 
 jumpBuff = 0b010, 
 invulBuff = 0b100}; //states/bool
 

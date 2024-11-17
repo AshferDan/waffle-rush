@@ -16,7 +16,6 @@
 #pragma once
 #include "platform.h"
 
-
 // MOVEMENT AND MOVESTATE LOGIC
 #pragma region Movement and movestate
 // 
@@ -227,7 +226,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	}
 }
 
-void jump(Player* player) {
+void jump(Player* player, buffs *buff) {
 	if (CP_Input_KeyTriggered(KEY_SPACE)) {
 		if (((player->onplatform == 0) && player->state == Sliding && player->walljump == 1)) {
 			player->walljump = 0;
@@ -241,7 +240,11 @@ void jump(Player* player) {
 		}
 		if (player->onplatform) {
 			player->movey = -600;
+			if (buff[jumpBuff].buffduration > 0.00) {
+				player->movey = -600 - buff[jumpBuff].jumpIncrease;
+			}
 		}
+		
 	}
 }
 #pragma endregion

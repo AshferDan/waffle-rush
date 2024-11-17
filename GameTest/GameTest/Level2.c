@@ -424,11 +424,12 @@ void L2_Update(void)
 		//is_colliding(Buff[jumpBuff].X+camera.worldshiftx, Buff[jumpBuff].Y+camera.worldshifty, Buff[jumpBuff].width, Buff[jumpBuff].height);
 		if (is_colliding(Buff[jumpBuff].X, Buff[jumpBuff].Y, Buff[jumpBuff].height, Buff[jumpBuff].width)) {
 			buffstate = buffstate | jumpBuff;
-			Buff[jumpBuff].canPickup = 0; //print
-			//insert playerbuff is available ie
+			Buff[jumpBuff].canPickup = 0; //availability of the buff on the map
+			Buff[jumpBuff].buffduration = 3;  //this resets the duration so that you can pick up the same buff while its still active
+
 		}
 
-		if (buffstate != 0b000 && Buff[jumpBuff].buffduration >= 0.00f) {
+		if (buffstate != 0b000 && Buff[jumpBuff].buffduration >= 0.00f) { //here jumpbuff is active
 			Buff[jumpBuff].buffduration -= 1 * dt;
 			printf("buff: %d\n", buffstate);
 			printf("duration: %f\n", Buff[jumpBuff].buffduration);

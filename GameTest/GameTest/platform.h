@@ -13,6 +13,7 @@
 #include "utils.h"
 #include "hazard.h"
 #include "camera.h"
+#include "playerbuff.h"
 
 
 #define max_coords 16
