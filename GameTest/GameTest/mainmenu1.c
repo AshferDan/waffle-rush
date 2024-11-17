@@ -190,6 +190,7 @@ void MainMenu1_Init(void)
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Player related
 	Init_Player(&speed, &player, &deaths);
+	canMove = 1;
 #pragma endregion
 	// Game states, counters
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -262,6 +263,11 @@ void MainMenu1_Init(void)
 	camera.prespawnY = camera.respawnY = camera.limittop = spawn.y - (camera.height * 3.0f / 4.0f);
 	camera.limitbase = camera.limittop + camera.height;
 
+	levelEnded = start;
+	scaler1 = (spawn.x + player.width / 2) - camera.worldshiftx;
+	scaler2 = (width - spawn.x + player.width / 2) - camera.worldshiftx;
+	scaler3 = (spawn.y + player.height / 2) - camera.worldshifty;
+	scaler4 = (height - spawn.y + player.height / 2) - camera.worldshifty;
 #pragma endregion
 }
 
@@ -311,7 +317,7 @@ void MainMenu1_Update(void)
 #pragma region Movement
 
 	// Pause check
-	if (isPaused == 0) {
+	if (isPaused == 0 && canMove == 1) {
 
 		// Animation Timer
 		player_anim_updates(&player, dt, &movestate, &camera, spawn);
@@ -734,15 +740,15 @@ void MainMenu1_Update(void)
 	}
 #pragma endregion
 #pragma region Level Transition
-	//have to force player to stop moving so that the transition works smoothly
+	//player lastX & Y store last location of player relative to screen, player is also forced to stop moving while level transition is ongoing to stop it from breaking
 	//scaler1,2,3,4 , respectively, control the rects moving (Left,Right,Top,Bottom) L-R, R-L, T-B, B-T
-
+	printf("%lf\n", scaler1);
+	playerLastX = player.x - camera.worldshiftx;
+	playerLastY = player.y - camera.worldshifty;
 	//Level Transition
 	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level1.posx, level1.posy, level1.width, level1.height)) {
 		printf("level1\n");
 		levelEnded = end;
-		playerLastX = player.x;
-		playerLastY = player.y;
 		player.stamina = 100.0f;
 		//CP_Engine_SetNextGameState(L1_Init, L1_Update, L1_Exit); //go to game
 	}
