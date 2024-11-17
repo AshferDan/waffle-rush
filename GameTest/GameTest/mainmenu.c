@@ -36,7 +36,7 @@ void Main_Menu_Update(void)
 	button_color = CP_Color_Create(200, 60, 60, 255);
 
 	//background
-	CP_Graphics_ClearBackground(CP_Color_Create(100, 100, 100, 255));
+	CP_Graphics_ClearBackground(CP_Color_Create(200, 200, 200, 255));
 
 
 	//draw play button
@@ -51,7 +51,7 @@ void Main_Menu_Update(void)
 	}
 
 	//test level button
-	TextBoxCreate(3*width / 4, height / 3, 150, 150, "T", button_color);
+	TextBoxCreate(3 * width / 4, height / 3, 150, 150, "T", button_color);
 	int TestClick = IsAreaClicked(3 * width / 4, height / 3, 150, 150, mouseX, mouseY); //if mouse is over button
 	if (TestClick) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button

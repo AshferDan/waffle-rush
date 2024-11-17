@@ -138,13 +138,7 @@ void Tutorial_Init(void)
 	//HAZARDS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Hazard
-	for (int i = 0; i < MAX_TRAPS; i++) {
-		for (int j = 0; j < 3; j++) {
-			traps[i].x[j] = 0;
-			traps[i].y[j] = 0;
-		}
-		traps[i].type = 0;
-	}
+	reset_hazards(&traps);
 
 	FILE* HazardFile = fopen("Assets/Level_Tutorial/Hazard.txt", "r");
 	fscanf_s(HazardFile, "%d", &numberoftraps);
@@ -189,33 +183,7 @@ void Tutorial_Init(void)
 	// PLAYER INITS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Player related
-	// initialize base speed
-	speed = 600;
-
-	// initialize player struct
-	// size
-	player.width = 20;
-	player.height = 20;
-	// position
-	player.x = spawn.x;
-	player.y = spawn.y;
-	// movement
-	player.movex = 0;
-	player.movey = 0;
-	player.walljump = 0;
-	// anim timers
-	player.transition_time = 15;
-	player.death_time = 17;
-	player.spawn_time = 34;
-	// health
-	player.stamina = 100.0f;
-	// anim state
-	player.state = Idle;
-	player.anim = 0;
-	player.direction = OnRight;
-
-	// initialize deaths
-	deaths = 0;
+	Init_Player(&speed, &player, &deaths);
 #pragma endregion
 	// Game states, counters
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -256,13 +224,14 @@ void Tutorial_Init(void)
 	height = CP_System_GetWindowHeight();
 
 	// Initialize colors
-	pausebg = CP_Color_Create(0, 0, 0, 100);
-	bg = CP_Color_Create(135, 200, 220, 255); //background
-	black = CP_Color_Create(0, 0, 0, 255); //black
-	red = CP_Color_Create(200, 50, 50, 255); //red
-	green = CP_Color_Create(50, 200, 50, 255); //green
-	plat = CP_Color_Create(200, 200, 200, 255); //platform colour
-	stamina = CP_Color_Create(255, 255, 40, 255); //stamina colour
+	pausebg		= CP_Color_Create(0, 0, 0, 100);
+	bg			= CP_Color_Create(135, 200, 220, 255); //background
+	black		= CP_Color_Create(0, 0, 0, 255); //black
+	red			= CP_Color_Create(200, 50, 50, 255); //red
+	green		= CP_Color_Create(50, 200, 50, 255); //green
+	plat		= CP_Color_Create(255, 200, 80, 255); //platform colour
+	wall		= CP_Color_Create(200, 200, 200, 255); //platform colour
+	stamina		= CP_Color_Create(255, 255, 40, 255); //stamina colour
 
 	// Corner drawing
 	CP_Settings_RectMode(CP_POSITION_CORNER);
@@ -275,14 +244,16 @@ void Tutorial_Init(void)
 		/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Camera Init
 
-	camera.limitleftx = camera.spawnX = width * 3.0f / 10.0f; //
-	camera.limitrightx = width * 7.0f / 10.0f; //
-	camera.limittop = camera.spawnY = height * 0.2f; //
-	camera.limitbase = height * 0.8f; //  
-	camera.width = camera.limitrightx - camera.limitleftx; //
-	camera.height = camera.limitbase - camera.limittop; //since base is a bigger number than the top number.
+	camera.spawnX = width * 3.5f / 10.0f; //
+	camera.spawnY = height * 0.4f; //
+	camera.width = 3.0f / 10.0f * width; //
+	camera.height = 0.2f * height; //since base is a bigger number than the top number.
 	camera.worldshiftx = 0;
 	camera.worldshifty = 0;
+	camera.prespawnX = camera.respawnX = camera.limitleftx = spawn.x - (camera.width / 2.0f);
+	camera.limitrightx = camera.limitleftx + camera.width;
+	camera.prespawnY = camera.respawnY = camera.limittop = spawn.y - (camera.height * 3.0f / 4.0f);
+	camera.limitbase = camera.limittop + camera.height;
 
 #pragma endregion
 	//CP_System_SetFrameRate(30);
@@ -504,20 +475,36 @@ void Tutorial_Update(void)
 		}
 		CP_Settings_NoFill();
 		CP_Settings_RectMode(CP_POSITION_CORNER);
-		CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop - camera.worldshifty, camera.width, camera.height); //code for rectangle
+		//CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop - camera.worldshifty, camera.width, camera.height); //code for rectangle
 	}
 #pragma endregion
 
 	// RENDER
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
+	
+		// TOOLTIPS
+		CP_Settings_TextSize(25);
+		CP_Settings_Fill(CP_Color_Create(50, 50, 50, 255));
+		CP_Font_DrawTextBox("A and D keys to move left and right.\nSPACE to jump\n\nR to COMMIT SUICIDE", 50 - camera.worldshiftx, 150 - camera.worldshifty, 300);
+		CP_Font_DrawTextBox("E key to crawl on the side of syrup-covered platforms >:)\n\nWASD to crawl around\nNOTE: if you run out of stamina, you DIE", 650 - camera.worldshiftx, 250 - camera.worldshifty, 250);
+		CP_Font_DrawTextBox("Move into a wall to slide, jump while sliding to perform a walljump!", 1050 - camera.worldshiftx, 200 - camera.worldshifty, 250);
+		CP_Font_DrawTextBox("Touch a closed waffle press to set your new checkpoint!\n\nTry it by\nCOMMITTING SUICIDE (R)", 1400 - camera.worldshiftx, 550 - camera.worldshifty, 250);
+		CP_Font_DrawTextBox("Land on the golden plate to complete the level :D", 2350 - camera.worldshiftx, 700 - camera.worldshifty, 250);
 
-	// Platforms
+		// Platforms
 		CP_Settings_Fill(plat);
 		CP_Settings_Stroke(CP_Color_Create(100, 100, 100, 255));
 		for (int i = 0; i < numplats; i++) {
 			DrawPlatform(i);
 		}
+
+		// Wall
+		CP_Settings_Fill(wall);
+		for (int i = 0; i < numwalls; i++) {
+			CP_Graphics_DrawRect(walls[i].x1 + 15 - camera.worldshiftx, walls[i].y1 + 15 - camera.worldshifty, walls[i].w - 30, walls[i].h - 30);
+		}
+
 		CP_Settings_Stroke(black);
 
 		// Goal
@@ -536,12 +523,6 @@ void Tutorial_Update(void)
 			isCleared = 1;
 		}
 
-
-		// Wall
-		CP_Settings_Fill(black);
-		for (int i = 0; i < numwalls; i++) {
-			CP_Graphics_DrawRect(walls[i].x1+15-camera.worldshiftx, walls[i].y1+15 - camera.worldshifty, walls[i].w-30, walls[i].h-30);
-		}
 
 		// HAZARD DRAWING
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
@@ -585,7 +566,7 @@ void Tutorial_Update(void)
 		}
 
 		// Stamina Bar
-		if (player.stamina < 100.0f) {
+		if (player.stamina < 100.0f && !(player.state == Dead || player.state == Spawning)) {
 			CP_Settings_Fill(stamina);
 			if (player.stamina <= 35.0f) {
 				CP_Settings_Fill(red);
@@ -593,7 +574,7 @@ void Tutorial_Update(void)
 			DrawStatBar(player.x - 15 - camera.worldshiftx, player.y - 30 - camera.worldshifty, player.x + 35 - camera.worldshiftx, player.y - 23 - camera.worldshifty, player.stamina, 100);
 		}
 
-		// DEATHS DRAWING
+		// DEATH COUNTER DRAWING
 		CP_Settings_Fill(black);
 		CP_Settings_TextSize(50);
 		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
@@ -616,7 +597,7 @@ void Tutorial_Update(void)
 			CP_Settings_RectMode(CP_POSITION_CENTER);
 			CP_Settings_Fill(pausebg);
 			CP_Graphics_DrawRect(width / 2, height / 2, width, height);
-			CP_Settings_Fill(plat);
+			CP_Settings_Fill(wall);
 			CP_Graphics_DrawRect(width / 2, height / 2, 1000, 450);
 			CP_Settings_Fill(black);
 			CP_Settings_TextSize(100);
@@ -654,7 +635,7 @@ void Tutorial_Update(void)
 		CP_Settings_RectMode(CP_POSITION_CENTER);
 		CP_Settings_Fill(pausebg);
 		CP_Graphics_DrawRect(width / 2, height / 2, width, height);
-		CP_Settings_Fill(plat);
+		CP_Settings_Fill(wall);
 		CP_Graphics_DrawRect(width / 2, height / 2, 1200, 600);
 		CP_Settings_Fill(black);
 		CP_Settings_TextSize(150);

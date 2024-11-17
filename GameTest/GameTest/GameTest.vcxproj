@@ -36,15 +36,16 @@
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\Assets\Base.txt" />
     <Text Include="..\Assets\Credits.txt" />
-    <Text Include="..\Assets\Level2.txt" />
-    <Text Include="..\Assets\Level2wall.txt" />
     <Text Include="..\Assets\LevelSelect.txt" />
     <Text Include="..\Assets\Level_1\Checkpoint.txt" />
     <Text Include="..\Assets\Level_1\Hazard.txt" />
     <Text Include="..\Assets\Level_1\Platform.txt" />
     <Text Include="..\Assets\Level_1\Wall.txt" />
+    <Text Include="..\Assets\Level_2\Checkpoint.txt" />
+    <Text Include="..\Assets\Level_2\Hazard.txt" />
+    <Text Include="..\Assets\Level_2\Platform.txt" />
+    <Text Include="..\Assets\Level_2\Wall.txt" />
     <Text Include="..\Assets\Level_Tutorial\Checkpoint.txt" />
     <Text Include="..\Assets\Level_Tutorial\Hazard.txt" />
     <Text Include="..\Assets\Level_Tutorial\Platform.txt" />

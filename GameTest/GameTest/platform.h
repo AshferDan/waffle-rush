@@ -55,7 +55,7 @@ float clear_timer;
 
 
 CP_Font text;
-CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
+CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 
 
 // STRUCTS --------------------------------------------
@@ -281,6 +281,7 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 	#pragma endregion 
 	
 	// Player States
+	void Init_Player(float* speed, Player* player, int* deaths);
 	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths);
 	void Spawn_Player(Player* player, coords spawn, Camera* camera);
 	void Reset_Player(Player* player, MoveState* movestate);
@@ -292,8 +293,12 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 	// Draw Platforms
 	void DrawPlatform(int plat_index);
 
+
+	// Draw Goal
+
 	// Draw Player
 	void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate);
+
 
 
 #pragma endregion

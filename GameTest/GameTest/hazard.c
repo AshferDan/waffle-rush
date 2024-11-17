@@ -87,3 +87,13 @@ int crusher_direction(hazard crusher, Player p) {
 		// horizontal = 1, vertical = 2
 		return (horizontal < vertical) ? 1 : 2;
 	}
+
+void reset_hazards(hazard* traps) {
+    for (int i = 0; i < MAX_TRAPS; i++) {
+        for (int j = 0; j < 3; j++) {
+            traps[i].x[j] = 0;
+            traps[i].y[j] = 0;
+        }
+        traps[i].type = 0;
+    }
+}

@@ -25,7 +25,7 @@ void start_transition(Player* player, MoveState* movestate) {
 		*movestate = EnterPlat;
 		player->movex = 0;
 	}
-	else if (*movestate == InPlat && player->y > 200 && player->leaveplatform == 1) {
+	else if (*movestate == InPlat && player->leaveplatform == 1) {
 		*movestate = ExitPlat;
 		player->y -= 50;
 		player->movex = 0;
@@ -96,8 +96,12 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 				ply->movex = 0;
 			}
 
-			ply->movex = CP_Math_ClampFloat(ply->movex, -speed, speed);
-
+			if (ply->walljump == 1) {
+				ply->movex = CP_Math_ClampFloat(ply->movex, -speed, speed);
+			}
+			else {
+				ply->movex = CP_Math_ClampFloat(ply->movex, -1.5f * speed, 1.5f * speed);
+			}
 			// anim state
 			if (tempdirH != Null) {
 				ply->direction = tempdirH;
@@ -233,10 +237,10 @@ void jump(Player* player) {
 			player->walljump = 0;
 			player->movey = -500;
 			if (player->direction == OnLeft) {
-				player->movex = 600;
+				player->movex = 800;
 			}
 			else if (player->direction == OnRight) {
-				player->movex = -600;
+				player->movex = -800;
 			}
 		}
 		if (player->onplatform) {
@@ -619,11 +623,42 @@ void jump(Player* player) {
 /*---------------------------------------------------------------------------------------------------*/
 #pragma region Player State Changes
 	//---------------------------------------------------------
+	// Init player
 	// Kill player
 	// Spawn player
 	// Reset player
 	// Transition player
 	//---------------------------------------------------------
+	void Init_Player(float* speed, Player* player, int* deaths) {
+		// initialize base speed
+		*speed = 600;
+
+		// initialize player struct
+		// size
+		player->width = 20;
+		player->height = 20;
+		// position
+		player->x = spawn.x;
+		player->y = spawn.y;
+		// movement
+		player->movex = 0;
+		player->movey = 0;
+		player->walljump = 0;
+		// anim timers
+		player->transition_time = 15;
+		player->death_time = 17;
+		player->spawn_time = 0;
+		// health
+		player->stamina = 100.0f;
+		// anim state
+		player->state = Spawning;
+		player->anim = 0;
+		player->direction = OnRight;
+
+		// initialize deaths
+		*deaths = 0;
+	}
+
 	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths) {
 		if (player->state != Dead) {
 			player->state = Dead;
@@ -650,6 +685,7 @@ void jump(Player* player) {
 	}
 
 	void Reset_Player(Player* player, MoveState* movestate) {
+		player->stamina = 100;
 		player->movey = -100;
 		*movestate = OnPlat;
 		player->state = Idle;
@@ -734,6 +770,19 @@ void DrawPlatform(int plat_index) {
 		CP_Graphics_AddVertex(Platform[plat_index].platcoords[i].x -camera.worldshiftx, Platform[plat_index].platcoords[i].y - camera.worldshifty);
 	}
 	CP_Graphics_EndShape();
+}
+
+void DrawGoal(CP_Image goal_sprite, float goalx, float goaly, Camera camera, float dt, float clear_timer) {
+	if (!isCleared) {
+		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, 0, 0, 32, 32, 255);
+	}
+	else {
+		if (clear_timer <= 3) {
+			clear_timer += 6 * dt;
+		}
+		int sprite_x = 32 + (32 * (int)clear_timer);
+		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, sprite_x, 0, sprite_x + 32, 32, 255);
+	}
 }
 
 void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
