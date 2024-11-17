@@ -286,7 +286,7 @@ void Game_Update(void)
 		CollWalls(walls, numwalls, &player, player, movestate);
 
 		// Jump
-		jump(&player);
+		jump(&player, movestate);
 
 		// window clamps (eventually World Clamps)
 		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);

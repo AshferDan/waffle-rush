@@ -354,7 +354,7 @@ void MainMenu1_Update(void)
 			}
 
 			// Jump
-			jump(&player);
+			jump(&player, movestate);
 
 			// window clamps (eventually World Clamps)
 			/*player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);

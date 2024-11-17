@@ -231,8 +231,8 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	}
 }
 
-void jump(Player* player) {
-	if (CP_Input_KeyTriggered(KEY_SPACE)) {
+void jump(Player* player, MoveState movestate) {
+	if (CP_Input_KeyTriggered(KEY_SPACE) && movestate == OnPlat) {
 		if (((player->onplatform == 0) && player->state == Sliding && player->walljump == 1)) {
 			player->walljump = 0;
 			player->movey = -500;

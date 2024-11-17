@@ -350,7 +350,7 @@ void L1_Update(void)
 			}
 
 			// Jump
-			jump(&player);
+			jump(&player, movestate);
 
 			// window clamps (eventually World Clamps)
 			/*player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
@@ -548,7 +548,7 @@ void L1_Update(void)
 
 
 		// Wall
-		CP_Settings_Fill(black);
+		CP_Settings_Fill(wall);
 		for (int i = 0; i < numwalls; i++) {
 			CP_Graphics_DrawRect(walls[i].x1+15-camera.worldshiftx, walls[i].y1+15 - camera.worldshifty, walls[i].w-30, walls[i].h-30);
 		}
