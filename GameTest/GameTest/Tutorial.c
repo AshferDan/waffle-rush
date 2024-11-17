@@ -115,6 +115,7 @@ void Tutorial_Init(void)
 
 
 	// Walls
+	reset_walls(&walls);
 	FILE* WallFile = fopen("Assets/Level_Tutorial/Wall.txt", "r");
 
 	if (WallFile == NULL) {

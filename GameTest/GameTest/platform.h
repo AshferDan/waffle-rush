@@ -264,6 +264,8 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 		// CHECKPOINTS
 		// reset checkpoint members and set active checkpoint to 0th coordinates
 		void reset_checkpoints(Checkpoint* checkpoint);
+		// reset walls
+		void reset_walls(platblocks* walls);
 	#pragma endregion
 
 	// COLLISION LOGIC (see platform.c)

@@ -385,6 +385,12 @@ void jump(Player* player) {
 		}
 		checkpoint->active = 0;
 	}
+
+	void reset_walls(platblocks* walls) {
+		for (int wall_index = 0; wall_index < max_walls; wall_index++) {
+			walls[wall_index] = (platblocks){ 0,0,0,0,0,0 };
+		}
+	}
 #pragma endregion
 
 

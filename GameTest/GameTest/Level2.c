@@ -118,6 +118,7 @@ void L2_Init(void)
 
 
 	// Walls
+	reset_walls(&walls);
 	FILE* WallFile = fopen("Assets/Level_2/Wall.txt", "r");
 
 	if (WallFile == NULL) {

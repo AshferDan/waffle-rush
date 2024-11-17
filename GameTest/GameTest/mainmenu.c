@@ -38,7 +38,16 @@ void Main_Menu_Update(void)
 	//background
 	CP_Graphics_ClearBackground(CP_Color_Create(200, 200, 200, 255));
 
-
+	//draw test play button (FOR ASH)
+	TextBoxCreate(width / 2, height / 9, 500, 150, "ASH", button_color);
+	int AshClick = IsAreaClicked(width / 2, height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
+	if (AshClick) {
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
+		CP_Graphics_DrawRect(width / 2, height / 9, 500, 150);
+		if (CP_Input_MouseClicked()) { //if LMB1 pressed
+			CP_Engine_SetNextGameState(MainMenu1_Init, MainMenu1_Update, MainMenu1_Exit); //go to game
+		}
+	}
 	//draw play button
 	TextBoxCreate(width / 2, height / 3, 500, 150, "PLAY", button_color);
 	int PlayClick = IsAreaClicked(width / 2, height / 3, 500, 150, mouseX, mouseY); //if mouse is over button
