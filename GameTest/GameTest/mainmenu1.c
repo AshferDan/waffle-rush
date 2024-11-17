@@ -256,23 +256,24 @@ void MainMenu1_Init(void)
 	camera.spawnY = height * 0.45f; //
 	camera.width = 3.0f / 10.0f * width; //
 	camera.height = 0.1f * height; //since base is a bigger number than the top number.
-	camera.worldshiftx = 0;
-	camera.worldshifty = 0;
 	camera.prespawnX = camera.respawnX = camera.limitleftx = spawn.x - (camera.width / 2.0f);
 	camera.limitrightx = camera.limitleftx + camera.width;
 	camera.prespawnY = camera.respawnY = camera.limittop = spawn.y - (camera.height * 3.0f / 4.0f);
 	camera.limitbase = camera.limittop + camera.height;
+	camera.worldshiftx = camera.limitleftx - camera.spawnX;
+	camera.worldshifty = camera.limittop - camera.spawnY;
 
 	levelEnded = start;
 	scaler1 = (spawn.x + player.width / 2) - camera.worldshiftx;
-	scaler2 = (width - spawn.x + player.width / 2) - camera.worldshiftx;
+	scaler2 = (spawn.x + player.width / 2) - camera.worldshiftx;
 	scaler3 = (spawn.y + player.height / 2) - camera.worldshifty;
-	scaler4 = (height - spawn.y + player.height / 2) - camera.worldshifty;
+	scaler4 = (spawn.y + player.height / 2) - camera.worldshifty;
 #pragma endregion
 }
 
 void MainMenu1_Update(void)
 {
+	printf("camera.worldshiftx %f | camera.worldshifty %f\n", camera.worldshiftx, camera.worldshifty);
 	// background
 	CP_Graphics_ClearBackground(bg);
 
@@ -742,7 +743,7 @@ void MainMenu1_Update(void)
 #pragma region Level Transition
 	//player lastX & Y store last location of player relative to screen, player is also forced to stop moving while level transition is ongoing to stop it from breaking
 	//scaler1,2,3,4 , respectively, control the rects moving (Left,Right,Top,Bottom) L-R, R-L, T-B, B-T
-	printf("%lf\n", scaler1);
+	//printf("%lf\n", scaler1);
 	playerLastX = player.x - camera.worldshiftx;
 	playerLastY = player.y - camera.worldshifty;
 	//Level Transition
