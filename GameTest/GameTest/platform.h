@@ -12,10 +12,13 @@
 #pragma once
 #include "utils.h"
 #include "hazard.h"
+#include "camera.h"
 
 
 #define max_coords 16
 #define max_platforms 20
+#define max_walls 20
+#define max_checkpoints 4
 
 // Platformer globals
 typedef enum MoveState {
@@ -29,9 +32,10 @@ MoveState movestate;
 
 // Level Variables
 int numplats;
+int numcheckpoints;
 int deaths;
 float speed; //speed
-float width, height; //window width/height
+int width, height; //window width/height
 float spawnx, spawny, goalx, goaly; // spawn and goal position
 int isPaused; // check if game paused
 int canMove;  //if player can move
@@ -41,22 +45,43 @@ int highScore; // level high score
 int levelNumber; // level number
 
 // Graphics
-CP_Image player_sprite, transition_sprite;
+CP_Image player_sprite, transition_sprite, spawn_sprite, burn_sprite, fall_sprite, crush_sprite, goal_sprite;
 
 float playerLastX, playerLastY;   //last player coords recorded, mainly used in level transition sequence
 float player_sprite_x, player_sprite_y;
 float transit_sprite_x, transit_sprite_y;
+float death_sprite_x, death_sprite_y;
+float clear_timer;
 
 // Anim timer
-float transit_anim;
 
 
 CP_Font text;
-CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
+CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 
 
 // STRUCTS --------------------------------------------
 #pragma region Structs
+
+	// Camera struct
+
+
+	typedef struct Camera {
+		float limitleftx;
+		float limitrightx;
+		float spawnX;
+		float spawnY;
+		float prespawnX, respawnX;
+		float prespawnY, respawnY;
+		float width;
+		float height;
+		float limittop;
+		float limitbase;
+		float worldshiftx;
+		float worldshifty;
+	} Camera;
+
+	Camera camera;
 
 	// Time Struct
 	#pragma region Timer
@@ -75,6 +100,17 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		typedef struct coords {
 			float x, y;
 		} coords;
+
+		coords spawn;
+
+		// Checkpoint
+		typedef struct Checkpoint {
+			coords coordinates[max_checkpoints];
+			int active;
+		} Checkpoint;
+
+		Checkpoint checkpoint;
+
 
 		// platform hitbox struct
 		typedef struct platblocks {
@@ -122,6 +158,10 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		// platform array
 		platform Platform[max_platforms];
 
+		int numwalls;
+		platblocks walls[max_walls];
+
+
 		// coordinate struct
 	#pragma endregion Platform Structs
 
@@ -132,7 +172,10 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			Idle,
 			Running,
 			Jumping,
+			Sliding,
 			Crawling,
+			Dead,
+			Spawning,
 		} PlayerState;
 		
 		typedef enum PlayerDirection {
@@ -149,6 +192,13 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			Null,
 		} PlayerDirection;
 
+		typedef enum CauseOfDeath {
+			Burn,
+			Fall,
+			Crush,
+			Reset,
+		} CauseOfDeath;
+
 		typedef struct Player {
 			float x; //posx
 			float y; //posy
@@ -157,13 +207,20 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			float stamina; //stamina for InPlat
 			float width; //width
 			float height; //height
-			float transition_time; //transition timer
+
+			// Animation timers
+			float transition_time;
+			float death_time;
+			float spawn_time;
+
+			// Condition checks
 			int onplatform;
+			int walljump;
 			int withinx;
 			int leaveplatform;
-			CP_Color color; //color
 			PlayerState state;
 			PlayerDirection direction;
+			CauseOfDeath deathcause;
 			float anim; //sprite animation timer
 		} Player;
 
@@ -184,10 +241,15 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		void end_transition(Player* player, MoveState* movestate);
 		// platformer and in platform movements
 		void movement(Player* p, MoveState movestate, float speed, float dt);
+		// jump >:)
+		void jump(Player* player);
 		#pragma endregion
 
 	// HITBOX LOGIC (see platform.c)
 	#pragma region Hitboxes
+		// PLATFORMS
+		// reset platform members
+		void reset_platforms(void);
 		// assign platform coordinates
 		void platform_coordinates(int plat_index, int coord_index, float x, float y);
 		// assign onblock coordinates
@@ -198,6 +260,10 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		void verticalhitbox(int coord_index, platform* plt);
 		// initialize all hitboxes for a platform
 		void hitbox(int plat_index, int numplatcoords, platform* plt);
+
+		// CHECKPOINTS
+		// reset checkpoint members and set active checkpoint to 0th coordinates
+		void reset_checkpoints(Checkpoint* checkpoint);
 	#pragma endregion
 
 	// COLLISION LOGIC (see platform.c)
@@ -211,19 +277,30 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 		float fix_collide_y(platblocks plt, Player p);
 
 		void CollPlatforms(int plat_index, platform plt, Player* p, Player ply);
-
 		void CollOnPlatforms(int plat_index, platform plt, Player* p, Player ply);
+
+		void CollWalls(platblocks walls[], int num, Player* pply, Player ply, MoveState movestate);
 	#pragma endregion 
 	
-	// Reset Player
-	void Reset_Player(Player* player, MoveState* movestate, int* deaths);
+	// Player States
+	void Init_Player(float* speed, Player* player, int* deaths);
+	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths);
+	void Spawn_Player(Player* player, coords spawn, Camera* camera);
+	void Reset_Player(Player* player, MoveState* movestate);
+	void Transition_Player(Player* player, MoveState* movestate);
+
+	// Anim Updates
+	void player_anim_updates(Player* player, float dt, MoveState* movestate, Camera* camera, coords spawn);
 
 	// Draw Platforms
 	void DrawPlatform(int plat_index);
 
+
+	// Draw Goal
+
 	// Draw Player
 	void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate);
 
-	void Draw_Player_Transitioning_Sprite(Player player);
+
 
 #pragma endregion

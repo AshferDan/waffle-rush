@@ -11,33 +11,48 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="camera.c" />
     <ClCompile Include="credits.c" />
     <ClCompile Include="game.c" />
     <ClCompile Include="hazard.c" />
     <ClCompile Include="Level1.c" />
+    <ClCompile Include="Level2.c" />
     <ClCompile Include="LevelSelect.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="mainmenu.c" />
     <ClCompile Include="mainmenu1.c" />
+    <ClCompile Include="options.c" />
     <ClCompile Include="platform.c" />
+    <ClCompile Include="Tutorial.c" />
     <ClCompile Include="utils.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="credits.h" />
     <ClInclude Include="hazard.h" />
     <ClInclude Include="LevelSelect.h" />
     <ClInclude Include="mainmenu1.h" />
+    <ClInclude Include="options.h" />
     <ClInclude Include="platform.h" />
     <ClInclude Include="mainmenu.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\Assets\Base.txt" />
     <Text Include="..\Assets\Credits.txt" />
-    <Text Include="..\Assets\Level1.txt" />
-    <Text Include="..\Assets\Level1hazard.txt" />
     <Text Include="..\Assets\LevelSelect.txt" />
-    <Text Include="..\Assets\mainmenu1.txt" />
+    <Text Include="..\Assets\Level_1\Checkpoint.txt" />
+    <Text Include="..\Assets\Level_1\Hazard.txt" />
+    <Text Include="..\Assets\Level_1\Platform.txt" />
+    <Text Include="..\Assets\Level_1\Wall.txt" />
+    <Text Include="..\Assets\Level_2\Checkpoint.txt" />
+    <Text Include="..\Assets\Level_2\Hazard.txt" />
+    <Text Include="..\Assets\Level_2\Platform.txt" />
+    <Text Include="..\Assets\Level_2\Wall.txt" />
+    <Text Include="..\Assets\Level_Tutorial\Checkpoint.txt" />
+    <Text Include="..\Assets\Level_Tutorial\Hazard.txt" />
+    <Text Include="..\Assets\Level_Tutorial\Platform.txt" />
+    <Text Include="..\Assets\Level_Tutorial\Wall.txt" />
+    <Text Include="..\Assets\Options.txt" />
     <Text Include="..\Assets\testhazard.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

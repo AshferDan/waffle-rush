@@ -25,7 +25,7 @@ void start_transition(Player* player, MoveState* movestate) {
 		*movestate = EnterPlat;
 		player->movex = 0;
 	}
-	else if (*movestate == InPlat && player->y > 200 && player->leaveplatform == 1) {
+	else if (*movestate == InPlat && player->leaveplatform == 1) {
 		*movestate = ExitPlat;
 		player->y -= 50;
 		player->movex = 0;
@@ -59,172 +59,198 @@ void end_transition(Player* player, MoveState* movestate) {
 void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	float accel = 3000.0f * dt;
 	float accel2 = 1500.0f * dt;
-	float speed2 = speed/2;
+	float speed2 = speed / 2;
 
 	PlayerDirection tempdirV = Null;
 	PlayerDirection tempdirH = Null;
 
-	// OnPlat movement
-	if (movestate == OnPlat) {
-		tempdirH = Null;
-		// Gravity and terminal velocity
-		if (ply->movey < 1000.0f && ply->onplatform == 0) {
-			ply->movey += 1800.0f * dt;
-		}
-		// jump!
-		if (CP_Input_KeyTriggered(KEY_SPACE) && ply->onplatform == 1) {
-			ply->movey = -speed;
-		}
-		// left
-		if (CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D)) && (ply->movex > -speed)) {
-			ply->movex -= accel;
-			tempdirH = OnLeft;
-		}
-		else if ((ply->movex < 100.f) && (!(CP_Input_KeyDown(KEY_A))|| ((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))))) {
-			ply->movex += accel;
-		};
-		// right
-		if (CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A)) && (ply->movex < speed)) {
-			ply->movex += accel;
-			tempdirH = OnRight;
-		}
-		else if ((ply->movex > 100.f) && (!(CP_Input_KeyDown(KEY_A)) || ((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))))) {
-			ply->movex -= accel;
-		};
-		if (((((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))) || !((CP_Input_KeyDown(KEY_A)) || (CP_Input_KeyDown(KEY_D)))) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
-			ply->movex = 0;
-		}
+	if (!(player.state == Dead || player.state == Spawning)) {
+		// OnPlat movement
+		if (movestate == OnPlat) {
+			tempdirH = Null;
+			// Gravity and terminal velocity
+			if (ply->movey < 1000.0f && ply->onplatform == 0) {
+				ply->movey += 1800.0f * dt;
+			}
 
-		// Speed clamp
-		ply->movex = CP_Math_ClampFloat(ply->movex, -speed, speed);
+			// left
+			if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_LEFT) && (!CP_Input_KeyDown(KEY_D) || !CP_Input_KeyDown(KEY_RIGHT)) && (ply->movex > -speed)) {
+				ply->movex -= accel;
+				tempdirH = OnLeft;
+			}
 
-		// anim state
-		if (tempdirH != Null) {
-			ply->direction = tempdirH;
-		}
-
-		if (ply->onplatform == 1) {
-			ply->state = Idle;
-			if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D)) {
-				ply->state = Running;
+			// right
+			if (CP_Input_KeyDown(KEY_D) || CP_Input_KeyDown(KEY_RIGHT) && (!CP_Input_KeyDown(KEY_A) || !CP_Input_KeyDown(KEY_LEFT)) && (ply->movex < speed)) {
+				ply->movex += accel;
+				tempdirH = OnRight;
 			}
-		}
-		if (ply->onplatform == 0) {
-			ply->state = Jumping;
-		}
-	}
-	// InPlat movement
-	if (movestate == InPlat) {
-		ply->state = Idle;
-
-		// WASD keys
-		// W - Up
-		if (CP_Input_KeyDown(KEY_W) && !CP_Input_KeyDown(KEY_S)) {
-			ply->state = Crawling;
-			tempdirV = InUp;
-			if (ply->movey > -speed2) {
-				ply->movey -= accel2;
+			if (tempdirH == Null) {
+				if (ply->movex < -100) {
+					ply->movex += accel;
+				}
+				else if (ply->movex > 100) {
+					ply->movex -= accel;
+				}
 			}
-		}
-		// A - Left
-		if (CP_Input_KeyDown(KEY_A) && !CP_Input_KeyDown(KEY_D)) {
-			ply->state = Crawling;
-			tempdirH = InLeft;
-			if (ply->movex > -speed2) {
-				ply->movex -= accel2;
-			}
-		}
-		// S - Down
-		if (CP_Input_KeyDown(KEY_S) && !CP_Input_KeyDown(KEY_W)) {
-			ply->state = Crawling;
-			tempdirV = InDown;
-			if (ply->movey < speed2) {
-				ply->movey += accel2;
-
-			}
-		}
-		// D - Right
-		if (CP_Input_KeyDown(KEY_D) && !CP_Input_KeyDown(KEY_A)) {
-			ply->state = Crawling;
-			tempdirH = InRight;
-			if (ply->movex < speed2) {
-				ply->movex += accel2;
-			}
-		}
-
-		// Idle decel and brake
-		if (tempdirH == Null) {
-			if (ply->movex < 0) {
-				ply->movex += accel2;
-			}
-			else {
-				ply->movex -= accel2;
-			}
-			if (ply->movex <= 50.f && ply->movex >= -50.f) {
+			if (((((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))) || ((CP_Input_KeyDown(KEY_LEFT) && CP_Input_KeyDown(KEY_RIGHT))) || tempdirH == Null) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
 				ply->movex = 0;
 			}
-		}
-		if (tempdirV == Null) {
-			if (ply->movey < 50) {
-				ply->movey += accel2;
-			}
-			else if (ply->movey > 50) {
-				ply->movey -= accel2;
-			}
-			if (ply->movey <= 50.f && ply->movey >= -50.f) {
-				ply->movey = 0;
-			}
-		}
 
-		// Speed clamps
-		ply->movex = CP_Math_ClampFloat(ply->movex, -speed2, speed2);
-		ply->movey = CP_Math_ClampFloat(ply->movey, -speed2, speed2);
-
-		// Direction
-		// Diagonal check if there are both horizontal and vertical inputs
-		if (tempdirH != Null && tempdirV != Null) {
-			if (tempdirV == InUp) {
-				if (tempdirH == InLeft) {
-					ply->direction = InUpLeft;
-				}
-				else {
-					ply->direction = InUpRight;
-				}
+			if (ply->walljump == 1) {
+				ply->movex = CP_Math_ClampFloat(ply->movex, -speed, speed);
 			}
 			else {
-				if (tempdirH == InLeft) {
-					ply->direction = InDownLeft;
-				}
-				else {
-					ply->direction = InDownRight;
+				ply->movex = CP_Math_ClampFloat(ply->movex, -1.5f * speed, 1.5f * speed);
+			}
+			// anim state
+			if (tempdirH != Null) {
+				ply->direction = tempdirH;
+			}
+
+			if (ply->onplatform == 1) {
+				ply->walljump = 1;
+				ply->state = Idle;
+				if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D) || CP_Input_KeyDown(KEY_LEFT) || CP_Input_KeyDown(KEY_RIGHT)) {
+					ply->state = Running;
 				}
 			}
+			if (ply->onplatform == 0) {
+				ply->state = Jumping;
+			}
 		}
-		// If no inputs, or only one directional input
-		if (tempdirV == Null && tempdirH == Null) {
-			ply->direction = ply->direction;
-		} 
-		else if (tempdirV == Null) {
-			ply->direction = tempdirH;
-		}
-		else if (tempdirH == Null) {
-			ply->direction = tempdirV;
+		// InPlat movement
+		if (movestate == InPlat) {
+			ply->state = Idle;
+
+			// WASD keys
+			// W - Up
+			if ((CP_Input_KeyDown(KEY_W) || CP_Input_KeyDown(KEY_UP)) && (!CP_Input_KeyDown(KEY_S) || !CP_Input_KeyDown(KEY_DOWN))) {
+				ply->state = Crawling;
+				tempdirV = InUp;
+				if (ply->movey > -speed2) {
+					ply->movey -= accel2;
+				}
+			}
+			// A - Left
+			if ((CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_LEFT)) && (!CP_Input_KeyDown(KEY_D) || !CP_Input_KeyDown(KEY_RIGHT))) {
+				ply->state = Crawling;
+				tempdirH = InLeft;
+				if (ply->movex > -speed2) {
+					ply->movex -= accel2;
+				}
+			}
+			// S - Down
+			if ((CP_Input_KeyDown(KEY_S) || CP_Input_KeyDown(KEY_DOWN)) && (!CP_Input_KeyDown(KEY_W) || !CP_Input_KeyDown(KEY_UP))) {
+				ply->state = Crawling;
+				tempdirV = InDown;
+				if (ply->movey < speed2) {
+					ply->movey += accel2;
+
+				}
+			}
+			// D - Right
+			if ((CP_Input_KeyDown(KEY_D) || CP_Input_KeyDown(KEY_RIGHT)) && (!CP_Input_KeyDown(KEY_A) || !CP_Input_KeyDown(KEY_LEFT))) {
+				ply->state = Crawling;
+				tempdirH = InRight;
+				if (ply->movex < speed2) {
+					ply->movex += accel2;
+				}
+			}
+
+			// Idle decel and brake
+			if (tempdirH == Null) {
+				if (ply->movex < -80) {
+					ply->movex += accel2;
+				}
+				else if (ply->movex > 80){
+					ply->movex -= accel2;
+				}
+				if (ply->movex <= 80.f && ply->movex >= -80.f) {
+					ply->movex = 0;
+				}
+			}
+			if (tempdirV == Null) {
+				if (ply->movey < -80) {
+					ply->movey += accel2;
+				}
+				else if (ply->movey > 80) {
+					ply->movey -= accel2;
+				}
+				if (ply->movey <= 80.f && ply->movey >= -80.f) {
+					ply->movey = 0;
+				}
+			}
+
+			// Speed clamps
+			ply->movex = CP_Math_ClampFloat(ply->movex, -speed2, speed2);
+			ply->movey = CP_Math_ClampFloat(ply->movey, -speed2, speed2);
+
+			// Direction
+			// Diagonal check if there are both horizontal and vertical inputs
+			if (tempdirH != Null && tempdirV != Null) {
+				if (tempdirV == InUp) {
+					if (tempdirH == InLeft) {
+						ply->direction = InUpLeft;
+					}
+					else {
+						ply->direction = InUpRight;
+					}
+				}
+				else {
+					if (tempdirH == InLeft) {
+						ply->direction = InDownLeft;
+					}
+					else {
+						ply->direction = InDownRight;
+					}
+				}
+			}
+			// If no inputs, or only one directional input
+			if (tempdirV == Null && tempdirH == Null) {
+				ply->direction = ply->direction;
+			}
+			else if (tempdirV == Null) {
+				ply->direction = tempdirH;
+			}
+			else if (tempdirH == Null) {
+				ply->direction = tempdirV;
+			}
+
 		}
 
+		// Update movement only if InPlat/OnPlat, ignore transition
+		if (movestate == InPlat || movestate == OnPlat) {
+			ply->x += ply->movex * dt;
+			ply->y += ply->movey * dt;
+		}
+
+		// reset checks for jumping and entering
+		ply->onplatform = 0;
+		ply->withinx = 0;
+		ply->leaveplatform = 0;
 	}
+}
 
-	// Update movement only if InPlat/OnPlat, ignore transition
-	if (movestate == InPlat || movestate == OnPlat) {
-		ply->x += ply->movex * dt;
-		ply->y += ply->movey * dt;
+void jump(Player* player) {
+	if (CP_Input_KeyTriggered(KEY_SPACE)) {
+		if (((player->onplatform == 0) && player->state == Sliding && player->walljump == 1)) {
+			player->walljump = 0;
+			player->movey = -500;
+			if (player->direction == OnLeft) {
+				player->movex = 800;
+			}
+			else if (player->direction == OnRight) {
+				player->movex = -800;
+			}
+		}
+		if (player->onplatform) {
+			player->movey = -600;
+		}
 	}
-
-	// reset checks for jumping and entering
-	ply->onplatform = 0;
-	ply->withinx = 0;
-	ply->leaveplatform = 0;
 }
 #pragma endregion
+
+
 
 
 // HITBOX LOGIC
@@ -245,6 +271,19 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	// This ensures the collision logic will not have conflicts when corners are touched by the player
 	//---------------------------------------------------------
 
+	// Reset platform members
+	void reset_platforms(void) {
+		for (int plat_index = 0; plat_index < max_platforms; plat_index++) {
+			Platform[plat_index].numcoords = 0;
+			Platform[plat_index].numblocks = 0;
+			for (int coord_index = 0; coord_index < max_coords; coord_index++) {
+				Platform[plat_index].platcoords[coord_index] = (coords){ 0,0 };
+				Platform[plat_index].inblocks[coord_index] = (platblocks){ 0,0,0,0 };
+				Platform[plat_index].onblocks[coord_index] = (platblocks){ 0,0,0,0 };
+			}
+		}
+	}
+
 	// Initializes platform coordinates
 	void platform_coordinates(int plat_index, int coord_index, float x, float y) {
 		Platform[plat_index].platcoords[coord_index] = (coords){ x,y };
@@ -253,6 +292,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	void platform_onblocks(int plat_index, int block_index, float x1, float y1, float x2, float y2) {
 		Platform[plat_index].onblocks[block_index] = (platblocks){ x1-15, x2+15, y1-15, y2+15, (x2+15) - (x1-15), (y2+15) - (y1-15) };
 	}
+
 
 	// assigns platform horizontal hitboxes, used in hitbox function below
 	void horizontalhitbox(int coord_index, platform* plt) {
@@ -336,6 +376,14 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 				verticalhitbox(coord_index, &Platform[plat_index]);
 			}
 		}
+	}
+
+	// Checkpoints
+	void reset_checkpoints(Checkpoint* checkpoint) {
+		for (int checkpoint_index = 0; checkpoint_index < max_checkpoints; checkpoint_index++) {
+			checkpoint->coordinates[checkpoint_index] = (coords){ 0,0 };
+		}
+		checkpoint->active = 0;
 	}
 #pragma endregion
 
@@ -478,22 +526,238 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 				if (collision_direction(Platform[plat_index].onblocks[block_index], ply) == 1) {
 					pply->movex = 0;
 				}
+				if (!(pply->onplatform) && pply->x == Platform[plat_index].onblocks[block_index].x2 && CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D))) {
+					pply->state = Sliding;
+					if (pply->movey >= 400) {
+						pply->movey = 400;
+					}
+
+				}
+				else if (!(pply->onplatform) && pply->x + pply->width == Platform[plat_index].onblocks[block_index].x1 && CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A))) {
+					pply->state = Sliding;
+					if (pply->movey >= 400) {
+						pply->movey = 400;
+					}
+
+				}
+				else if (!(pply->onplatform)){
+					pply->state = Jumping;
+				}
+				else if (pply->onplatform && pply->state == Jumping) {
+					pply->state = Idle;
+				}
 				
 			}// end if collision check
 		}
 	}
+	void CollWalls(platblocks walls[], int num, Player* pply, Player ply, MoveState movestate) {
+		movestate = movestate;
 
-	void Reset_Player(Player* player, MoveState* movestate, int* deaths) {
-		player->x = spawnx;
-		player->y = spawny;
-		*movestate = OnPlat;
-		player->state = Idle;
-		player->direction = OnRight;
-		player->movey = 0;
-		*deaths += 1;
+		// iterate through number of coordinates
+		for (int wall_index = 0; wall_index < numwalls; wall_index++) {
+			// check for collision
+			if (collision(walls[wall_index], ply)) 
+			{
+				// check if collision is from vertical and not horizontal
+				if (collision_direction(walls[wall_index], ply) == 2) { // if colliding vertically
+					if (ply.x < walls[wall_index].x2 && ply.x + ply.width > walls[wall_index].x1) {  // if player within x coords of platform 
+
+						pply->y = fix_collide_y(walls[wall_index], ply);
+
+						// check player within X corners of platform
+						/*if (ply.x >= walls[wall_index].x1 + 30 && ply.x + ply.width <= walls[wall_index].x2 - 30) {
+							pply->withinx = 1;
+						}*/
+
+						if ((pply->y + ply.height) == walls[wall_index].y1) {
+							pply->onplatform = 1; // on platform!
+						}
+						//---------------------------------------------------------
+						// two conditions to set player vertical velocity 0:
+						// 1) if player is on top of platform and travelling downwards
+						// 2) if player bumps bottom of platform and travelling upwards
+						//---------------------------------------------------------
+						if (ply.y < walls[wall_index].y1 && ply.movey > 0 || ply.y > walls[wall_index].y1 && ply.movey < 0) { pply->movey = 0; }
+
+						// end if player within x coords of platform
+					}
+					// end if colliding vertically
+				}
+				// if player is outside x coords of platform
+				// aka player is colliding from the sides
+				else {
+					pply->x = fix_collide_x(walls[wall_index], ply);
+					if ((collision_direction(walls[wall_index], ply) == 1)) {
+						pply->movex = 0;
+					}
+					if (movestate == OnPlat) {
+						if (pply->x == walls[wall_index].x2 && CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D))) {
+							pply->state = Sliding;
+							if (pply->movey >= 400) {
+								pply->movey = 400;
+							}
+
+						}
+						else if (pply->x + pply->width == walls[wall_index].x1 && CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A))) {
+							pply->state = Sliding;
+							if (pply->movey >= 400) {
+								pply->movey = 400;
+							}
+
+						}
+						else if (!(pply->onplatform)) {
+							pply->state = Jumping;
+						}
+					}
+				}
+			}// end if collision check
+		}
+
+		if (pply->onplatform && (pply->state == Jumping || pply->state == Sliding)) {
+			pply->state = Idle;
+		}
 	}
 #pragma endregion
 
+// PLAYER STATES
+/*---------------------------------------------------------------------------------------------------*/
+#pragma region Player State Changes
+	//---------------------------------------------------------
+	// Init player
+	// Kill player
+	// Spawn player
+	// Reset player
+	// Transition player
+	//---------------------------------------------------------
+	void Init_Player(float* speed, Player* player, int* deaths) {
+		// initialize base speed
+		*speed = 600;
+
+		// initialize player struct
+		// size
+		player->width = 20;
+		player->height = 20;
+		// position
+		player->x = spawn.x;
+		player->y = spawn.y;
+		// movement
+		player->movex = 0;
+		player->movey = 0;
+		player->walljump = 0;
+		// anim timers
+		player->transition_time = 15;
+		player->death_time = 17;
+		player->spawn_time = 0;
+		// health
+		player->stamina = 100.0f;
+		// anim state
+		player->state = Spawning;
+		player->anim = 0;
+		player->direction = OnRight;
+
+		// initialize deaths
+		*deaths = 0;
+	}
+
+	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths) {
+		if (player->state != Dead) {
+			player->state = Dead;
+			player->deathcause = deathcause;
+			player->death_time = 0;
+			player->spawn_time = 0;
+			player->movey = (deathcause != Fall) ? 0 : -300;
+			++*deaths;
+		}
+	}
+
+	void Spawn_Player(Player* player, coords spawn,  Camera* camera) {
+		// Player changes
+		player->x = spawn.x;
+		player->y = spawn.y;
+		player->movex = 0;
+		player->movey = 0;
+		player->state = Spawning;
+		// Camera changes
+		camera->prespawnX = camera->limitleftx;
+		camera->prespawnY = camera->limittop;
+		camera->respawnX = spawn.x - camera->width / 2;
+		camera->respawnY = spawn.y - 3 * camera->height / 4;
+	}
+
+	void Reset_Player(Player* player, MoveState* movestate) {
+		player->stamina = 100;
+		player->movey = -100;
+		*movestate = OnPlat;
+		player->state = Idle;
+		player->anim = 0;
+		player->direction = OnRight;
+		player->deathcause = Reset;
+	}
+
+	void Transition_Player(Player *player, MoveState *movestate) {
+		if (movestate == OnPlat || movestate == InPlat) {
+			start_transition(player, movestate);
+		}
+
+		if (player->transition_time >= 13) {
+			end_transition(player, movestate);
+		}
+	}
+#pragma endregion
+
+
+// TIMER
+/*---------------------------------------------------------------------------------------------------*/
+#pragma region TIMERS
+	void player_anim_updates(Player* player, float dt, MoveState* movestate, Camera* camera, coords spawn) {
+		player->anim += 10 * dt;
+		if (player->anim >= 20) {
+			player->anim = 0;
+		}
+		if (player->transition_time < 13) {
+			player->transition_time += 20 * dt;
+			if (*movestate == EnterPlat) {
+				camera->limitbase += 100 * dt;
+				camera->limittop += 100 * dt;
+			}
+			if (*movestate == ExitPlat) {
+				camera->limitbase -= 100 * dt;
+				camera->limittop -= 100 * dt;
+			}
+		}
+		if (player->transition_time > 13) {
+			player->transition_time = 13;
+		}
+		if (player->death_time < 17) {
+			if (player->deathcause != Fall) {
+				player->death_time += 17 * dt;
+			}
+			else if (player->y <= camera->limitbase + 400) {
+				player->movey += 1800.0f * dt;
+				player->y += player->movey * dt;
+			}
+			else player->death_time = 17;
+		}
+		if (player->death_time >= 17) {
+			if (player->state == Dead) {
+				Spawn_Player(player, spawn, camera);
+				player->movex = 0;
+			}
+			player->death_time = 17;
+		}
+		if (player->spawn_time < 34 && player->state == Spawning) {
+			player->spawn_time += 34 * dt;
+			camera->limitleftx = camera->prespawnX - (player->spawn_time * ((camera->prespawnX - camera->respawnX)/34));
+			camera->limitrightx = camera->prespawnX + camera->width - (player->spawn_time * ((camera->prespawnX - camera->respawnX) / 34));
+			camera->limittop = camera->prespawnY - (player->spawn_time * ((camera->prespawnY - camera->respawnY) / 34));
+			camera->limitbase = camera->prespawnY + camera->height - (player->spawn_time * ((camera->prespawnY - camera->respawnY) / 34));
+		}
+		if (player->spawn_time > 34 && player->state == Spawning) {
+			Reset_Player(player, movestate);
+			player->spawn_time = 34;
+		}
+	}
+#pragma endregion
 
 
 // RENDER
@@ -503,86 +767,138 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 void DrawPlatform(int plat_index) {
 	CP_Graphics_BeginShape();
 	for (int i = 0; i <= Platform[plat_index].numcoords - 1; i++) {
-		CP_Graphics_AddVertex(Platform[plat_index].platcoords[i].x, Platform[plat_index].platcoords[i].y);
+		CP_Graphics_AddVertex(Platform[plat_index].platcoords[i].x -camera.worldshiftx, Platform[plat_index].platcoords[i].y - camera.worldshifty);
 	}
 	CP_Graphics_EndShape();
 }
 
+void DrawGoal(CP_Image goal_sprite, float goalx, float goaly, Camera camera, float dt, float clear_timer) {
+	if (!isCleared) {
+		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, 0, 0, 32, 32, 255);
+	}
+	else {
+		if (clear_timer <= 3) {
+			clear_timer += 6 * dt;
+		}
+		int sprite_x = 32 + (32 * (int)clear_timer);
+		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, sprite_x, 0, sprite_x + 32, 32, 255);
+	}
+}
+
 void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 	// Normal Player
-	float sprite_x, sprite_y;
+	float draw_posx = player.x - 15 - camera.worldshiftx;
+	float draw_posy = player.y - 15 - camera.worldshifty;
+	float sprite_x = 0;
+	float sprite_y = 0;
 	float rot = 0;
-	if (movestate == InPlat || movestate == OnPlat) {
-		switch (player.direction) {
-		case OnLeft:
+	if (!(player.state == Dead || player.state == Spawning)) {
+		if (movestate == InPlat || movestate == OnPlat) {
+			switch (player.direction) {
+			case OnLeft:
+				sprite_y = 0;
+				break;
+			case OnRight:
+				sprite_y = 18;
+				break;
+			case InUp:
+				sprite_y = 36;
+				rot = 0;
+				break;
+			case InUpLeft:
+				sprite_y = 36;
+				rot = 315;
+				break;
+			case InLeft:
+				sprite_y = 36;
+				rot = 270;
+				break;
+			case InDownLeft:
+				sprite_y = 36;
+				rot = 225;
+				break;
+			case InDown:
+				sprite_y = 36;
+				rot = 180;
+				break;
+			case InDownRight:
+				sprite_y = 36;
+				rot = 135;
+				break;
+			case InRight:
+				sprite_y = 36;
+				rot = 90;
+				break;
+			case InUpRight:
+				sprite_y = 36;
+				rot = 45;
+				break;
+			}
+			switch (player.state) {
+			case Idle:
+				sprite_x = (player.anim < 10) ? 0 : 18;
+				break;
+			case Running:
+			case Crawling:
+				sprite_x = ((int)player.anim % 2 == 0) ? 36 : 54;
+				break;
+			case Jumping:
+				sprite_x = 72;
+				break;
+			case Sliding:
+				sprite_x = 90;
+				break;
+			}
+			CP_Image_DrawSubImageAdvanced(player_sprite, draw_posx, draw_posy, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 255, rot);
+		}
+		else
+		{
+			sprite_y = (movestate == EnterPlat) ? 36 : 0;
+
+			sprite_x = ((int)player.transition_time / 1) * 18;
+			CP_Image_DrawSubImage(transition_sprite, draw_posx, draw_posy, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
+		}
+	}
+	else if (player.state == Dead) {
+		CP_Image death_sprite;
+		switch (player.deathcause) {
+		case Burn: {
+			death_sprite = burn_sprite;
+
+			switch (player.direction) {
+			case OnLeft: sprite_y = 0;
+				break;
+			case OnRight: sprite_y = 36;
+				break;
+			default: sprite_y = 0;
+			}
+			sprite_x = ((int)player.death_time) * 18;
+			if (!player.onplatform) {
+				sprite_x += 306;
+			}
+			break;
+		}
+		case Fall: 
+			death_sprite = fall_sprite;
+			sprite_x = ((int)(player.anim) % 2 == 0) ? 0 : 18;
 			sprite_y = 0;
 			break;
-		case OnRight:
-			sprite_y = 180;
-			break;
-		case InUp:
-			sprite_y = 360;
-			rot = 0;
-			break;
-		case InUpLeft:
-			sprite_y = 360;
-			rot = 315;
-			break;
-		case InLeft:
-			sprite_y = 360;
-			rot = 270;
-			break;
-		case InDownLeft:
-			sprite_y = 360;
-			rot = 225;
-			break;
-		case InDown:
-			sprite_y = 360;
-			rot = 180;
-			break;
-		case InDownRight:
-			sprite_y = 360;
-			rot = 135;
-			break;
-		case InRight:
-			sprite_y = 360;
-			rot = 90;
-			break;
-		case InUpRight:
-			sprite_y = 360;
-			rot = 45;
-			break;
-		}
-		switch (player.state) {
-		case Idle:
-			sprite_x = (player.anim < 10) ? 0 : 180;
-			break;
-		case Running:
-		case Crawling:
-			sprite_x = ((int)player.anim % 2 == 0) ? 360 : 540;
-			break;
-		case Jumping:
-			sprite_x = 720;
-			break;
-		}
-		CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15, player.y - 15, player.width + 30, player.height + 30, sprite_x + 5, sprite_y + 5, sprite_x + 170, sprite_y + 170, 255, rot);
-	}
-	else 
-	{
-		sprite_y = (movestate == EnterPlat) ? 360 : 0;
 
-		sprite_x = ((int)player.transition_time / 1) * 180;
-		CP_Image_DrawSubImage(transition_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 5, sprite_y + 5, sprite_x + 170, sprite_y + 350, 255);
+		case Crush: 
+			death_sprite = crush_sprite;
+			sprite_x = ((int)player.death_time < 3) ? (int)player.death_time * 18 : 54;
+			sprite_y = (player.direction == OnLeft) ? 36 : 0;
+			break;
+		
+		default:
+			death_sprite = burn_sprite;
+		
+		}
+
+		CP_Image_DrawSubImage(death_sprite, draw_posx, draw_posy, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
 	}
 }
 
-void Draw_Player_Transitioning_Sprite(Player player) {
-	float transit_sprite_x, transit_sprite_y;
-	transit_sprite_y = (movestate == EnterPlat) ? 360 : 0;
 
-	transit_sprite_x = ((int)player.transition_time / 1) * 180;
-	CP_Image_DrawSubImage(transition_sprite, player.x - 15, player.y - 15, player.width + 30, (player.height + 30) * 2, transit_sprite_x + 5, transit_sprite_y + 5, transit_sprite_x + 170, transit_sprite_y + 350, 255);
-
-}
 
 #pragma endregion
