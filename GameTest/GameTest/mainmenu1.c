@@ -86,13 +86,6 @@ void MainMenu1_Init(void)
 
 
 #pragma endregion
-
-	//TEXT FOR LEVEL SELECT
-	CP_Settings_Fill(black);
-	CP_Settings_TextSize(100);
-	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
-	CP_Font_DrawText("You touched grass", width / 2, 50);
-
 #pragma endregion
 	// PLAYER INITS
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -121,8 +114,7 @@ void MainMenu1_Init(void)
 	player.anim = 0;
 	player.direction = OnRight;
 
-	//Level transitions set
-
+	//LEVEL SELECT
 	level1.posx = 300;
 	level1.posy = 950;
 	level1.width = 200;
@@ -135,7 +127,7 @@ void MainMenu1_Init(void)
 
 	//transition box reset
 	scaler1 = scaler2 = scaler3 = scaler4 = 0;
-	levelEnded = 0;
+	levelEnded = reset;
 
 	// initialize deaths
 	deaths = 0;
@@ -281,8 +273,8 @@ void MainMenu1_Update(void)
 
 	// window clamps
 		//!! commented out to for smooth main menu -> level transition !!
-		/*player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
-		if (player.y + player.height > height || player.y < 0) {
+		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
+		/*if (player.y + player.height > height || player.y < 0) {
 			player.movey = 0;
 		}
 		player.y = CP_Math_ClampFloat(player.y, 0, height - player.height);*/
@@ -334,15 +326,12 @@ void MainMenu1_Update(void)
 		isCleared = 1;
 	}
 
-	//Level Transition
-	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level1.posx, level1.posy, level1.width, level1.height)) {
-		printf("level1\n");
-		//CP_Engine_SetNextGameState(L1_Init, L1_Update, L1_Exit); //go to game
-	}
-	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level2.posx, level2.posy, level2.width, level2.height)) {
-		printf("level2\n");
-		//CP_Engine_SetNextGameState(L2_Init, L2_Update, L2_Exit); //go to game
-	}
+	// LEVEL TEXT DRAWING
+	CP_Settings_Fill(black);
+	CP_Settings_TextSize(70);
+	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+	CP_Font_DrawText("Level 1", level1.posx + 100, level1.posy - 400);
+	CP_Font_DrawText("Level 2", level2.posx + 100, level2.posy - 400);
 
 	// Player
 	Draw_Player(player_sprite, player, movestate);
@@ -355,6 +344,7 @@ void MainMenu1_Update(void)
 		}
 		DrawStatBar(player.x - 15, player.y - 30, player.x + 35, player.y - 23, player.stamina, 100);
 	}
+
 	// DEATHS DRAWING
 	CP_Settings_Fill(black);
 	CP_Settings_TextSize(50);
@@ -415,20 +405,34 @@ void MainMenu1_Update(void)
 		CP_Settings_RectMode(CP_POSITION_CORNER);
 	}
 #pragma endregion
+#pragma region Level Transition
 	//have to force player to stop moving so that the transition works smoothly
 	//scaler1,2,3,4 , respectively, control the rects moving (Left,Right,Top,Bottom) L-R, R-L, T-B, B-T
-	//TODO - press p start whole animation sequence, press o to do opening animation
+
+	//Level Transition
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level1.posx, level1.posy, level1.width, level1.height)) {
+		printf("level1\n");
+		levelEnded = end;
+		playerLastX = player.x;
+		playerLastY = player.y;
+		player.stamina = 100.0f;
+		//CP_Engine_SetNextGameState(L1_Init, L1_Update, L1_Exit); //go to game
+	}
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level2.posx, level2.posy, level2.width, level2.height)) {
+		printf("level2\n");
+		//CP_Engine_SetNextGameState(L2_Init, L2_Update, L2_Exit); //go to game
+	}
 
 	if (CP_Input_KeyTriggered(KEY_P)) {
-		levelEnded = 1;
+		levelEnded = end;
 		playerLastX = player.x;
 		playerLastY = player.y;
 	}
 	if (CP_Input_KeyDown(KEY_O)) {
-		levelEnded = 2;
+		levelEnded = start;
 	}
 
-	if (levelEnded == 1) {
+	if (levelEnded == end) {
 		canMove = 0;
 		scaler1 += (playerLastX + player.width / 2) * dt;
 		scaler2 += (width - playerLastX + player.width / 2) * dt;
@@ -437,25 +441,26 @@ void MainMenu1_Update(void)
 		TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
 
 		if (scaler1 >= playerLastX) {
-			levelEnded = 2;
+			levelEnded = start;
 		}
 	}
 
-	if (levelEnded == 2) {
+	if (levelEnded == start) {
 		canMove = 1;
-		scaler1 -= (playerLastX + player.width/2) * dt;
-		scaler2 -= (width - playerLastX + player.width/2) * dt;
-		scaler3 -= (playerLastY + player.height/2) * dt;
-		scaler4 -= (height - playerLastY + player.height/2) * dt;
+		scaler1 -= (playerLastX + player.width / 2) * dt;
+		scaler2 -= (width - playerLastX + player.width / 2) * dt;
+		scaler3 -= (playerLastY + player.height / 2) * dt;
+		scaler4 -= (height - playerLastY + player.height / 2) * dt;
 		TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
 
 		if (scaler1 <= 0 && scaler2 <= 0 && scaler3 <= 0 && scaler4 <= 0) {
-			levelEnded = 0;
+			levelEnded = reset;
 		}
 	}
-	if (levelEnded == 0) {
+	if (levelEnded == reset) {
 		scaler1 = scaler2 = scaler3 = scaler4 = 0;
 	}
+#pragma endregion
 
 	// Back to main menu
 	if (CP_Input_KeyDown(KEY_Q)) { CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit); }
