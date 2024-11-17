@@ -116,6 +116,7 @@ void L1_Init(void)
 
 
 	// Walls
+	reset_walls(&walls);
 	FILE* WallFile = fopen("Assets/Level_1/Wall.txt", "r");
 
 	if (WallFile == NULL) {
@@ -593,7 +594,7 @@ void L1_Update(void)
 		
 
 		// Stamina Bar
-		if (player.stamina < 100.0f) {
+		if (player.stamina < 100.0f && !(player.state == Dead || player.state == Spawning)) {
 			CP_Settings_Fill(stamina);
 			if (player.stamina <= 35.0f) {
 				CP_Settings_Fill(red);

@@ -51,6 +51,9 @@
     <ClCompile Include="hazard.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mainmenu1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="credits.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -81,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hazard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mainmenu1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="credits.h">
@@ -141,6 +147,9 @@
     </Text>
     <Text Include="..\Assets\Level_2\Hazard.txt">
       <Filter>Resource Files\Levels\Level_2</Filter>
+    </Text>
+    <Text Include="..\Assets\mainmenu1.txt">
+      <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
 </Project>

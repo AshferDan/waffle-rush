@@ -15,3 +15,8 @@
 void Main_Menu_Init(void);
 void Main_Menu_Update(void);
 void Main_Menu_Exit(void);
+
+
+void MainMenu1_Init(void);
+void MainMenu1_Update(void);
+void MainMenu1_Exit(void);
