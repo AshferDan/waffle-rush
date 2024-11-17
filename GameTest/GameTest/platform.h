@@ -214,7 +214,6 @@ CP_Color bg, pausebg, black, red, green, plat, stamina; //colors
 			// Condition checks
 			int onplatform;
 			int walljump;
-			int wallhug;
 			int withinx;
 			int leaveplatform;
 			PlayerState state;

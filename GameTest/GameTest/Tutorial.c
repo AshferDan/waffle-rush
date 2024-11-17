@@ -43,7 +43,6 @@ void Tutorial_Init(void)
 	}
 	fclose(file2);
 
-
 	// Initialize checkpoints and first spawn
 	reset_checkpoints(&checkpoint);
 	FILE* CheckpointFile = fopen("Assets/Level_Tutorial/Checkpoint.txt", "r");
@@ -60,7 +59,7 @@ void Tutorial_Init(void)
 	// initialize spawn location
 	spawn.x = checkpoint.coordinates[0].x - 10;
 	spawn.y = checkpoint.coordinates[0].y - 60;
-	// initialize test goal
+	// initialize goal
 	goalx = 2400;
 	goaly = 700;
 
@@ -139,6 +138,14 @@ void Tutorial_Init(void)
 	//HAZARDS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Hazard
+	for (int i = 0; i < MAX_TRAPS; i++) {
+		for (int j = 0; j < 3; j++) {
+			traps[i].x[j] = 0;
+			traps[i].y[j] = 0;
+		}
+		traps[i].type = 0;
+	}
+
 	FILE* HazardFile = fopen("Assets/Level_Tutorial/Hazard.txt", "r");
 	fscanf_s(HazardFile, "%d", &numberoftraps);
 
@@ -147,7 +154,7 @@ void Tutorial_Init(void)
 		fscanf_s(HazardFile, "%d", &traps[i].type);
 		switch (traps[i].type)
 		{
-		case 0:
+		case spike:
 		{
 			int j = 0;
 			for (; j < 3; ++j)
@@ -156,7 +163,7 @@ void Tutorial_Init(void)
 			}
 			break;
 		}
-		case 1:
+		case crusher:
 		{
 			int j = 0;
 			for (; j < 3; ++j)
@@ -165,7 +172,15 @@ void Tutorial_Init(void)
 			}
 			break;
 		}
-
+		case shooter:
+		{
+			int j = 0;
+			for (; j < 3; ++j)
+			{
+				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
+			}
+			break;
+		}
 		}
 	}
 	fclose(HazardFile);
@@ -188,7 +203,6 @@ void Tutorial_Init(void)
 	player.movex = 0;
 	player.movey = 0;
 	player.walljump = 0;
-	player.wallhug = 0;
 	// anim timers
 	player.transition_time = 15;
 	player.death_time = 17;
@@ -218,8 +232,8 @@ void Tutorial_Init(void)
 	// game pause
 	isPaused = 0;
 
-	//// check if level complete
-	//isCleared = 0;
+	// check if level complete
+	isCleared = 0;
 
 	//// initialize level number
 	//levelNumber = 1;
@@ -401,20 +415,80 @@ void Tutorial_Update(void)
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
-		if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
-			Kill_Player(&player, Crush, &deaths);
-		}
+		////declaring top left of square for square triangle collision
+		//Point squareTopLeft = { player.x, player.y };
+		//for (int i = 0; i < 4; i++) {
+		//	Point A = { traps[i].x[0], traps[i].y[0] };
+		//	Point B = { traps[i].x[1], traps[i].y[1] };
+		//	Point C = { traps[i].x[2], traps[i].y[2] };
 
-		Point squareTopLeft = { player.x, player.y };
-		for (int i = 0; i < 4; i++) {
-			Point A = { traps[i].x[0], traps[i].y[0] };
-			Point B = { traps[i].x[1], traps[i].y[1] };
-			Point C = { traps[i].x[2], traps[i].y[2] };
+		//	if (check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C)) {
+		//		Kill_Player(&player, Burn, &deaths);
+		//	}
+		//}
+		////CRUSHER MOVEMENT
+		//// crusherstate = 0 if going down and crusherstate = 1 when going up
+		//float crushervely;
+		//if (crusherstate == 0) {
+		//	crushervely = 1000.f * dt;
+		//	traps[4].y[2] += crushervely;
+		//	if (traps[4].y[2] > 600) {
+		//		traps[4].y[2] = 600;
+		//		crusherstate = 1;
+		//	}
+		//	//if the player hits the crusher at the bottom, add death and reset
+		//	if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
+		//		if (crusher_direction(traps[4], player) == 1) {
+		//			if (player.x >= ((traps[4].x[1] + traps[4].x[0]) / 2.f)) {
+		//				player.x = 300;
+		//				player.movex = 0;
+		//			}
+		//			else if (player.x <= ((traps[4].x[1] + traps[4].x[0]) / 2.f)) {
+		//				player.x = 200 - player.width;
+		//				player.movex = 0;
+		//			}
+		//		}
+		//		else if (crusher_direction(traps[4], player) == 2) {
+		//			player.y = traps[4].y[2];
+		//			player.movey = 0;
+		//			if ((player.y + player.height) >= 600) {
+		//				player.y = (600 - player.height);
+		//				Kill_Player(&player, Crush, &deaths);
+		//				printf("active\n");
+		//			}
+		//		}
 
-			if (check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C)) {
-				Kill_Player(&player, Burn, &deaths);
-			}
-		}
+		//	}
+		//}
+		//if (crusherstate == 1) {
+		//	crushervely = -0.005f * dt;
+		//	traps[4].y[2] += crushervely;
+		//	//traps[4].y[0] += crushervely;
+		//	if (traps[4].y[2] < 450) {
+		//		traps[4].y[2] = 450;
+		//		crusherstate = 0;
+		//	}
+		//	//if the player hits the crusher as it goes up, no death but cant go in
+		//	if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0])) {
+		//		
+		//		if (crusher_direction(traps[4], player) == 1) {
+		//			if (player.x >= ((traps[4].x[1] + traps[4].x[0]) / 2.f)) {
+		//				player.x = 300;
+		//				player.movex = 0;
+		//			}
+		//			else if (player.x <= ((traps[4].x[1] + traps[4].x[0]) / 2.f)) {
+		//				player.x = 200 - player.width;
+		//				player.movex = 0;
+		//			}
+		//		}
+		//		else if (crusher_direction(traps[4], player) == 2) {
+		//			player.y = traps[4].y[2];
+		//			player.movey = 0;
+		//		}
+
+		//	}
+		//}
+
 
 #pragma endregion
 
@@ -424,14 +498,13 @@ void Tutorial_Update(void)
 		//camera.limitleftx =  camera.limitleftx  + offsetX;
 		//camera.limitrightx = camera.limitrightx + offsetX;
 #pragma region Camera
-		if (!(player.state == Dead /*|| player.state == Spawning*/)) {
+		if (!(player.state == Dead)) {
 			playerCamColl(&player, &camera); //functionised my camera shift. 
 			//where worldshiftx is now the modifyable for all objects
 		}
 		CP_Settings_NoFill();
 		CP_Settings_RectMode(CP_POSITION_CORNER);
 		CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop - camera.worldshifty, camera.width, camera.height); //code for rectangle
-
 	}
 #pragma endregion
 
@@ -461,7 +534,6 @@ void Tutorial_Update(void)
 
 		if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly, 50, 50)) {
 			isCleared = 1;
-
 		}
 
 
@@ -471,40 +543,25 @@ void Tutorial_Update(void)
 			CP_Graphics_DrawRect(walls[i].x1+15-camera.worldshiftx, walls[i].y1+15 - camera.worldshifty, walls[i].w-30, walls[i].h-30);
 		}
 
-		//CRUSHER MOVEMENT
-		// crusherstate = 0 if going down and crusherstate = 1 when going up
-		float crushervely;
-		if (crusherstate == 0) {
-			crushervely = 100.f * dt;
-			traps[4].y[2] += crushervely;
-			traps[4].y[0] += crushervely;
-			if (traps[4].y[2] >= 600) {
-				crusherstate = 1;
-			}
-		}
-		if (crusherstate == 1) {
-			crushervely = 10.f * dt;
-			traps[4].y[2] -= crushervely;
-			traps[4].y[0] -= crushervely;
-			if (traps[4].y[0] <= 450) {
-				crusherstate = 0;
-			}
-		}
-
 		// HAZARD DRAWING
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
 		for (int i = 0; i < numberoftraps; ++i)
 		{
 			switch (traps[i].type)
 			{
-			case 0:
+			case spike:
 			{
-				CP_Graphics_DrawTriangle(traps[i].x[0]-camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - camera.worldshiftx, traps[i].y[1] - camera.worldshifty, traps[i].x[2] - camera.worldshiftx, traps[i].y[2] - camera.worldshifty);
+				CP_Graphics_DrawTriangle(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - camera.worldshiftx, traps[i].y[1] - camera.worldshifty, traps[i].x[2] - camera.worldshiftx, traps[i].y[2] - camera.worldshifty);
 				break;
 			}
-			case 1:
+			case crusher:
 			{
-				CP_Graphics_DrawRect(traps[i].x[0]-camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
+				CP_Graphics_DrawRect(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
+				break;
+			}
+			case shooter:
+			{
+				CP_Graphics_DrawRect(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
 				break;
 			}
 
@@ -552,7 +609,7 @@ void Tutorial_Update(void)
 		// TIMER DRAWING
 		char time[16] = { 0 };
 		sprintf_s(time, 16, "TIME: %02d:%02d:%02d", (int)timer.minutes, (int)timer.seconds, (int)timer.millis);
-		CP_Font_DrawText(time, 1200, 100);
+		CP_Font_DrawText(time, 1200, 50);
 
 		// LEVEL COMPLETE PAGE
 		if (isCleared == 1) {

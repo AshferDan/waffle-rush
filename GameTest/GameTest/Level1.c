@@ -25,10 +25,11 @@ void L1_Init(void)
 	// load player sprite
 	player_sprite		= CP_Image_Load("Assets/Player_Sprites.png");
 	transition_sprite	= CP_Image_Load("Assets/Transition.png");
+	spawn_sprite		= CP_Image_Load("Assets/Spawn_Sprite.png");
 	burn_sprite			= CP_Image_Load("Assets/Burnt.png");
 	fall_sprite			= CP_Image_Load("Assets/Fall_Sprite.png");
 	crush_sprite		= CP_Image_Load("Assets/Crush_Sprite.png");
-	goal_sprite = CP_Image_Load("Assets/Plate.png");
+	goal_sprite			= CP_Image_Load("Assets/Plate.png");
 #pragma endregion
 
 	// LEVEL INIT
@@ -42,10 +43,24 @@ void L1_Init(void)
 	}
 	fclose(file2);
 
+
+	// Initialize checkpoints and first spawn
+	reset_checkpoints(&checkpoint);
+	FILE* CheckpointFile = fopen("Assets/Level_1/Checkpoint.txt", "r");
+	fscanf_s(CheckpointFile, "%d", &numcheckpoints);
+	for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
+		int x = 0;
+		int y = 0;
+		fscanf_s(CheckpointFile, "%d %d", &x, &y);
+		checkpoint.coordinates[checkpoint_index] = (coords){ x, y };
+	}
+	fclose(CheckpointFile);
+
+
 	// initialize spawn location
-	spawn.x = 150;
-	spawn.y = 200;
-	// initialize test goal
+	spawn.x = checkpoint.coordinates[0].x - 10;
+	spawn.y = checkpoint.coordinates[0].y - 60;
+	// initialize goal
 	goalx = 1500;
 	goaly = 200;
 
@@ -55,7 +70,7 @@ void L1_Init(void)
 
 	reset_platforms();
 
-	FILE* PlatformFile = fopen("Assets/Level1.txt", "r");
+	FILE* PlatformFile = fopen("Assets/Level_1/Platform.txt", "r");
 
 	if (PlatformFile == NULL) {
 		printf("Failed to open platform file! Check if file exists\n");
@@ -101,7 +116,7 @@ void L1_Init(void)
 
 
 	// Walls
-	FILE* WallFile = fopen("Assets/Level1wall.txt", "r");
+	FILE* WallFile = fopen("Assets/Level_1/Wall.txt", "r");
 
 	if (WallFile == NULL) {
 		printf("Failed to open wall file! Check if file exists\n");
@@ -124,7 +139,7 @@ void L1_Init(void)
 	//HAZARDS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Hazard
-	FILE* HazardFile = fopen("Assets/Level1hazard.txt", "r");
+	FILE* HazardFile = fopen("Assets/Level_1/Hazard.txt", "r");
 	fscanf_s(HazardFile, "%d", &numberoftraps);
 
 	for (int i = 0; i < numberoftraps; ++i)
@@ -181,11 +196,10 @@ void L1_Init(void)
 	player.movex = 0;
 	player.movey = 0;
 	player.walljump = 0;
-	player.wallhug = 0;
 	// anim timers
 	player.transition_time = 15;
 	player.death_time = 17;
-	player.spawn_time = 35;
+	player.spawn_time = 34;
 	// health
 	player.stamina = 100.0f;
 	// anim state
@@ -254,9 +268,9 @@ void L1_Init(void)
 		/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Camera Init
 
-	camera.limitleftx = width * 2.0f / 10.0f; //
-	camera.limitrightx = width * 8.0f / 10.0f; //
-	camera.limittop = height * 0.2f; //
+	camera.limitleftx = camera.spawnX = width * 3.0f / 10.0f; //
+	camera.limitrightx = width * 7.0f / 10.0f; //
+	camera.limittop = camera.spawnY = height * 0.2f; //
 	camera.limitbase = height * 0.8f; //  
 	camera.width = camera.limitrightx - camera.limitleftx; //
 	camera.height = camera.limitbase - camera.limittop; //since base is a bigger number than the top number.
@@ -313,100 +327,83 @@ void L1_Update(void)
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Movement
 
-	// Pause check
+		// Pause check
 	if (isPaused == 0) {
 
-	// Animation Timer
-		player.anim += 10 * dt;
-		if (player.anim >= 20) {
-			player.anim = 0;
-		}
-		if (player.transition_time < 13) {
-			player.transition_time += 20 * dt;
-		}
-		if (player.transition_time > 13) {
-			player.transition_time = 13;
-		}
-		if (player.death_time < 17) {
-			if (player.deathcause != Fall) {
-				player.death_time += 17 * dt;
-			}
-			else if (player.y <= height - player.height) {
-				player.movey += 1800.0f * dt;
-				player.y += player.movey * dt;
-			}
-			else player.death_time = 17;
-		}
-		if (player.death_time >= 17) {
-			if (player.state == Dead) {
-				Reset_Player(&player, &movestate);
-				player.movex = 0;
-			}
-			player.death_time = 17;
-		}
+		// Animation Timer
+		player_anim_updates(&player, dt, &movestate, &camera, spawn);
 
 		// Movement logics
 		if (isCleared == 0) {
 			movement(&player, movestate, speed, dt);
 		}
 
-	// Collision against platforms
-	if (player.state != Dead) {
-		if (movestate == OnPlat && player.deathcause != Fall) {
-			player.stamina += 40.0f * dt;
-			for (int plat_index = 0; plat_index < numplats; plat_index++) {
-				CollOnPlatforms(plat_index, Platform[plat_index], &player, player);
+		// Collision against platforms
+		if (!(player.state == Dead || player.state == Spawning)) {
+			if (movestate == OnPlat && player.deathcause != Fall) {
+				player.stamina += 40.0f * dt;
+				for (int plat_index = 0; plat_index < numplats; plat_index++) {
+					CollOnPlatforms(plat_index, Platform[plat_index], &player, player);
+				}
 			}
-		}
 
-		else if (movestate == InPlat && player.deathcause != Fall) {
-			player.stamina -= 20.0f * dt;
-			for (int plat_index = 0; plat_index < numplats; plat_index++) {
-				CollPlatforms(plat_index, Platform[plat_index], &player, player);
+			else if (movestate == InPlat && player.deathcause != Fall) {
+				player.stamina -= 20.0f * dt;
+				for (int plat_index = 0; plat_index < numplats; plat_index++) {
+					CollPlatforms(plat_index, Platform[plat_index], &player, player);
+				}
+				if (player.stamina <= 0) {
+					Kill_Player(&player, Fall, &deaths);
+				}
 			}
-			if (player.stamina <= 0) {
+			player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
+
+			// Collision against walls
+			CollWalls(walls, numwalls, &player, player, movestate);
+
+			// Update active checkpoint
+			for (int cp_index = 0; cp_index < numcheckpoints; cp_index++) {
+				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, checkpoint.coordinates[cp_index].x - 50, checkpoint.coordinates[cp_index].y - 100, 100, 100)) {
+					checkpoint.active = cp_index;
+					spawn.x = checkpoint.coordinates[cp_index].x - 10;
+					spawn.y = checkpoint.coordinates[cp_index].y - 60;
+				}
+			}
+
+			// Jump
+			jump(&player);
+
+			// window clamps (eventually World Clamps)
+			/*player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
+			if (player.y + player.height > height || player.y < 0) {
+				player.movey = 0;
+			}
+			player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);*/
+
+			// change movestate
+				/*
+				OnPlat	  - on platform
+				InPlat	  - inside platform
+				EnterPlat - from OnPlat to InPlat
+				ExitPlat  - from InPlat to OnPlat
+				*/
+			if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
+				start_transition(&player, &movestate);
+			}
+
+			if (player.transition_time >= 13) {
+				end_transition(&player, &movestate);
+			}
+			// reset with R or touch ground while movestate OnPlat
+			if (CP_Input_KeyTriggered(KEY_R) && !(player.state == Dead || player.state == Spawning) && !isCleared) {
+				CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
+				Kill_Player(&player, reset, &deaths);
+			}
+			if ((player.y >= height - player.height) && movestate == OnPlat && player.deathcause != Fall) {
 				Kill_Player(&player, Fall, &deaths);
 			}
 		}
-		player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
 
-		// Collision against walls
-		CollWalls(walls, numwalls, &player, player, movestate);
-
-		// Jump
-		jump(&player);
-
-		// window clamps (eventually World Clamps)
-		//player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
-		//if (player.y + player.height > height || player.y < 0) {
-		//	player.movey = 0;
-		//}
-		//player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);
-
-		// change movestate
-			/*
-			OnPlat	  - on platform
-			InPlat	  - inside platform
-			EnterPlat - from OnPlat to InPlat
-			ExitPlat  - from InPlat to OnPlat
-			*/
-		if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
-			start_transition(&player, &movestate);
-		}
-
-		if (player.transition_time >= 13) {
-			end_transition(&player, &movestate);
-		}
-
-		// reset with R or touch ground while movestate OnPlat
-		if (CP_Input_KeyTriggered(KEY_R) && (player.state != Dead)) {
-			CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
-			Kill_Player(&player, reset, &deaths);
-		}
-		if ((player.y >= height - player.height) && movestate == OnPlat && player.deathcause != Fall) {
-			Kill_Player(&player, Fall, &deaths);
-		}
-	}
 #pragma endregion
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
@@ -484,7 +481,6 @@ void L1_Update(void)
 			}
 		}
 		
-		
 #pragma endregion
 
 		// CAMERA UPDATE
@@ -493,14 +489,14 @@ void L1_Update(void)
 		//camera.limitleftx =  camera.limitleftx  + offsetX;
 		//camera.limitrightx = camera.limitrightx + offsetX;
 #pragma region Camera
-		playerCamColl(&player, &camera); //functionised my camera shift. 
-		//where worldshiftx is now the modifyable for all objects
-
-		printf("limitleftx %f| limitrightx %f\n", camera.limitleftx, camera.limitrightx);
+		if (!(player.state == Dead)) {
+			playerCamColl(&player, &camera); //functionised my camera shift. 
+			//where worldshiftx is now the modifyable for all objects
+		}
 		CP_Settings_NoFill();
 		CP_Settings_RectMode(CP_POSITION_CORNER);
 		CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop - camera.worldshifty, camera.width, camera.height); //code for rectangle
-
+	}
 
 #pragma endregion
 
@@ -583,7 +579,7 @@ void L1_Update(void)
 			}
 			case crusher:
 			{
-				CP_Graphics_DrawRect(traps[i].x[0], traps[i].y[0], traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
+				CP_Graphics_DrawRect(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
 				break;
 			}
 			case shooter:
@@ -595,6 +591,16 @@ void L1_Update(void)
 			}
 		}
 
+		// Checkpoint
+		for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
+			if (checkpoint_index != checkpoint.active) {
+				CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50 - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, 1472, 0, 1536, 64, 255);
+			}
+			if (checkpoint_index == checkpoint.active) {
+				float spawn_sprite_x = (int)player.spawn_time * 64;
+				CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50 - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, spawn_sprite_x, 0, spawn_sprite_x + 64, 64, 255);
+			}
+		}
 
 		// Player
 		if (isCleared == 0) {
@@ -626,12 +632,7 @@ void L1_Update(void)
 		// TIMER DRAWING
 		char time[16] = { 0 };
 		sprintf_s(time, 16, "TIME: %02d:%02d:%02d", (int)timer.minutes, (int)timer.seconds, (int)timer.millis);
-		CP_Font_DrawText(time, 1200, 100);
-
-		// SCORE DRAWING
-		char score[20] = { 0 };
-		sprintf_s(score, 20, "HIGH SCORE: %d", levels[levelNumber - 1].score);
-		CP_Font_DrawText(score, 1200, 50);
+		CP_Font_DrawText(time, 1200, 50);
 
 		// LEVEL COMPLETE PAGE
 		if (isCleared == 1) {
@@ -702,8 +703,7 @@ void L1_Update(void)
 
 			CP_Settings_RectMode(CP_POSITION_CORNER);
 		}
-	}
-
+	
 	// PAUSE PAGE
 	if (isPaused == 1 && isCleared == 0) {
 		CP_Settings_RectMode(CP_POSITION_CENTER);
@@ -752,6 +752,7 @@ void L1_Exit(void)
 {
 	CP_Image_Free(&player_sprite);
 	CP_Image_Free(&transition_sprite);
+	CP_Image_Free(&spawn_sprite);
 	CP_Image_Free(&burn_sprite);
 	CP_Image_Free(&fall_sprite);
 	CP_Image_Free(&crush_sprite);
