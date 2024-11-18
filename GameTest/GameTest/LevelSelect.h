@@ -50,7 +50,3 @@ void L1_Exit(void);
 void L2_Init(void);
 void L2_Update(void);
 void L2_Exit(void);
-
-void L3_Init(void);
-void L3_Update(void);
-void L3_Exit(void);

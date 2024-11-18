@@ -28,9 +28,6 @@
     <Filter Include="Resource Files\Levels\Level_Select">
       <UniqueIdentifier>{855ca6cc-4e68-4f1c-b3db-592b906b4177}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Levels\Level_3">
-      <UniqueIdentifier>{73da51e1-d4ad-4c2f-ac58-35eb42617e39}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -75,9 +72,6 @@
     <ClCompile Include="Tutorial.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Level3.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainmenu.h">
@@ -102,9 +96,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="options.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Level3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -168,21 +159,6 @@
     </Text>
     <Text Include="..\Assets\Level_Select\Platform.txt">
       <Filter>Resource Files\Levels\Level_Select</Filter>
-    <Text Include="..\Assets\Level_Select\Checkpoint.txt" />
-    <Text Include="..\Assets\Level_Select\Hazard.txt" />
-    <Text Include="..\Assets\Level_Select\Platform.txt" />
-    <Text Include="..\Assets\Level_Select\Wall.txt" />
-    <Text Include="..\Assets\Level_3\Checkpoint.txt">
-      <Filter>Resource Files\Levels\Level_3</Filter>
-    </Text>
-    <Text Include="..\Assets\Level_3\Hazard.txt">
-      <Filter>Resource Files\Levels\Level_3</Filter>
-    </Text>
-    <Text Include="..\Assets\Level_3\Platform.txt">
-      <Filter>Resource Files\Levels\Level_3</Filter>
-    </Text>
-    <Text Include="..\Assets\Level_3\Wall.txt">
-      <Filter>Resource Files\Levels\Level_3</Filter>
     </Text>
   </ItemGroup>
 </Project>
