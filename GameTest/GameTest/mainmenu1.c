@@ -15,10 +15,10 @@
 level levels[num_levels];
 float timeElapsed;
 
-EnterLevel level1, level2;
+EnterLevel Tutorial, level1, level2, level3;
 int levelEnded;
 
-void MainMenu1_Init(void)
+void LSelect_Init(void)
 {
 	// ASSET LOADS
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -262,18 +262,33 @@ void MainMenu1_Init(void)
 	camera.limitbase = camera.limittop + camera.height;
 	camera.worldshiftx = camera.limitleftx - camera.spawnX;
 	camera.worldshifty = camera.limittop - camera.spawnY;
+#pragma endregion
 
+#pragma region Level Transition Inits
+	//scaler1-4 sets the level transition effect
 	levelEnded = start;
 	scaler1 = (spawn.x + player.width / 2) - camera.worldshiftx;
 	scaler2 = (spawn.x + player.width / 2) - camera.worldshiftx;
 	scaler3 = (spawn.y + player.height / 2) - camera.worldshifty;
 	scaler4 = (spawn.y + player.height / 2) - camera.worldshifty;
+
+	//sets coords to detect when player warps through level select platform
+	Tutorial.posx = 0;
+	Tutorial.posy = 725;
+	level1.posx = 400;
+	level1.posy = 725;
+	level2.posx = 800;
+	level2.posy = 725;
+	level3.posx = 1200;
+	level3.posy = 725;
+	Tutorial.height = level1.height = level2.height = level3.height = 100;
+	Tutorial.width = level1.width = level2.width = level3.width = 200;
 #pragma endregion
 }
 
-void MainMenu1_Update(void)
+void LSelect_Update(void)
 {
-	printf("camera.worldshiftx %f | camera.worldshifty %f\n", camera.worldshiftx, camera.worldshifty);
+	//printf("camera.worldshiftx %f | camera.worldshifty %f\n", camera.worldshiftx, camera.worldshifty);
 	// background
 	CP_Graphics_ClearBackground(bg);
 
@@ -338,7 +353,7 @@ void MainMenu1_Update(void)
 			}
 
 			else if (movestate == InPlat && player.deathcause != Fall) {
-				player.stamina -= 20.0f * dt;
+				//player.stamina -= 20.0f * dt;
 				for (int plat_index = 0; plat_index < numplats; plat_index++) {
 					CollPlatforms(plat_index, Platform[plat_index], &player, player);
 				}
@@ -504,14 +519,38 @@ void MainMenu1_Update(void)
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
 
+	//Drawing Level Text
+	CP_Settings_Fill(black);
+	CP_Settings_TextSize(70);
+	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+	CP_Font_DrawText("TUTORIAL", Tutorial.posx + Tutorial.width / 2 - camera.worldshiftx, Tutorial.height * 5 - camera.worldshifty);
+	CP_Font_DrawText("Level 1", level1.posx + level1.width / 2 - camera.worldshiftx, level1.height * 5 - camera.worldshifty);
+	CP_Font_DrawText("Level 2", level2.posx + level2.width / 2 - camera.worldshiftx, level2.height * 5 - camera.worldshifty);
+	CP_Font_DrawText("Level 3", level3.posx + level3.width / 2 - camera.worldshiftx, level3.height * 5 - camera.worldshifty);
+
+	//this will be replaced with an actual logo ideally
+	CP_Settings_TextSize(120);
+	CP_Font_DrawText("WAFFLE RUSH WOOOOOOOO", -800 - camera.worldshiftx, 300 - camera.worldshifty);
+	CP_Font_DrawText("-->", -800 - camera.worldshiftx, 400 - camera.worldshifty);
+	CP_Settings_TextSize(50);
+	CP_Font_DrawText("WRONG WAY", -1750-camera.worldshiftx, 800-camera.worldshifty);
+
 	// Platforms
 	CP_Settings_Fill(plat);
 	CP_Settings_Stroke(CP_Color_Create(100, 100, 100, 255));
 	for (int i = 0; i < numplats; i++) {
 		DrawPlatform(i);
 	}
+
+	// Wall
+	CP_Settings_Fill(wall);
+	for (int i = 0; i < numwalls; i++) {
+		CP_Graphics_DrawRect(walls[i].x1 + 15 - camera.worldshiftx, walls[i].y1 + 15 - camera.worldshifty, walls[i].w - 30, walls[i].h - 30);
+	}
+
 	CP_Settings_Stroke(black);
 
+	/*
 	// Goal
 	if (!isCleared) {
 		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, 0, 0, 32, 32, 255);
@@ -556,12 +595,8 @@ void MainMenu1_Update(void)
 		//}
 		//fclose(LevelFile);
 	}
+	*/
 
-	// Wall
-	CP_Settings_Fill(black);
-	for (int i = 0; i < numwalls; i++) {
-		CP_Graphics_DrawRect(walls[i].x1 + 15 - camera.worldshiftx, walls[i].y1 + 15 - camera.worldshifty, walls[i].w - 30, walls[i].h - 30);
-	}
 
 	// Checkpoint
 	for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
@@ -573,6 +608,8 @@ void MainMenu1_Update(void)
 			CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50 - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, spawn_sprite_x, 0, spawn_sprite_x + 64, 64, 255);
 		}
 	}
+
+
 
 	// Player
 	if (isCleared == 0) {
@@ -615,6 +652,7 @@ void MainMenu1_Update(void)
 		DrawStatBar(player.x - 15 - camera.worldshiftx, player.y - 30 - camera.worldshifty, player.x + 35 - camera.worldshiftx, player.y - 23 - camera.worldshifty, player.stamina, 100);
 	}
 
+	/*
 	// DEATHS DRAWING
 	CP_Settings_Fill(black);
 	CP_Settings_TextSize(50);
@@ -628,10 +666,12 @@ void MainMenu1_Update(void)
 		CP_Font_DrawText("Bruh", 50, 50);
 	}
 
+
 	// TIMER DRAWING
 	char time[16] = { 0 };
 	sprintf_s(time, 16, "TIME: %02d:%02d:%02d", (int)timer.minutes, (int)timer.seconds, (int)timer.millis);
 	CP_Font_DrawText(time, 1200, 50);
+	*/
 
 	//// LEVEL COMPLETE PAGE
 	//if (isCleared == 1) {
@@ -743,25 +783,44 @@ void MainMenu1_Update(void)
 #pragma region Level Transition
 	//player lastX & Y store last location of player relative to screen, player is also forced to stop moving while level transition is ongoing to stop it from breaking
 	//scaler1,2,3,4 , respectively, control the rects moving (Left,Right,Top,Bottom) L-R, R-L, T-B, B-T
-	//printf("%lf\n", scaler1);
+	/*printf("scaler1: %lf | scaler2: %lf | scaler3: %lf | scaler4: %lf\n", scaler1, scaler2, scaler3, scaler4);
+	printf("playerlastx: %lf\n", playerLastX);*/
 	playerLastX = player.x - camera.worldshiftx;
 	playerLastY = player.y - camera.worldshifty;
 	//Level Transition
-	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level1.posx, level1.posy, level1.width, level1.height)) {
-		printf("level1\n");
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, Tutorial.posx, Tutorial.posy, Tutorial.width, Tutorial.height)) {
 		levelEnded = end;
-		player.stamina = 100.0f;
-		//CP_Engine_SetNextGameState(L1_Init, L1_Update, L1_Exit); //go to game
+		if (scaler1 >= playerLastX - 20) {
+
+			CP_Engine_SetNextGameState(Tutorial_Init, Tutorial_Update, Tutorial_Exit); //go to game
+		}
+
+	}
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level1.posx, level1.posy, level1.width, level1.height)) {
+		levelEnded = end;
+		if (scaler1 >= playerLastX - 20) {
+
+			CP_Engine_SetNextGameState(L1_Init, L1_Update, L1_Exit); //go to game
+		}
+
 	}
 	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level2.posx, level2.posy, level2.width, level2.height)) {
-		printf("level2\n");
-		//CP_Engine_SetNextGameState(L2_Init, L2_Update, L2_Exit); //go to game
+		levelEnded = end;
+		if (scaler1 >= playerLastX - 20) {
+			CP_Engine_SetNextGameState(L2_Init, L2_Update, L2_Exit); //go to game
+		}
+	}
+
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level3.posx, level3.posy, level3.width, level3.height)) {
+		levelEnded = end;
+		player.stamina = 100.0f;
+		if (scaler1 >= playerLastX - 20) {
+			CP_Engine_SetNextGameState(L3_Init, L3_Update, L3_Exit); //go to game
+		}
 	}
 
 	if (CP_Input_KeyTriggered(KEY_P)) {
 		levelEnded = end;
-		playerLastX = player.x;
-		playerLastY = player.y;
 	}
 	if (CP_Input_KeyDown(KEY_O)) {
 		levelEnded = start;
@@ -803,7 +862,7 @@ void MainMenu1_Update(void)
 	}
 }
 
-void MainMenu1_Exit(void)
+void LSelect_Exit(void)
 {
 	CP_Image_Free(&player_sprite);
 	CP_Image_Free(&transition_sprite);

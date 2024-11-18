@@ -32,6 +32,9 @@ void LSelect_Init(void);
 void LSelect_Update(void);
 void LSelect_Exit(void);
 
+void LSelectx_Init(void);
+void LSelectx_Update(void);
+void LSelectx_Exit(void);
 
 void Game_Init(void);
 void Game_Update(void);
@@ -50,3 +53,13 @@ void L1_Exit(void);
 void L2_Init(void);
 void L2_Update(void);
 void L2_Exit(void);
+
+
+void L3_Init(void);
+void L3_Update(void);
+void L3_Exit(void);
+
+
+void L4_Init(void);
+void L4_Update(void);
+void L4_Exit(void);

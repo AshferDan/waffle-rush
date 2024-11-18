@@ -38,16 +38,16 @@ void Main_Menu_Update(void)
 	//background
 	CP_Graphics_ClearBackground(CP_Color_Create(200, 200, 200, 255));
 
-	//draw test play button (FOR ASH)
-	TextBoxCreate(width / 2, height / 9, 500, 150, "ASH", button_color);
-	int AshClick = IsAreaClicked(width / 2, height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
-	if (AshClick) {
-		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-		CP_Graphics_DrawRect(width / 2, height / 9, 500, 150);
-		if (CP_Input_MouseClicked()) { //if LMB1 pressed
-			CP_Engine_SetNextGameState(MainMenu1_Init, MainMenu1_Update, MainMenu1_Exit); //go to game
-		}
-	}
+	////draw test play button (FOR ASH)
+	//TextBoxCreate(width / 2, height / 9, 500, 150, "ASH", button_color);
+	//int AshClick = IsAreaClicked(width / 2, height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
+	//if (AshClick) {
+	//	CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
+	//	CP_Graphics_DrawRect(width / 2, height / 9, 500, 150);
+	//	if (CP_Input_MouseClicked()) { //if LMB1 pressed
+	//		CP_Engine_SetNextGameState(MainMenu1_Init, MainMenu1_Update, MainMenu1_Exit); //go to game
+	//	}
+	//}
 	//draw play button
 	TextBoxCreate(width / 2, height / 3, 500, 150, "PLAY", button_color);
 	int PlayClick = IsAreaClicked(width / 2, height / 3, 500, 150, mouseX, mouseY); //if mouse is over button
@@ -59,34 +59,34 @@ void Main_Menu_Update(void)
 		}
 	}
 
-	//test level button
-	TextBoxCreate(3 * width / 4, height / 3, 150, 150, "T", button_color);
-	int TestClick = IsAreaClicked(3 * width / 4, height / 3, 150, 150, mouseX, mouseY); //if mouse is over button
-	if (TestClick) {
-		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-		CP_Graphics_DrawRect(3 * width / 4, height / 3, 150, 150);
-		if (CP_Input_MouseClicked()) { //if LMB1 pressed
-			CP_Engine_SetNextGameState(Tutorial_Init, Tutorial_Update, Tutorial_Exit); //go to test stage
-		}
-	}
+	////test level button
+	//TextBoxCreate(3 * width / 4, height / 3, 150, 150, "T", button_color);
+	//int TestClick = IsAreaClicked(3 * width / 4, height / 3, 150, 150, mouseX, mouseY); //if mouse is over button
+	//if (TestClick) {
+	//	CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
+	//	CP_Graphics_DrawRect(3 * width / 4, height / 3, 150, 150);
+	//	if (CP_Input_MouseClicked()) { //if LMB1 pressed
+	//		CP_Engine_SetNextGameState(Tutorial_Init, Tutorial_Update, Tutorial_Exit); //go to test stage
+	//	}
+	//}
 
 	//options button
-	TextBoxCreate(3 * width / 4, 5 * height / 9, 150, 150, "0p", button_color);
-	int OptionsClick = IsAreaClicked(3 * width / 4, 5 * height / 9, 150, 150, mouseX, mouseY); //if mouse is over button
+	TextBoxCreate(2 * width / 3, 5 * height / 9, 500, 150, "OPTIONS", button_color);
+	int OptionsClick = IsAreaClicked(2 * width / 3, 5 * height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
 	if (OptionsClick) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-		CP_Graphics_DrawRect(3 * width / 4, 5 * height / 9, 150, 150);
+		CP_Graphics_DrawRect(2 * width / 3, 5 * height / 9, 500, 150);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
 			CP_Engine_SetNextGameState(Options_Init, Options_Update, Options_Exit); //go to test stage
 		}
 	}
 
 	//credits button
-	TextBoxCreate(width / 2, 5 * height / 9, 500, 150, "CREDITS", button_color);
-	int CreditsClick = IsAreaClicked(width / 2, 5 * height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
+	TextBoxCreate(width / 3, 5 * height / 9, 500, 150, "CREDITS", button_color);
+	int CreditsClick = IsAreaClicked(width / 3, 5 * height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
 	if (CreditsClick) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-		CP_Graphics_DrawRect(width / 2, 5 * height / 9, 500, 150);
+		CP_Graphics_DrawRect(width / 3, 5 * height / 9, 500, 150);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
 			CP_Engine_SetNextGameState(Credits_Init, Credits_Update, Credits_Exit); //go to test stage
 		}

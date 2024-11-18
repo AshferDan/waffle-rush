@@ -214,12 +214,6 @@ void L1_Init(void)
 	// time elapsed (for level complete screen)
 	timeElapsed = 0.0f;
 
-	// game pause
-	// isPaused = 0;
-
-	// check if level complete
-	// isCleared = 0;
-
 	// initialize level number
 	levelNumber = 1;
 
@@ -454,7 +448,7 @@ void L1_Update(void)
 						crusherstate = 1;
 					}
 					// if the player hits the crusher at the bottom, add death and reset
-					if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0]) && !(player.state == Dead || player.state == Spawning)) {
+					if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], traps[trap_index].y[0], traps[trap_index].x[1] - traps[trap_index].x[0], traps[trap_index].y[2] - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning)) {
 						if (crusher_direction(traps[trap_index], player) == 1) {
 							if (player.x >= ((traps[trap_index].x[1] + traps[trap_index].x[0]) / 2.f)) {
 								player.x = traps[trap_index].x[1];
@@ -531,7 +525,7 @@ void L1_Update(void)
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
 
-	// Platforms
+		// Platforms
 		CP_Settings_Fill(plat);
 		CP_Settings_Stroke(CP_Color_Create(100, 100, 100, 255));
 		for (int i = 0; i < numplats; i++) {
@@ -730,6 +724,7 @@ void L1_Update(void)
 			CP_Settings_RectMode(CP_POSITION_CORNER);
 		}
 	
+
 	// PAUSE PAGE
 	if (levelstate == Paused) {
 		CP_Settings_RectMode(CP_POSITION_CENTER);
