@@ -13,6 +13,7 @@
 #define num_levels 5
 level levels[num_levels];
 float timeElapsed;
+int buffstate;
 
 void L1_Init(void)
 {
@@ -186,6 +187,7 @@ void L1_Init(void)
 
 	// initialize deaths
 	deaths = 0;
+	int buffstate = 0b000;
 #pragma endregion
 	// Game states, counters
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -365,7 +367,7 @@ void L1_Update(void)
 		CollWalls(walls, numwalls, &player, player, movestate);
 
 		// Jump
-		jump(&player);
+		jump(&player, Buff[jumpBuff].state);
 
 		// window clamps (eventually World Clamps)
 		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);

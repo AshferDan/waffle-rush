@@ -9,6 +9,7 @@
 //---------------------------------------------------------
 
 #include "LevelSelect.h"
+int buffstate;
 
 void Game_Init(void)
 {
@@ -131,6 +132,7 @@ void Game_Init(void)
 
 	// initialize deaths
 	deaths = 0;
+	buffstate = 0b000;
 #pragma endregion
 	// Game states, counters
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -285,8 +287,9 @@ void Game_Update(void)
 		// Collision against walls
 		CollWalls(walls, numwalls, &player, player, movestate);
 
-		// Jump
-		jump(&player);
+		// 
+
+		jump(&player, Buff[jumpBuff].state);
 
 		// window clamps (eventually World Clamps)
 		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);

@@ -226,7 +226,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	}
 }
 
-void jump(Player* player, buffs *buff) {
+void jump(Player* player, int buffstate) {
 	if (CP_Input_KeyTriggered(KEY_SPACE)) {
 		if (((player->onplatform == 0) && player->state == Sliding && player->walljump == 1)) {
 			player->walljump = 0;
@@ -240,9 +240,14 @@ void jump(Player* player, buffs *buff) {
 		}
 		if (player->onplatform) {
 			player->movey = -600;
-			if (buff[jumpBuff].buffduration > 0.00) {
-				player->movey = -600 - buff[jumpBuff].jumpIncrease;
+			if (buffstate & jumpBuff) {
+				player->movey -= Buff[jumpBuff].jumpIncrease;
+				printf("movey: %lf\n", player->movey);
+				printf("jumpincrease : %lf\n", Buff[jumpBuff].jumpIncrease);
 			}
+			else
+				player->movey = -600;
+			
 		}
 		
 	}
@@ -544,7 +549,7 @@ void jump(Player* player, buffs *buff) {
 	void CollWalls(platblocks walls[], int num, Player* pply, Player ply, MoveState movestate) {
 		movestate = movestate;
 
-		printf("movestate %d\n", movestate);
+		printf("");
 		// iterate through number of coordinates
 		for (int wall_index = 0; wall_index < numwalls; wall_index++) {
 			// check for collision

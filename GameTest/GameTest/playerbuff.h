@@ -17,11 +17,13 @@
 
 //typedef struct playerBuff{  
 //	float speedincrease;
-//	float jumpincrease;
+//	float 
+// increase;
 //	float invulnarability;
 //}playerBuff;
 
 typedef struct buffs{//we use this to get the quantitative amount of these buffs
+	int state;
 	int canPickup; //whether its there
 	//int playerActive; //whether player has it
 	float X; //for drawing
@@ -32,6 +34,7 @@ typedef struct buffs{//we use this to get the quantitative amount of these buffs
 	float jumpIncrease; //jumpIncrease
 	float invulActive; //invulnerable
 	float buffduration; //duration for each buff
+	float resetTimer;
 }buffs;
 
 

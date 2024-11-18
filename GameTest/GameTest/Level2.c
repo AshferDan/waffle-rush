@@ -56,13 +56,25 @@ void L2_Init(void)
 	//example of how to access buffs Buff[0].timeslowed = CP_System_GetDt();
 
 	// initialize powerups location
+	buffstate = 0b000;
 	Buff[jumpBuff].canPickup = 1; //if active,
-	Buff[jumpBuff].X = 100; //draw
+	Buff[jumpBuff].X = 500; //draw
 	Buff[jumpBuff].Y = 575; //draw
 	Buff[jumpBuff].width = 20; //draw
 	Buff[jumpBuff].height = 20; //draw
-	Buff[jumpBuff].buffduration = 3; //seconds?
-	buffstate = 0b000;
+	Buff[jumpBuff].buffduration = 0; //seconds?
+	Buff[jumpBuff].jumpIncrease = 1000;
+	Buff[jumpBuff].resetTimer = 3;
+
+
+	Buff[invulBuff].canPickup = 1; //if active,
+	Buff[invulBuff].X = 750; //draw
+	Buff[invulBuff].Y = 575; //draw
+	Buff[invulBuff].width = 20; //draw
+	Buff[invulBuff].height = 20; //draw
+	Buff[invulBuff].buffduration = 0; //seconds?
+	Buff[invulBuff].invulActive = 0;
+	Buff[invulBuff].resetTimer = 3;
 	
 
 	// PLATFORMS INITIALIZATION
@@ -379,7 +391,7 @@ void L2_Update(void)
 			CollWalls(walls, numwalls, &player, player, movestate);
 
 			// Jump
-			jump(&player);
+			jump(&player, buffstate);
 
 			// window clamps (eventually World Clamps)
 			player.x = CP_Math_ClampFloat(player.x, 0, 2600);
@@ -422,23 +434,60 @@ void L2_Update(void)
 
 		//checking for collision between players and buff
 		//is_colliding(Buff[jumpBuff].X+camera.worldshiftx, Buff[jumpBuff].Y+camera.worldshifty, Buff[jumpBuff].width, Buff[jumpBuff].height);
-		if (is_colliding(Buff[jumpBuff].X, Buff[jumpBuff].Y, Buff[jumpBuff].height, Buff[jumpBuff].width)) {
+		if (is_colliding(Buff[jumpBuff].X, Buff[jumpBuff].Y, Buff[jumpBuff].height, Buff[jumpBuff].width) && Buff[jumpBuff].canPickup == 1) {
 			buffstate = buffstate | jumpBuff;
 			Buff[jumpBuff].canPickup = 0; //availability of the buff on the map
 			Buff[jumpBuff].buffduration = 3;  //this resets the duration so that you can pick up the same buff while its still active
-
+			
+		}
+		if (is_colliding(Buff[invulBuff].X, Buff[invulBuff].Y, Buff[invulBuff].height, Buff[invulBuff].width) && Buff[invulBuff].canPickup == 1) {
+			buffstate = buffstate | invulBuff;
+			Buff[invulBuff].canPickup = 0; //availability of the buff on the map
+			Buff[invulBuff].buffduration = 3;  //this resets the duration so that you can pick up the same buff while its still active
 		}
 
-		if (buffstate != 0b000 && Buff[jumpBuff].buffduration >= 0.00f) { //here jumpbuff is active
+		//Reset the spawn of the buffs
+		if (Buff[jumpBuff].canPickup == 0 && Buff[jumpBuff].resetTimer > 0) {
+			Buff[jumpBuff].resetTimer -= 1 * dt;
+			//printf("jump reset timer: %f\n", Buff[jumpBuff].resetTimer);
+			if (Buff[jumpBuff].resetTimer <= 0) {
+				Buff[jumpBuff].canPickup = 1;
+				Buff[jumpBuff].resetTimer = 3;
+			}
+		}
+		if (Buff[invulBuff].canPickup == 0 && Buff[invulBuff].resetTimer > 0) {
+			Buff[invulBuff].resetTimer -= 1 * dt;
+			//printf("invul reset timer: %f\n", Buff[invulBuff].resetTimer);
+			if (Buff[invulBuff].resetTimer <= 0) {
+				Buff[invulBuff].canPickup = 1;
+				Buff[invulBuff].resetTimer = 3;
+			}
+		}
+
+		//Set the stats for jumpboost below the first if statement
+		if ((buffstate & 0b010) && Buff[jumpBuff].buffduration > 0.00f) { //here jumpbuff is active
 			Buff[jumpBuff].buffduration -= 1 * dt;
-			printf("buff: %d\n", buffstate);
-			printf("duration: %f\n", Buff[jumpBuff].buffduration);
+			printf("JUMP BUFF ACTIVE!\n");
+			//printf("buff: %d\n", buffstate); 
+			//printf("jump increase duration: %f\n", Buff[jumpBuff].buffduration);
 		}
-		else if (buffstate != 0b000 && Buff[jumpBuff].buffduration < 0.00f) {
-			buffstate = 0b000;
+		else if ((buffstate & 0b010) && Buff[jumpBuff].buffduration <= 0.00f) {
+			buffstate &= ~0b010;
 			Buff[jumpBuff].buffduration = 3; //maybe can functionise these two to reset
 		}
 
+
+		//Set the stats for invulnerability below the first if statement
+		if ((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f) { //here invulbuff is active
+			Buff[invulBuff].buffduration -= 1 * dt;
+			printf("INVUL BUFF ACTIVE!\n");
+			//printf("buff: %d\n", buffstate);
+			//printf("invul duration: %f\n", Buff[invulBuff].buffduration);
+		}
+		else if ((buffstate & 0b100) && Buff[invulBuff].buffduration <= 0.00f) {
+			buffstate &= ~0b100;
+			Buff[invulBuff].buffduration = 3; //maybe can functionise these two to reset
+		}
 
 
 
@@ -469,7 +518,7 @@ void L2_Update(void)
 		playerCamColl(&player, &camera); //functionised my camera shift. 
 		//where worldshiftx is now the modifyable for all objects
 
-		printf("limitleftx %f| limitrightx %f\n", camera.limitleftx, camera.limitrightx);
+		//printf("limitleftx %f| limitrightx %f\n", camera.limitleftx, camera.limitrightx);
 		CP_Settings_NoFill();
 		CP_Settings_RectMode(CP_POSITION_CORNER);
 		//CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop - camera.worldshifty, camera.width, camera.height); //code for rectangle
@@ -591,6 +640,10 @@ void L2_Update(void)
 		if (Buff[jumpBuff].canPickup == 1) {
 			CP_Settings_Fill(CP_Color_Create(100, 100, 100, 255));
 			CP_Graphics_DrawRect(Buff[jumpBuff].X-camera.worldshiftx, Buff[jumpBuff].Y-camera.worldshifty, Buff[jumpBuff].width, Buff[jumpBuff].height);
+		}
+		if (Buff[invulBuff].canPickup == 1) {
+			CP_Settings_Fill(CP_Color_Create(100, 100, 100, 255));
+			CP_Graphics_DrawRect(Buff[invulBuff].X - camera.worldshiftx, Buff[invulBuff].Y - camera.worldshifty, Buff[invulBuff].width, Buff[invulBuff].height);
 		}
 
 		// Stamina Bar
