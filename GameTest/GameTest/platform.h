@@ -58,6 +58,7 @@ int levelNumber; // level number
 CP_Image player_sprite, transition_sprite, spawn_sprite, burn_sprite, fall_sprite, crush_sprite, goal_sprite;
 
 float playerLastX, playerLastY;   //last player coords recorded, mainly used in level transition sequence
+float tutorialDataY, level1DataY, level2DataY, level3DataY; //display high score and time for each level
 float player_sprite_x, player_sprite_y;
 float transit_sprite_x, transit_sprite_y;
 float death_sprite_x, death_sprite_y;

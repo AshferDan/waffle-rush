@@ -283,6 +283,12 @@ void LSelect_Init(void)
 	level3.posy = 725;
 	Tutorial.height = level1.height = level2.height = level3.height = 100;
 	Tutorial.width = level1.width = level2.width = level3.width = 200;
+
+	//data to display for each level
+	tutorialDataY = Tutorial.height * 5 - camera.worldshifty + 300;
+	level1DataY = level1.height * 5 - camera.worldshifty;
+	level2DataY = level2.height * 5 - camera.worldshifty;
+	level3DataY = level3.height * 5 - camera.worldshifty;
 #pragma endregion
 }
 
@@ -532,8 +538,85 @@ void LSelect_Update(void)
 	CP_Settings_TextSize(120);
 	CP_Font_DrawText("WAFFLE RUSH WOOOOOOOO", -800 - camera.worldshiftx, 300 - camera.worldshifty);
 	CP_Font_DrawText("-->", -800 - camera.worldshiftx, 400 - camera.worldshifty);
+	CP_Settings_TextSize(30);
+	CP_Font_DrawText("INSTRUCTIONS:", -400 - camera.worldshiftx, 400 - camera.worldshifty);
+	CP_Font_DrawText("WASD to move, E to enter a level!", -400 - camera.worldshiftx, 450 - camera.worldshifty);
 	CP_Settings_TextSize(50);
 	CP_Font_DrawText("WRONG WAY", -1750-camera.worldshiftx, 800-camera.worldshifty);
+
+	// Text transition (when player is touching the platform before entering each level)
+	// display stats when standing on each level platform
+	char highScore[20] = { 0 };
+	char bestTime[20] = { 0 };
+	// TUTORIAL
+	CP_Settings_Fill(black);
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, Tutorial.posx, Tutorial.posy - 30, Tutorial.width, Tutorial.height)) {
+		tutorialDataY -= 20.0f;
+		if (tutorialDataY < Tutorial.height * 5 - camera.worldshifty + 50) {
+			tutorialDataY = Tutorial.height * 5 - camera.worldshifty + 50;
+		}
+	}
+	else {
+		tutorialDataY += 20.0f;
+		if (tutorialDataY > Tutorial.height * 5 - camera.worldshifty + 300) {
+			tutorialDataY = Tutorial.height * 5 - camera.worldshifty + 300;
+		}
+	}
+	CP_Font_DrawText("JUST DO IT", Tutorial.posx + Tutorial.width / 2 - camera.worldshiftx, tutorialDataY);
+
+	// LEVEL 1
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level1.posx, level1.posy - 30, level1.width, level1.height)) {
+		level1DataY -= 20.0f;
+		if (level1DataY < level1.height * 5 - camera.worldshifty + 50) {
+			level1DataY = level1.height * 5 - camera.worldshifty + 50;
+		}
+	}
+	else {
+		level1DataY += 20.0f;
+		if (level1DataY > level1.height * 5 - camera.worldshifty + 300) {
+			level1DataY = level1.height * 5 - camera.worldshifty + 300;
+		}
+	}
+	sprintf_s(highScore, 20, "HIGH SCORE: %d", levels[0].score);
+	CP_Font_DrawText(highScore, level1.posx + level1.width / 2 - camera.worldshiftx, level1DataY);
+	sprintf_s(bestTime, 20, "BEST TIME: %02d:%02d:%02d", levels[0].time.minutes, levels[0].time.seconds, levels[0].time.millis);
+	CP_Font_DrawText(bestTime, level1.posx + level1.width / 2 - camera.worldshiftx, level1DataY + 50);
+
+	// LEVEL 2
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level2.posx, level2.posy - 30, level2.width, level2.height)) {
+		level2DataY -= 20.0f;
+		if (level2DataY < level2.height * 5 - camera.worldshifty + 50) {
+			level2DataY = level2.height * 5 - camera.worldshifty + 50;
+		}
+	}
+	else {
+		level2DataY += 20.0f;
+		if (level2DataY > level2.height * 5 - camera.worldshifty + 300) {
+			level2DataY = level2.height * 5 - camera.worldshifty + 300;
+		}
+	}
+	sprintf_s(highScore, 20, "HIGH SCORE: %d", levels[1].score);
+	CP_Font_DrawText(highScore, level2.posx + level2.width / 2 - camera.worldshiftx, level2DataY);
+	sprintf_s(bestTime, 20, "BEST TIME: %02d:%02d:%02d", levels[1].time.minutes, levels[1].time.seconds, levels[1].time.millis);
+	CP_Font_DrawText(bestTime, level2.posx + level2.width / 2 - camera.worldshiftx, level2DataY + 50);
+
+	// LEVEL 3
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level3.posx, level3.posy - 30, level3.width, level3.height)) {
+		level3DataY -= 20.0f;
+		if (level3DataY < level3.height * 5 - camera.worldshifty + 50) {
+			level3DataY = level3.height * 5 - camera.worldshifty + 50;
+		}
+	}
+	else {
+		level3DataY += 20.0f;
+		if (level3DataY > level3.height * 5 - camera.worldshifty + 300) {
+			level3DataY = level3.height * 5 - camera.worldshifty + 300;
+		}
+	}
+	sprintf_s(highScore, 20, "HIGH SCORE: %d", levels[2].score);
+	CP_Font_DrawText(highScore, level3.posx + level3.width / 2 - camera.worldshiftx, level3DataY);
+	sprintf_s(bestTime, 20, "BEST TIME: %02d:%02d:%02d", levels[2].time.minutes, levels[2].time.seconds, levels[2].time.millis);
+	CP_Font_DrawText(bestTime, level3.posx + level3.width / 2 - camera.worldshiftx, level3DataY + 50);
 
 	// Platforms
 	CP_Settings_Fill(plat);
