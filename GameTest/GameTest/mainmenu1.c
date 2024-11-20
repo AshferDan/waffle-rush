@@ -872,7 +872,7 @@ void LSelect_Update(void)
 	playerLastX = player.x - camera.worldshiftx;
 	playerLastY = player.y - camera.worldshifty;
 	//Level Transition
-	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, Tutorial.posx, Tutorial.posy, Tutorial.width, Tutorial.height)) {
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, Tutorial.posx, Tutorial.posy + 270, Tutorial.width, Tutorial.height)) {
 		levelEnded = end;
 		if (scaler1 >= playerLastX - 20) {
 
@@ -880,7 +880,7 @@ void LSelect_Update(void)
 		}
 
 	}
-	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level1.posx, level1.posy, level1.width, level1.height)) {
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level1.posx, level1.posy + 270, level1.width, level1.height)) {
 		levelEnded = end;
 		if (scaler1 >= playerLastX - 20) {
 
@@ -888,14 +888,14 @@ void LSelect_Update(void)
 		}
 
 	}
-	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level2.posx, level2.posy, level2.width, level2.height)) {
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level2.posx, level2.posy + 270, level2.width, level2.height)) {
 		levelEnded = end;
 		if (scaler1 >= playerLastX - 20) {
 			CP_Engine_SetNextGameState(L2_Init, L2_Update, L2_Exit); //go to game
 		}
 	}
 
-	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level3.posx, level3.posy, level3.width, level3.height)) {
+	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level3.posx, level3.posy + 270, level3.width, level3.height)) {
 		levelEnded = end;
 		player.stamina = 100.0f;
 		if (scaler1 >= playerLastX - 20) {
