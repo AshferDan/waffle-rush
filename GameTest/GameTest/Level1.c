@@ -694,18 +694,18 @@ void L1_Update(void)
 				CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 				CP_Graphics_DrawRect(600, 720, 250, 100);
 				if (CP_Input_MouseClicked()) { //if LMB1 pressed
-					CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit);
+					CP_Engine_SetNextGameState(L2_Init, L2_Update, L2_Exit);
 				}
 			}
 
 			// draw quit button
-			TextBoxCreate(1000, 720, 250, 100, "QUIT", red);
+			TextBoxCreate(1000, 720, 250, 100, "EXIT", red);
 			int QuitClick = IsAreaClicked(1000, 720, 250, 100, mouseX, mouseY); //if mouse is over button
 			if (QuitClick) {
 				CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 				CP_Graphics_DrawRect(1000, 720, 250, 100);
 				if (CP_Input_MouseClicked()) { //if LMB1 pressed
-					CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit);
+					CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit);
 				}
 			}
 

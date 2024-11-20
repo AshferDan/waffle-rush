@@ -688,25 +688,15 @@ void L3_Update(void)
 			CP_Font_DrawText(score, 1200, 600);
 
 			CP_Settings_TextSize(50);
-			// draw resume button
-			TextBoxCreate(600, 720, 250, 100, "NEXT LEVEL", red);
-			int ResumeClick = IsAreaClicked(600, 720, 250, 100, mouseX, mouseY); //if mouse is over button
-			if (ResumeClick) {
-				CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
-				CP_Graphics_DrawRect(600, 720, 250, 100);
-				if (CP_Input_MouseClicked()) { //if LMB1 pressed
-					CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit);
-				}
-			}
 
 			// draw quit button
-			TextBoxCreate(1000, 720, 250, 100, "QUIT", red);
+			TextBoxCreate(1000, 720, 250, 100, "EXIT", red);
 			int QuitClick = IsAreaClicked(1000, 720, 250, 100, mouseX, mouseY); //if mouse is over button
 			if (QuitClick) {
 				CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 				CP_Graphics_DrawRect(1000, 720, 250, 100);
 				if (CP_Input_MouseClicked()) { //if LMB1 pressed
-					CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit);
+					CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit);
 				}
 			}
 
