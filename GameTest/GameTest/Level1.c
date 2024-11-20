@@ -188,7 +188,7 @@ void L1_Init(void)
 	// PLAYER INITS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Player related
-	Init_Player(&speed, &player, &deaths);
+	Init_Player(&speed, &player, &deaths, spawn);
 #pragma endregion
 	// Game states, counters
 	/*---------------------------------------------------------------------------------------------------------------------*/

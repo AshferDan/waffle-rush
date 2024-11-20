@@ -31,6 +31,7 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="credits.h" />
+    <ClInclude Include="globals.h" />
     <ClInclude Include="hazard.h" />
     <ClInclude Include="LevelSelect.h" />
     <ClInclude Include="options.h" />

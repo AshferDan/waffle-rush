@@ -643,7 +643,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 	// Reset player
 	// Transition player
 	//---------------------------------------------------------
-	void Init_Player(float* speed, Player* player, int* deaths) {
+	void Init_Player(float* speed, Player* player, int* deaths, coords spawn) {
 		// initialize base speed
 		*speed = 600;
 

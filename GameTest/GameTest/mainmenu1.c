@@ -189,7 +189,7 @@ void LSelect_Init(void)
 	// PLAYER INITS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Player related
-	Init_Player(&speed, &player, &deaths);
+	Init_Player(&speed, &player, &deaths, spawn);
 	canMove = 1;
 #pragma endregion
 	// Game states, counters
