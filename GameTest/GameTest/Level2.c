@@ -46,7 +46,7 @@ void L2_Init(void)
 
 	// Initialize checkpoints and first spawn
 	reset_checkpoints(&checkpoint);
-	FILE* CheckpointFile = fopen("Assets/Level_3/Checkpoint.txt", "r");
+	FILE* CheckpointFile = fopen("Assets/Level_2/Checkpoint.txt", "r");
 	fscanf_s(CheckpointFile, "%d", &numcheckpoints);
 	for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
 		int x = 0;

@@ -548,12 +548,13 @@ void LSelect_Update(void)
 	// display stats when standing on each level platform
 	char highScore[20] = { 0 };
 	char bestTime[20] = { 0 };
+	CP_Settings_TextSize(40);
 	// TUTORIAL
 	CP_Settings_Fill(black);
 	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, Tutorial.posx, Tutorial.posy - 30, Tutorial.width, Tutorial.height)) {
 		tutorialDataY -= 20.0f;
-		if (tutorialDataY < Tutorial.height * 5 - camera.worldshifty + 50) {
-			tutorialDataY = Tutorial.height * 5 - camera.worldshifty + 50;
+		if (tutorialDataY < Tutorial.height * 5 - camera.worldshifty + 55) {
+			tutorialDataY = Tutorial.height * 5 - camera.worldshifty + 55;
 		}
 	}
 	else {
@@ -567,8 +568,8 @@ void LSelect_Update(void)
 	// LEVEL 1
 	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level1.posx, level1.posy - 30, level1.width, level1.height)) {
 		level1DataY -= 20.0f;
-		if (level1DataY < level1.height * 5 - camera.worldshifty + 50) {
-			level1DataY = level1.height * 5 - camera.worldshifty + 50;
+		if (level1DataY < level1.height * 5 - camera.worldshifty + 55) {
+			level1DataY = level1.height * 5 - camera.worldshifty + 55;
 		}
 	}
 	else {
@@ -580,13 +581,13 @@ void LSelect_Update(void)
 	sprintf_s(highScore, 20, "HIGH SCORE: %d", levels[0].score);
 	CP_Font_DrawText(highScore, level1.posx + level1.width / 2 - camera.worldshiftx, level1DataY);
 	sprintf_s(bestTime, 20, "BEST TIME: %02d:%02d:%02d", levels[0].time.minutes, levels[0].time.seconds, levels[0].time.millis);
-	CP_Font_DrawText(bestTime, level1.posx + level1.width / 2 - camera.worldshiftx, level1DataY + 50);
+	CP_Font_DrawText(bestTime, level1.posx + level1.width / 2 - camera.worldshiftx, level1DataY + 40);
 
 	// LEVEL 2
 	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level2.posx, level2.posy - 30, level2.width, level2.height)) {
 		level2DataY -= 20.0f;
-		if (level2DataY < level2.height * 5 - camera.worldshifty + 50) {
-			level2DataY = level2.height * 5 - camera.worldshifty + 50;
+		if (level2DataY < level2.height * 5 - camera.worldshifty + 55) {
+			level2DataY = level2.height * 5 - camera.worldshifty + 55;
 		}
 	}
 	else {
@@ -598,13 +599,13 @@ void LSelect_Update(void)
 	sprintf_s(highScore, 20, "HIGH SCORE: %d", levels[1].score);
 	CP_Font_DrawText(highScore, level2.posx + level2.width / 2 - camera.worldshiftx, level2DataY);
 	sprintf_s(bestTime, 20, "BEST TIME: %02d:%02d:%02d", levels[1].time.minutes, levels[1].time.seconds, levels[1].time.millis);
-	CP_Font_DrawText(bestTime, level2.posx + level2.width / 2 - camera.worldshiftx, level2DataY + 50);
+	CP_Font_DrawText(bestTime, level2.posx + level2.width / 2 - camera.worldshiftx, level2DataY + 40);
 
 	// LEVEL 3
 	if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, level3.posx, level3.posy - 30, level3.width, level3.height)) {
 		level3DataY -= 20.0f;
-		if (level3DataY < level3.height * 5 - camera.worldshifty + 50) {
-			level3DataY = level3.height * 5 - camera.worldshifty + 50;
+		if (level3DataY < level3.height * 5 - camera.worldshifty + 55) {
+			level3DataY = level3.height * 5 - camera.worldshifty + 55;
 		}
 	}
 	else {
@@ -616,7 +617,7 @@ void LSelect_Update(void)
 	sprintf_s(highScore, 20, "HIGH SCORE: %d", levels[2].score);
 	CP_Font_DrawText(highScore, level3.posx + level3.width / 2 - camera.worldshiftx, level3DataY);
 	sprintf_s(bestTime, 20, "BEST TIME: %02d:%02d:%02d", levels[2].time.minutes, levels[2].time.seconds, levels[2].time.millis);
-	CP_Font_DrawText(bestTime, level3.posx + level3.width / 2 - camera.worldshiftx, level3DataY + 50);
+	CP_Font_DrawText(bestTime, level3.posx + level3.width / 2 - camera.worldshiftx, level3DataY + 40);
 
 	// Platforms
 	CP_Settings_Fill(plat);
