@@ -255,9 +255,7 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 		// platformer and in platform movements
 		void movement(Player* p, MoveState movestate, float speed, float dt);
 		// jump >:)
-		void jump(Player* player, MoveState movestate);
-
-		void jump(Player* player, int buffstate); // might need to pointer this
+		void jump(Player* player, MoveState movestate, int buffstate);
 		#pragma endregion
 
 	// HITBOX LOGIC (see platform.c)
