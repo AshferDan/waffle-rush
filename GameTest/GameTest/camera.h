@@ -15,19 +15,4 @@
 
 
 
-typedef struct camera {
-	float limitleftx;
-	float limitrightx;
-	float spawnX;
-	float spawnY;
-	float width;
-	float height;
-	float limittop;
-	float limitbase;
-	float worldshiftx;
-	float worldshifty;
-} Camera;
-
-Camera camera;
-
 //void playerCamColl(Player* player, Camera* camera);

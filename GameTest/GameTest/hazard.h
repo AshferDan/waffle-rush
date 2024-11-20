@@ -10,12 +10,14 @@
 
 #pragma once
 #include <stdbool.h>
-#define MAX_TRAPS 100
+#include "platform.h"
+#define MAX_TRAPS 50
 
 //
 typedef enum hazardstype {
 	spike,
 	crusher,
+	shooter
 }hazardstype;
 
 typedef struct hazard {
@@ -39,3 +41,5 @@ int orientation(Point a, Point b, Point c);
 bool lines_intersect(Point p1, Point q1, Point p2, Point q2);
 bool check_square_triangle_collision(Point squareTopLeft, float width, float height,
 	Point A, Point B, Point C);
+
+void reset_hazards(hazard* traps);

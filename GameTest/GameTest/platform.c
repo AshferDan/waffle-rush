@@ -24,7 +24,7 @@ void start_transition(Player* player, MoveState* movestate) {
 		*movestate = EnterPlat;
 		player->movex = 0;
 	}
-	else if (*movestate == InPlat && player->y > 200 && player->leaveplatform == 1) {
+	else if (*movestate == InPlat && player->leaveplatform == 1) {
 		*movestate = ExitPlat;
 		player->y -= 50;
 		player->movex = 0;
@@ -63,7 +63,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	PlayerDirection tempdirV = Null;
 	PlayerDirection tempdirH = Null;
 
-	if (ply->state != Dead) {
+	if (!(player.state == Dead || player.state == Spawning)) {
 		// OnPlat movement
 		if (movestate == OnPlat) {
 			tempdirH = Null;
@@ -95,8 +95,12 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 				ply->movex = 0;
 			}
 
-			ply->movex = CP_Math_ClampFloat(ply->movex, -speed, speed);
-
+			if (ply->walljump == 1) {
+				ply->movex = CP_Math_ClampFloat(ply->movex, -speed, speed);
+			}
+			else {
+				ply->movex = CP_Math_ClampFloat(ply->movex, -1.5f * speed, 1.5f * speed);
+			}
 			// anim state
 			if (tempdirH != Null) {
 				ply->direction = tempdirH;
@@ -226,16 +230,18 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	}
 }
 
+void jump(Player* player, MoveState movestate) {
+	if (CP_Input_KeyTriggered(KEY_SPACE) && movestate == OnPlat) {
 void jump(Player* player, int buffstate) {
 	if (CP_Input_KeyTriggered(KEY_SPACE)) {
 		if (((player->onplatform == 0) && player->state == Sliding && player->walljump == 1)) {
 			player->walljump = 0;
 			player->movey = -500;
 			if (player->direction == OnLeft) {
-				player->movex = 600;
+				player->movex = 800;
 			}
 			else if (player->direction == OnRight) {
-				player->movex = -600;
+				player->movex = -800;
 			}
 		}
 		if (player->onplatform) {
@@ -381,6 +387,20 @@ void jump(Player* player, int buffstate) {
 			}
 		}
 	}
+
+	// Checkpoints
+	void reset_checkpoints(Checkpoint* checkpoint) {
+		for (int checkpoint_index = 0; checkpoint_index < max_checkpoints; checkpoint_index++) {
+			checkpoint->coordinates[checkpoint_index] = (coords){ 0,0 };
+		}
+		checkpoint->active = 0;
+	}
+
+	void reset_walls(platblocks* walls) {
+		for (int wall_index = 0; wall_index < max_walls; wall_index++) {
+			walls[wall_index] = (platblocks){ 0,0,0,0,0,0 };
+		}
+	}
 #pragma endregion
 
 
@@ -522,14 +542,14 @@ void jump(Player* player, int buffstate) {
 				if (collision_direction(Platform[plat_index].onblocks[block_index], ply) == 1) {
 					pply->movex = 0;
 				}
-				if (!(pply->onplatform) && pply->x == Platform[plat_index].onblocks[block_index].x2 && CP_Input_KeyDown(KEY_A)) {
+				if (!(pply->onplatform) && pply->x == Platform[plat_index].onblocks[block_index].x2 && CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D))) {
 					pply->state = Sliding;
 					if (pply->movey >= 400) {
 						pply->movey = 400;
 					}
 
 				}
-				else if (!(pply->onplatform) && pply->x + pply->width == Platform[plat_index].onblocks[block_index].x1 && CP_Input_KeyDown(KEY_D)) {
+				else if (!(pply->onplatform) && pply->x + pply->width == Platform[plat_index].onblocks[block_index].x1 && CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A))) {
 					pply->state = Sliding;
 					if (pply->movey >= 400) {
 						pply->movey = 400;
@@ -549,7 +569,6 @@ void jump(Player* player, int buffstate) {
 	void CollWalls(platblocks walls[], int num, Player* pply, Player ply, MoveState movestate) {
 		movestate = movestate;
 
-		printf("");
 		// iterate through number of coordinates
 		for (int wall_index = 0; wall_index < numwalls; wall_index++) {
 			// check for collision
@@ -588,14 +607,14 @@ void jump(Player* player, int buffstate) {
 						pply->movex = 0;
 					}
 					if (movestate == OnPlat) {
-						if (pply->x == walls[wall_index].x2 && CP_Input_KeyDown(KEY_A)) {
+						if (pply->x == walls[wall_index].x2 && CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D))) {
 							pply->state = Sliding;
 							if (pply->movey >= 400) {
 								pply->movey = 400;
 							}
 
 						}
-						else if (pply->x + pply->width == walls[wall_index].x1 && CP_Input_KeyDown(KEY_D)) {
+						else if (pply->x + pply->width == walls[wall_index].x1 && CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A))) {
 							pply->state = Sliding;
 							if (pply->movey >= 400) {
 								pply->movey = 400;
@@ -614,29 +633,147 @@ void jump(Player* player, int buffstate) {
 			pply->state = Idle;
 		}
 	}
+#pragma endregion
+
+// PLAYER STATES
+/*---------------------------------------------------------------------------------------------------*/
+#pragma region Player State Changes
+	//---------------------------------------------------------
+	// Init player
+	// Kill player
+	// Spawn player
+	// Reset player
+	// Transition player
+	//---------------------------------------------------------
+	void Init_Player(float* speed, Player* player, int* deaths) {
+		// initialize base speed
+		*speed = 600;
+
+		// initialize player struct
+		// size
+		player->width = 20;
+		player->height = 20;
+		// position
+		player->x = spawn.x;
+		player->y = spawn.y;
+		// movement
+		player->movex = 0;
+		player->movey = 0;
+		player->walljump = 0;
+		// anim timers
+		player->transition_time = 15;
+		player->death_time = 17;
+		player->spawn_time = 0;
+		// health
+		player->stamina = 100.0f;
+		// anim state
+		player->state = Spawning;
+		player->anim = 0;
+		player->direction = OnRight;
+
+		// initialize deaths
+		*deaths = 0;
+	}
 
 	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths) {
 		if (player->state != Dead) {
 			player->state = Dead;
 			player->deathcause = deathcause;
 			player->death_time = 0;
+			player->spawn_time = 0;
 			player->movey = (deathcause != Fall) ? 0 : -300;
 			++*deaths;
 		}
 	}
+
+	void Spawn_Player(Player* player, coords spawn,  Camera* camera) {
+		// Player changes
+		player->x = spawn.x;
+		player->y = spawn.y;
+		player->movex = 0;
+		player->movey = 0;
+		player->state = Spawning;
+		// Camera changes
+		camera->prespawnX = camera->limitleftx;
+		camera->prespawnY = camera->limittop;
+		camera->respawnX = spawn.x - camera->width / 2;
+		camera->respawnY = spawn.y - 3 * camera->height / 4;
+	}
+
 	void Reset_Player(Player* player, MoveState* movestate) {
-		player->x = spawnx;
-		player->y = spawny;
+		player->stamina = 100;
+		player->movey = -100;
 		*movestate = OnPlat;
 		player->state = Idle;
 		player->anim = 0;
 		player->direction = OnRight;
-		player->movex = 0;
-		player->movey = 0;
 		player->deathcause = Reset;
+	}
+
+	void Transition_Player(Player *player, MoveState *movestate) {
+		if (movestate == OnPlat || movestate == InPlat) {
+			start_transition(player, movestate);
+		}
+
+		if (player->transition_time >= 13) {
+			end_transition(player, movestate);
+		}
 	}
 #pragma endregion
 
+
+// TIMER
+/*---------------------------------------------------------------------------------------------------*/
+#pragma region TIMERS
+	void player_anim_updates(Player* player, float dt, MoveState* movestate, Camera* camera, coords spawn) {
+		player->anim += 10 * dt;
+		if (player->anim >= 20) {
+			player->anim = 0;
+		}
+		if (player->transition_time < 13) {
+			player->transition_time += 20 * dt;
+			if (*movestate == EnterPlat) {
+				camera->limitbase += 100 * dt;
+				camera->limittop += 100 * dt;
+			}
+			if (*movestate == ExitPlat) {
+				camera->limitbase -= 100 * dt;
+				camera->limittop -= 100 * dt;
+			}
+		}
+		if (player->transition_time > 13) {
+			player->transition_time = 13;
+		}
+		if (player->death_time < 17) {
+			if (player->deathcause != Fall) {
+				player->death_time += 17 * dt;
+			}
+			else if (player->y <= camera->limitbase + 400) {
+				player->movey += 1800.0f * dt;
+				player->y += player->movey * dt;
+			}
+			else player->death_time = 17;
+		}
+		if (player->death_time >= 17) {
+			if (player->state == Dead) {
+				Spawn_Player(player, spawn, camera);
+				player->movex = 0;
+			}
+			player->death_time = 17;
+		}
+		if (player->spawn_time < 34 && player->state == Spawning) {
+			player->spawn_time += 34 * dt;
+			camera->limitleftx = camera->prespawnX - (player->spawn_time * ((camera->prespawnX - camera->respawnX)/34));
+			camera->limitrightx = camera->prespawnX + camera->width - (player->spawn_time * ((camera->prespawnX - camera->respawnX) / 34));
+			camera->limittop = camera->prespawnY - (player->spawn_time * ((camera->prespawnY - camera->respawnY) / 34));
+			camera->limitbase = camera->prespawnY + camera->height - (player->spawn_time * ((camera->prespawnY - camera->respawnY) / 34));
+		}
+		if (player->spawn_time > 34 && player->state == Spawning) {
+			Reset_Player(player, movestate);
+			player->spawn_time = 34;
+		}
+	}
+#pragma endregion
 
 
 // RENDER
@@ -651,12 +788,27 @@ void DrawPlatform(int plat_index) {
 	CP_Graphics_EndShape();
 }
 
+void DrawGoal(CP_Image goal_sprite, float goalx, float goaly, Camera camera, float dt, float clear_timer) {
+	if (!isCleared) {
+		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, 0, 0, 32, 32, 255);
+	}
+	else {
+		if (clear_timer <= 3) {
+			clear_timer += 6 * dt;
+		}
+		int sprite_x = 32 + (32 * (int)clear_timer);
+		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, sprite_x, 0, sprite_x + 32, 32, 255);
+	}
+}
+
 void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 	// Normal Player
+	float draw_posx = player.x - 15 - camera.worldshiftx;
+	float draw_posy = player.y - 15 - camera.worldshifty;
 	float sprite_x = 0;
 	float sprite_y = 0;
 	float rot = 0;
-	if (player.state != Dead) {
+	if (!(player.state == Dead || player.state == Spawning)) {
 		if (movestate == InPlat || movestate == OnPlat) {
 			switch (player.direction) {
 			case OnLeft:
@@ -713,17 +865,17 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 				sprite_x = 90;
 				break;
 			}
-			CP_Image_DrawSubImageAdvanced(player_sprite, player.x - 15 - camera.worldshiftx, player.y - 15 - camera.worldshifty, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 255, rot);
+			CP_Image_DrawSubImageAdvanced(player_sprite, draw_posx, draw_posy, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 255, rot);
 		}
 		else
 		{
 			sprite_y = (movestate == EnterPlat) ? 36 : 0;
 
 			sprite_x = ((int)player.transition_time / 1) * 18;
-			CP_Image_DrawSubImage(transition_sprite, player.x - 15 - camera.worldshiftx, player.y - 15 - camera.worldshifty, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
+			CP_Image_DrawSubImage(transition_sprite, draw_posx, draw_posy, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
 		}
 	}
-	else {
+	else if (player.state == Dead) {
 		CP_Image death_sprite;
 		switch (player.deathcause) {
 		case Burn: {
@@ -759,7 +911,7 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 		
 		}
 
-		CP_Image_DrawSubImage(death_sprite, player.x - 15 - camera.worldshiftx, player.y - 15, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
+		CP_Image_DrawSubImage(death_sprite, draw_posx, draw_posy, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
 	}
 }
 

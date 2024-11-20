@@ -16,7 +16,7 @@ CP_Color button_color, button_color_locked, button_color_cleared;
 #define num_levels 5
 level levels[num_levels];
 
-void LSelect_Init(void)
+void LSelectx_Init(void)
 {
 	//load font
 	exo = CP_Font_Load("Assets/Exo2-Regular.ttf");
@@ -35,7 +35,7 @@ void LSelect_Init(void)
 	fclose(file);
 }
 
-void LSelect_Update(void)
+void LSelectx_Update(void)
 {
 	//assign window width and height
 	int width = CP_System_GetWindowWidth();
@@ -142,7 +142,7 @@ void LSelect_Update(void)
 			sprintf_s(bestTime, 20, "BEST TIME: %02d:%02d:%02d", levels[2].time.minutes, levels[2].time.seconds, levels[2].time.millis);
 			CP_Font_DrawText(bestTime, width / 2, 650);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
-				CP_Engine_SetNextGameState(L1_Init, L1_Update, L1_Exit); //go to game
+				CP_Engine_SetNextGameState(L3_Init, L3_Update, L3_Exit); //go to game
 			}
 			CP_Settings_TextSize(150);
 		}
@@ -218,7 +218,7 @@ void LSelect_Update(void)
 	}
 }
 
-void LSelect_Exit(void)
+void LSelectx_Exit(void)
 {
 
 }

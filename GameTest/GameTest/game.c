@@ -21,7 +21,7 @@ void Game_Init(void)
 
 	// load player sprite
 	player_sprite		= CP_Image_Load("Assets/Player_Sprites.png");
-	transition_sprite	= CP_Image_Load("Assets/transition.png");
+	transition_sprite	= CP_Image_Load("Assets/Transition.png");
 	burn_sprite			= CP_Image_Load("Assets/Burnt.png");
 	fall_sprite			= CP_Image_Load("Assets/Fall_Sprite.png");
 	crush_sprite		= CP_Image_Load("Assets/Crush_Sprite.png");
@@ -287,9 +287,8 @@ void Game_Update(void)
 		// Collision against walls
 		CollWalls(walls, numwalls, &player, player, movestate);
 
-		// 
-
-		jump(&player, Buff[jumpBuff].state);
+		// Jump
+		jump(&player, movestate, Buff[jumpBuff].state);
 
 		// window clamps (eventually World Clamps)
 		player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
@@ -433,9 +432,9 @@ void Game_Update(void)
 
 void Game_Exit(void)
 {
-	CP_Image_Free(player_sprite);
-	CP_Image_Free(transition_sprite);
-	CP_Image_Free(burn_sprite);
-	CP_Image_Free(fall_sprite);
-	CP_Image_Free(crush_sprite);
+	CP_Image_Free(&player_sprite);
+	CP_Image_Free(&transition_sprite);
+	CP_Image_Free(&burn_sprite);
+	CP_Image_Free(&fall_sprite);
+	CP_Image_Free(&crush_sprite);
 }
