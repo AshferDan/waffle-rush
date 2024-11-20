@@ -13,6 +13,7 @@
 #define num_levels 5
 level levels[num_levels];
 float timeElapsed;
+int levelEnded;
 
 void Tutorial_Init(void)
 {
@@ -274,18 +275,26 @@ void Tutorial_Init(void)
 
 	// CAMERA INIT
 	/*---------------------------------------------------------------------------------------------------------------------*/
-#pragma region Camera Init
+#pragma region Camera Init + Transition Init
 
-	camera.spawnX = width * 3.5f / 10.0f; //
-	camera.spawnY = height * 0.4f; //
+	camera.spawnX = width * 0.35f; //
+	camera.spawnY = height * 0.45f; //
 	camera.width = 3.0f / 10.0f * width; //
-	camera.height = 0.2f * height; //since base is a bigger number than the top number.
-	camera.worldshiftx = 0;
-	camera.worldshifty = 0;
+	camera.height = 0.1f * height; //since base is a bigger number than the top number.
 	camera.prespawnX = camera.respawnX = camera.limitleftx = spawn.x - (camera.width / 2.0f);
 	camera.limitrightx = camera.limitleftx + camera.width;
 	camera.prespawnY = camera.respawnY = camera.limittop = spawn.y - (camera.height * 3.0f / 4.0f);
 	camera.limitbase = camera.limittop + camera.height;
+	camera.worldshiftx = camera.limitleftx - camera.spawnX;
+	camera.worldshifty = camera.limittop - camera.spawnY;
+
+	playerLastX = player.x - camera.worldshiftx;
+	playerLastY = player.y - camera.worldshifty;
+	levelEnded = start;
+	scaler1 = (spawn.x + player.width / 2) - camera.worldshiftx;
+	scaler2 = (spawn.x + player.width / 2) - camera.worldshiftx;
+	scaler3 = (spawn.y + player.height / 2) - camera.worldshifty;
+	scaler4 = (spawn.y + player.height / 2) - camera.worldshifty;
 
 #pragma endregion
 }
@@ -554,7 +563,9 @@ void Tutorial_Update(void)
 		}
 
 		if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly, 50, 50)) {
-			levelstate = Cleared;
+			if (levelstate != EndLevel) {
+				levelstate = Cleared;
+			}
 		}
 
 		// Checkpoint
@@ -646,7 +657,8 @@ void Tutorial_Update(void)
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 			CP_Graphics_DrawRect(600, 520, 250, 100);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
-				CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit);
+				levelEnded = end;
+				levelstate = EndLevel;
 			}
 		}
 
@@ -675,6 +687,43 @@ void Tutorial_Update(void)
 	// QUIT CLICKED
 	else if (levelstate == InQuit) {
 		QuitMenu();
+	}
+	printf("%d\n", levelstate);
+	//LEVEL TRANSITION EFFECTS
+	//keep the reset code bc if removed it leaves a black border around the screen grrrr RAA RAA WOOF WOOF WOOF
+	//printf("scaler1: %lf | scaler2: %lf | scaler3: %lf | scaler4: %lf\n", scaler1, scaler2, scaler3, scaler4);
+	//printf("playerlastx: %lf\n", playerLastX);
+	playerLastX = player.x - camera.worldshiftx;
+	playerLastY = player.y - camera.worldshifty;
+
+	if (levelEnded == end) {
+		canMove = 0;
+		scaler1 += (playerLastX + player.width / 2) * dt;
+		scaler2 += (width - playerLastX + player.width / 2) * dt;
+		scaler3 += (playerLastY + player.height / 2) * dt;
+		scaler4 += (height - playerLastY + player.height / 2) * dt;
+		TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
+
+		if (scaler1 >= playerLastX) {
+			levelEnded = start;
+			CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit);
+		}
+	}
+
+	if (levelEnded == start) {
+		canMove = 1;
+		scaler1 -= (playerLastX + player.width / 2) * dt;
+		scaler2 -= (width - playerLastX + player.width / 2) * dt;
+		scaler3 -= (playerLastY + player.height / 2) * dt;
+		scaler4 -= (height - playerLastY + player.height / 2) * dt;
+		TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
+
+		if (scaler1 <= 0 && scaler2 <= 0 && scaler3 <= 0 && scaler4 <= 0) {
+			levelEnded = reset;
+		}
+	}
+	if (levelEnded == reset) {
+		scaler1 = scaler2 = scaler3 = scaler4 = 0;
 	}
 #pragma endregion
 

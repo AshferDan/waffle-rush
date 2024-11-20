@@ -13,6 +13,7 @@
 #define num_levels 5
 level levels[num_levels];
 float timeElapsed;
+int levelEnded;
 
 void L2_Init(void)
 {
@@ -267,18 +268,26 @@ void L2_Init(void)
 #pragma endregion
 	// CAMERA INIT
 	/*---------------------------------------------------------------------------------------------------------------------*/
-#pragma region Camera Init
+#pragma region Camera Init + Transition Init
 
 	camera.spawnX = width * 0.35f; //
 	camera.spawnY = height * 0.45f; //
 	camera.width = 3.0f / 10.0f * width; //
 	camera.height = 0.1f * height; //since base is a bigger number than the top number.
-	camera.worldshiftx = 0;
-	camera.worldshifty = 0;
 	camera.prespawnX = camera.respawnX = camera.limitleftx = spawn.x - (camera.width / 2.0f);
 	camera.limitrightx = camera.limitleftx + camera.width;
 	camera.prespawnY = camera.respawnY = camera.limittop = spawn.y - (camera.height * 3.0f / 4.0f);
 	camera.limitbase = camera.limittop + camera.height;
+	camera.worldshiftx = camera.limitleftx - camera.spawnX;
+	camera.worldshifty = camera.limittop - camera.spawnY;
+
+	playerLastX = player.x - camera.worldshiftx;
+	playerLastY = player.y - camera.worldshifty;
+	levelEnded = start;
+	scaler1 = (spawn.x + player.width / 2) - camera.worldshiftx;
+	scaler2 = (spawn.x + player.width / 2) - camera.worldshiftx;
+	scaler3 = (spawn.y + player.height / 2) - camera.worldshifty;
+	scaler4 = (spawn.y + player.height / 2) - camera.worldshifty;
 
 #pragma endregion
 }
@@ -543,34 +552,36 @@ void L2_Update(void)
 		if (AreSquaresIntersecting(player.x, player.y, player.height, player.width, goalx, goaly + 70, 100, 30)) {
 			// calculate score and mark the level as cleared
 			AddScore(&levelScore, 10000 + (10000 - ((int)timer.seconds * 50) - ((int)timer.minutes * 3000)) - deaths * 100, &levelstate);
-			levelstate = Cleared;
-			// if cleared for the first time, unlock the next level
-			if (levels[levelNumber - 1].isCleared == 0) {
-				levels[levelNumber - 1].isCleared = 1;
-				levels[levelNumber].isUnlocked = 1;
+			if (levelstate != EndLevel) {
+				levelstate = Cleared;
+				// if cleared for the first time, unlock the next level
+				if (levels[levelNumber - 1].isCleared == 0) {
+					levels[levelNumber - 1].isCleared = 1;
+					levels[levelNumber].isUnlocked = 1;
+				}
+				// update high score if current score is greater than previous high score
+				if (levelScore > levels[levelNumber - 1].score) {
+					levels[levelNumber - 1].score = levelScore;
+				}
+				// update best time if current time is less than previous best time
+				if ((levels[levelNumber - 1].time.minutes == 0 && levels[levelNumber - 1].time.seconds == 0 &&
+					levels[levelNumber - 1].time.millis == 0) ||
+					(timer.minutes < levels[levelNumber - 1].time.minutes) ||
+					(timer.minutes == levels[levelNumber - 1].time.minutes && timer.seconds < levels[levelNumber - 1].time.seconds) ||
+					(timer.minutes == levels[levelNumber - 1].time.minutes && timer.seconds == levels[levelNumber - 1].time.seconds && timer.millis < levels[levelNumber - 1].time.millis)
+					) {
+					levels[levelNumber - 1].time.minutes = (int)timer.minutes;
+					levels[levelNumber - 1].time.seconds = (int)timer.seconds;
+					levels[levelNumber - 1].time.millis = (int)timer.millis;
+				}
+				// update the values in LevelSelect.txt
+				FILE* LevelFile = fopen("Assets/LevelSelect.txt", "w");
+				for (int i = 0; i < num_levels; i++) {
+					fprintf_s(LevelFile, "%d %d %d %d %02d:%02d:%02d\n", levels[i].level_no, levels[i].isUnlocked, levels[i].isCleared, levels[i].score,
+						levels[i].time.minutes, levels[i].time.seconds, levels[i].time.millis);
+				}
+				fclose(LevelFile);
 			}
-			// update high score if current score is greater than previous high score
-			if (levelScore > levels[levelNumber - 1].score) {
-				levels[levelNumber - 1].score = levelScore;
-			}
-			// update best time if current time is less than previous best time
-			if ((levels[levelNumber - 1].time.minutes == 0 && levels[levelNumber - 1].time.seconds == 0 &&
-				levels[levelNumber - 1].time.millis == 0) ||
-				(timer.minutes < levels[levelNumber - 1].time.minutes) ||
-				(timer.minutes == levels[levelNumber - 1].time.minutes && timer.seconds < levels[levelNumber - 1].time.seconds) ||
-				(timer.minutes == levels[levelNumber - 1].time.minutes && timer.seconds == levels[levelNumber - 1].time.seconds && timer.millis < levels[levelNumber - 1].time.millis)
-				) {
-				levels[levelNumber - 1].time.minutes = (int)timer.minutes;
-				levels[levelNumber - 1].time.seconds = (int)timer.seconds;
-				levels[levelNumber - 1].time.millis = (int)timer.millis;
-			}
-			// update the values in LevelSelect.txt
-			FILE* LevelFile = fopen("Assets/LevelSelect.txt", "w");
-			for (int i = 0; i < num_levels; i++) {
-				fprintf_s(LevelFile, "%d %d %d %d %02d:%02d:%02d\n", levels[i].level_no, levels[i].isUnlocked, levels[i].isCleared, levels[i].score,
-					levels[i].time.minutes, levels[i].time.seconds, levels[i].time.millis);
-			}
-			fclose(LevelFile);
 		}
 
 
@@ -695,7 +706,8 @@ void L2_Update(void)
 				CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 				CP_Graphics_DrawRect(600, 720, 250, 100);
 				if (CP_Input_MouseClicked()) { //if LMB1 pressed
-					CP_Engine_SetNextGameState(L3_Init, L3_Update, L3_Exit);
+					levelEnded = end;
+					levelstate = EndLevel;
 				}
 			}
 
@@ -724,6 +736,43 @@ void L2_Update(void)
 		// QUIT CLICKED
 		else if (levelstate == InQuit) {
 			QuitMenu();
+		}
+
+		//LEVEL TRANSITION EFFECTS
+		//keep the reset code bc if removed it leaves a black border around the screen grrrr RAA RAA WOOF WOOF WOOF
+		//printf("scaler1: %lf | scaler2: %lf | scaler3: %lf | scaler4: %lf\n", scaler1, scaler2, scaler3, scaler4);
+		//printf("playerlastx: %lf\n", playerLastX);
+		playerLastX = player.x - camera.worldshiftx;
+		playerLastY = player.y - camera.worldshifty;
+
+		if (levelEnded == end) {
+			canMove = 0;
+			scaler1 += (playerLastX + player.width / 2) * dt;
+			scaler2 += (width - playerLastX + player.width / 2) * dt;
+			scaler3 += (playerLastY + player.height / 2) * dt;
+			scaler4 += (height - playerLastY + player.height / 2) * dt;
+			TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
+
+			if (scaler1 >= playerLastX) {
+				levelEnded = start;
+				CP_Engine_SetNextGameState(L3_Init, L3_Update, L3_Exit);
+			}
+		}
+
+		if (levelEnded == start) {
+			canMove = 1;
+			scaler1 -= (playerLastX + player.width / 2) * dt;
+			scaler2 -= (width - playerLastX + player.width / 2) * dt;
+			scaler3 -= (playerLastY + player.height / 2) * dt;
+			scaler4 -= (height - playerLastY + player.height / 2) * dt;
+			TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
+
+			if (scaler1 <= 0 && scaler2 <= 0 && scaler3 <= 0 && scaler4 <= 0) {
+				levelEnded = reset;
+			}
+		}
+		if (levelEnded == reset) {
+			scaler1 = scaler2 = scaler3 = scaler4 = 0;
 		}
 
 #pragma endregion

@@ -35,7 +35,8 @@ typedef enum LevelState {
 	Paused,
 	InOptions,
 	InQuit,
-	Cleared
+	Cleared,
+	EndLevel
 } LevelState;
 
 LevelState levelstate;
