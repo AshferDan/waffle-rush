@@ -180,16 +180,6 @@ int IncrementScore(int startScore, int endScore, float *timeElapsed, float dt) {
 	return score;
 }
 
-int WinAnimationComplete(float* timeElapsed, float dt) {
-	int isAnimFinished = 0;
-	*timeElapsed += dt;
-	float duration = 1.0f;
-	if (*timeElapsed >= duration) {
-		isAnimFinished = 1;
-	}
-	return isAnimFinished;
- }
-
 int TransitionInBoxEffect(float playerX, float playerY, float boxX1, float boxX2, float boxY1, float boxY2, float scaler1, float scaler2, float scaler3, float scaler4) {
 	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
 	CP_Settings_RectMode(CP_POSITION_CORNER);

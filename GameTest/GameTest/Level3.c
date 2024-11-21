@@ -214,6 +214,9 @@ void L3_Init(void)
 	player_sprite_x = 0;
 	player_sprite_y = 0;
 
+	// clear anim
+	clear_timer = 0;
+
 #pragma endregion
 	// Misc settings
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -542,10 +545,10 @@ void L3_Update(void)
 			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, 0, 0, 32, 32, 255);
 		}
 		else {
-			if (clear_timer <= 3) {
+			if (clear_timer <= 5) {
 				clear_timer += 6 * dt;
 			}
-			int sprite_x = 32 + (32 * (int)clear_timer);
+			int sprite_x = ((int)clear_timer <= 3) ? 32 + (32 * (int)clear_timer) : 32 * 4;
 			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, sprite_x, 0, sprite_x + 32, 32, 255);
 		}
 
@@ -656,7 +659,7 @@ void L3_Update(void)
 
 		// LEVEL COMPLETE PAGE
 		if (levelstate == Cleared) {
-			if (WinAnimationComplete(&timeElapsed, dt)) {
+			if (clear_timer >= 5) {
 				CP_Settings_RectMode(CP_POSITION_CENTER);
 				CP_Settings_Fill(pausebg);
 				CP_Graphics_DrawRect(width / 2, height / 2, width, height);
