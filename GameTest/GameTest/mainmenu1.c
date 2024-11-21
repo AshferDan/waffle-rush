@@ -382,7 +382,7 @@ void LSelect_Update(void)
 			}
 
 			// Jump
-			jump(&player, movestate);
+			jump(&player, movestate, Buff[jumpBuff].state);
 
 			// window clamps (eventually World Clamps)
 			/*player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
