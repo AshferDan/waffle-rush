@@ -638,42 +638,44 @@ void Tutorial_Update(void)
 
 	// LEVEL COMPLETE PAGE
 	if (levelstate == Cleared) {
-		CP_Settings_RectMode(CP_POSITION_CENTER);
-		CP_Settings_Fill(pausebg);
-		CP_Graphics_DrawRect(width / 2, height / 2, width, height);
-		CP_Settings_Fill(wall);
-		CP_Graphics_DrawRect(width / 2, 2 * height / 5, 1200, 500);
-		CP_Settings_Fill(black);
-		CP_Settings_TextSize(100);
-		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
-		CP_Font_DrawText("TUTORIAL COMPLETE", width / 2, 200);
+		if (WinAnimationComplete(&timeElapsed, dt)) {
+			CP_Settings_RectMode(CP_POSITION_CENTER);
+			CP_Settings_Fill(pausebg);
+			CP_Graphics_DrawRect(width / 2, height / 2, width, height);
+			CP_Settings_Fill(wall);
+			CP_Graphics_DrawRect(width / 2, 2 * height / 5, 1200, 500);
+			CP_Settings_Fill(black);
+			CP_Settings_TextSize(100);
+			CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+			CP_Font_DrawText("TUTORIAL COMPLETE", width / 2, 200);
 
 
-		CP_Settings_TextSize(50);
-		// draw resume button
-		TextBoxCreate(600, 520, 250, 100, "LEVELS", red);
-		int ResumeClick = IsAreaClicked(600, 520, 250, 100, mouseX, mouseY); //if mouse is over button
-		if (ResumeClick) {
-			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
-			CP_Graphics_DrawRect(600, 520, 250, 100);
-			if (CP_Input_MouseClicked()) { //if LMB1 pressed
-				levelEnded = end;
-				levelstate = EndLevel;
+			CP_Settings_TextSize(50);
+			// draw resume button
+			TextBoxCreate(600, 520, 250, 100, "LEVELS", red);
+			int ResumeClick = IsAreaClicked(600, 520, 250, 100, mouseX, mouseY); //if mouse is over button
+			if (ResumeClick) {
+				CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+				CP_Graphics_DrawRect(600, 520, 250, 100);
+				if (CP_Input_MouseClicked()) { //if LMB1 pressed
+					levelEnded = end;
+					levelstate = EndLevel;
+				}
 			}
-		}
 
-		// draw quit button
-		TextBoxCreate(1000, 520, 250, 100, "QUIT", red);
-		int QuitClick = IsAreaClicked(1000, 520, 250, 100, mouseX, mouseY); //if mouse is over button
-		if (QuitClick) {
-			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
-			CP_Graphics_DrawRect(1000, 520, 250, 100);
-			if (CP_Input_MouseClicked()) { //if LMB1 pressed
-				CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit);
+			// draw quit button
+			TextBoxCreate(1000, 520, 250, 100, "QUIT", red);
+			int QuitClick = IsAreaClicked(1000, 520, 250, 100, mouseX, mouseY); //if mouse is over button
+			if (QuitClick) {
+				CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+				CP_Graphics_DrawRect(1000, 520, 250, 100);
+				if (CP_Input_MouseClicked()) { //if LMB1 pressed
+					CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit);
+				}
 			}
-		}
 
-		CP_Settings_RectMode(CP_POSITION_CORNER);
+			CP_Settings_RectMode(CP_POSITION_CORNER);
+		}
 	}
 
 	// PAUSE MENU

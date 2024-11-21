@@ -656,63 +656,75 @@ void L3_Update(void)
 
 		// LEVEL COMPLETE PAGE
 		if (levelstate == Cleared) {
-			CP_Settings_RectMode(CP_POSITION_CENTER);
-			CP_Settings_Fill(pausebg);
-			CP_Graphics_DrawRect(width / 2, height / 2, width, height);
-			CP_Settings_Fill(wall);
-			CP_Graphics_DrawRect(width / 2, height / 2, 1200, 700);
-			CP_Settings_Fill(black);
-			CP_Settings_TextSize(100);
-			CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
-			CP_Font_DrawText("LEVEL COMPLETE", width / 2, 200);
+			if (WinAnimationComplete(&timeElapsed, dt)) {
+				CP_Settings_RectMode(CP_POSITION_CENTER);
+				CP_Settings_Fill(pausebg);
+				CP_Graphics_DrawRect(width / 2, height / 2, width, height);
+				CP_Settings_Fill(wall);
+				CP_Graphics_DrawRect(width / 2, height / 2, 1200, 700);
+				CP_Settings_Fill(black);
+				CP_Settings_TextSize(100);
+				CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+				CP_Font_DrawText("LEVEL COMPLETE", width / 2, 200);
 
-			CP_Settings_TextSize(50);
-			CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
+				CP_Settings_TextSize(50);
+				CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
 
-			// Score labels (on the left side)
-			CP_Font_DrawText("GOAL BONUS", 300, 300);
-			CP_Font_DrawText("TIME BONUS", 300, 400);
-			CP_Font_DrawText("DEATH PENALTIES", 300, 500);
-			CP_Font_DrawText("TOTAL SCORE", 300, 600);
+				// Score labels (on the left side)
+				CP_Font_DrawText("GOAL BONUS", 300, 300);
+				CP_Font_DrawText("TIME BONUS", 300, 400);
+				CP_Font_DrawText("DEATH PENALTIES", 300, 500);
+				CP_Font_DrawText("TOTAL SCORE", 300, 600);
 
-			CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_MIDDLE);
+				CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_MIDDLE);
 
-			// Score values (on the right side)
-			// GOAL SCORE CALCULATION
-			char scoreText[20] = { 0 };
-			sprintf_s(scoreText, 20, "%d", IncrementScore(0, 10000, &timeElapsed, dt));
-			CP_Font_DrawText(scoreText, 1200, 300);
+				// Score values (on the right side)
+				// GOAL SCORE CALCULATION
+				char scoreText[20] = { 0 };
+				sprintf_s(scoreText, 20, "%d", IncrementScore(0, 10000, &timeElapsed, dt));
+				CP_Font_DrawText(scoreText, 1200, 300);
 
-			// TIMER DRAWING
-			char time[20] = { 0 };
-			sprintf_s(time, 20, "%d", IncrementScore(0, 10000 - (int)timer.seconds * 50 - (int)timer.minutes * 3000, &timeElapsed, dt));
-			CP_Font_DrawText(time, 1200, 400);
+				// TIMER DRAWING
+				char time[20] = { 0 };
+				sprintf_s(time, 20, "%d", IncrementScore(0, 10000 - (int)timer.seconds * 50 - (int)timer.minutes * 3000, &timeElapsed, dt));
+				CP_Font_DrawText(time, 1200, 400);
 
-			// DEATH DRAWING
-			char deathcount[20] = { 0 };
-			sprintf_s(deathcount, 20, "%d", IncrementScore(0, deaths * -100, &timeElapsed, dt));
-			CP_Font_DrawText(deathcount, 1200, 500);
+				// DEATH DRAWING
+				char deathcount[20] = { 0 };
+				sprintf_s(deathcount, 20, "%d", IncrementScore(0, deaths * -100, &timeElapsed, dt));
+				CP_Font_DrawText(deathcount, 1200, 500);
 
-			// SCORE DRAWING
-			char score[20] = { 0 };
-			sprintf_s(score, 20, "%d", IncrementScore(0, levelScore, &timeElapsed, dt));
-			CP_Font_DrawText(score, 1200, 600);
+				// SCORE DRAWING
+				char score[20] = { 0 };
+				sprintf_s(score, 20, "%d", IncrementScore(0, levelScore, &timeElapsed, dt));
+				CP_Font_DrawText(score, 1200, 600);
 
-			CP_Settings_TextSize(50);
-
-			// draw quit button
-			TextBoxCreate(1000, 720, 250, 100, "EXIT", red);
-			int QuitClick = IsAreaClicked(1000, 720, 250, 100, mouseX, mouseY); //if mouse is over button
-			if (QuitClick) {
-				CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
-				CP_Graphics_DrawRect(1000, 720, 250, 100);
-				if (CP_Input_MouseClicked()) { //if LMB1 pressed
-					levelEnded = end;
-					levelstate = EndLevel;
+				CP_Settings_TextSize(50);
+				// draw replay button
+				TextBoxCreate(800, 720, 250, 100, "REPLAY", red);
+				int ReplayClick = IsAreaClicked(800, 720, 250, 100, mouseX, mouseY); //if mouse is over button
+				if (ReplayClick) {
+					CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+					CP_Graphics_DrawRect(800, 720, 250, 100);
+					if (CP_Input_MouseClicked()) { //if LMB1 pressed
+						CP_Engine_SetNextGameStateForced(L3_Init, L3_Update, L3_Exit);
+					}
 				}
-			}
 
-			CP_Settings_RectMode(CP_POSITION_CORNER);
+				// draw quit button
+				TextBoxCreate(1100, 720, 250, 100, "EXIT", red);
+				int QuitClick = IsAreaClicked(1100, 720, 250, 100, mouseX, mouseY); //if mouse is over button
+				if (QuitClick) {
+					CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
+					CP_Graphics_DrawRect(1100, 720, 250, 100);
+					if (CP_Input_MouseClicked()) { //if LMB1 pressed
+						levelEnded = end;
+						levelstate = EndLevel;
+					}
+				}
+
+				CP_Settings_RectMode(CP_POSITION_CORNER);
+			}
 		}
 
 		// PAUSE MENU
