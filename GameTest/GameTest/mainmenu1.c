@@ -388,7 +388,7 @@ void LSelect_Update(void)
 				EnterPlat - from OnPlat to InPlat
 				ExitPlat  - from InPlat to OnPlat
 				*/
-			if (CP_Input_KeyTriggered(KEY_G) && (movestate == OnPlat || movestate == InPlat)) {
+			if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
 				start_transition(&player, &movestate);
 			}
 
@@ -527,7 +527,7 @@ void LSelect_Update(void)
 	CP_Settings_TextSize(30);
 	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
 	CP_Font_DrawText("INSTRUCTIONS:", -500 - camera.worldshiftx, 400 - camera.worldshifty);
-	CP_Font_DrawTextBox("WASD to move\nG to enter a level,\ncrawl all the way down to start!", -500 - camera.worldshiftx, 450 - camera.worldshifty, 500);
+	CP_Font_DrawTextBox("WASD to move\nE to enter a level,\ncrawl all the way down to start!", -500 - camera.worldshiftx, 450 - camera.worldshifty, 500);
 
 
 

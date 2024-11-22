@@ -391,7 +391,7 @@ void L3_Update(void)
 				EnterPlat - from OnPlat to InPlat
 				ExitPlat  - from InPlat to OnPlat
 				*/
-			if (CP_Input_KeyTriggered(KEY_G) && (movestate == OnPlat || movestate == InPlat)) {
+			if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
 				start_transition(&player, &movestate);
 			}
 

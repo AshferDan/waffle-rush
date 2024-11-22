@@ -75,13 +75,13 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			if (!(CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))) {
 
 				// left
-				if (CP_Input_KeyDown(KEY_A) && (!CP_Input_KeyDown(KEY_D)) && (ply->movex > -speed)) {
+				if (CP_Input_KeyDown(KEY_A) && (!CP_Input_KeyDown(KEY_D))) {
 					ply->movex -= accel;
 					tempdirH = OnLeft;
 				}
 
 				// right
-				if (CP_Input_KeyDown(KEY_D) && (!CP_Input_KeyDown(KEY_A)) && (ply->movex < speed)) {
+				if (CP_Input_KeyDown(KEY_D) && (!CP_Input_KeyDown(KEY_A))) {
 					ply->movex += accel;
 					tempdirH = OnRight;
 				}
@@ -106,6 +106,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			else {
 				ply->movex = CP_Math_ClampFloat(ply->movex, -1.5f * speed, 1.5f * speed);
 			}
+			printf("walljump %d | movex %f\n", ply->walljump, ply->movex);
 			// anim state
 			if (tempdirH != Null) {
 				ply->direction = tempdirH;

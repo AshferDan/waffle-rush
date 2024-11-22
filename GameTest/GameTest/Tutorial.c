@@ -398,7 +398,7 @@ void Tutorial_Update(void)
 				EnterPlat - from OnPlat to InPlat
 				ExitPlat  - from InPlat to OnPlat
 				*/
-			if (CP_Input_KeyTriggered(KEY_G) && (movestate == OnPlat || movestate == InPlat) && levelstate != Cleared) {
+			if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat) && levelstate != Cleared) {
 				start_transition(&player, &movestate);
 			}
 
@@ -524,10 +524,10 @@ void Tutorial_Update(void)
 		// TOOLTIPS
 		CP_Settings_TextSize(25);
 		CP_Settings_Fill(CP_Color_Create(50, 50, 50, 255));
-		CP_Font_DrawTextBox("A and D keys to move left and right.\nSPACE to jump\n\nR to COMMIT SUICIDE", 50 - camera.worldshiftx, 150 - camera.worldshifty, 300);
-		CP_Font_DrawTextBox("E key to crawl on the side of syrup-covered platforms >:)\n\nWASD to crawl around\nNOTE: if you run out of stamina, you DIE", 650 - camera.worldshiftx, 250 - camera.worldshifty, 250);
-		CP_Font_DrawTextBox("Move into a wall to slide, jump while sliding to perform a walljump!", 1050 - camera.worldshiftx, 200 - camera.worldshifty, 250);
-		CP_Font_DrawTextBox("Touch a closed waffle press to set your new checkpoint!\n\nTry it by\nCOMMITTING SUICIDE (R)", 1400 - camera.worldshiftx, 550 - camera.worldshifty, 250);
+		CP_Font_DrawTextBox("Move your mouse to the edges of the screen to look around,\nR to reset the camera\n\nA and D keys to move left and right.\nSPACE to jump\n\nK to KILL the waffle", 50 - camera.worldshiftx, 50 - camera.worldshifty, 300);
+		CP_Font_DrawTextBox("E key to ENTER the side of syrup-covered platforms\n\nWASD to crawl around >:)\nNOTE: if you run out of stamina, you DIE", 650 - camera.worldshiftx, 250 - camera.worldshifty, 250);
+		CP_Font_DrawTextBox("Move into a wall to slide, jump while sliding against a wall (holding movement input) to perform a walljump!", 1050 - camera.worldshiftx, 150 - camera.worldshifty, 250);
+		CP_Font_DrawTextBox("Touch a closed waffle press to set your new checkpoint!\n\nTry it by\nKILLING the waffle (K)", 1500 - camera.worldshiftx, 550 - camera.worldshifty, 250);
 		CP_Font_DrawTextBox("Land on the golden plate to complete the level :D", 2350 - camera.worldshiftx, 700 - camera.worldshifty, 250);
 
 	// Platforms

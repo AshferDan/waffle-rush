@@ -75,7 +75,7 @@ void L2_Init(void)
 	Buff[jumpBuff].width = 20; //draw
 	Buff[jumpBuff].height = 20; //draw
 	Buff[jumpBuff].buffduration = 0; //seconds?
-	Buff[jumpBuff].jumpIncrease = 1000;
+	Buff[jumpBuff].jumpIncrease = 800;
 	Buff[jumpBuff].resetTimer = 3;
 
 
@@ -415,7 +415,7 @@ void L2_Update(void)
 				EnterPlat - from OnPlat to InPlat
 				ExitPlat  - from InPlat to OnPlat
 				*/
-			if (CP_Input_KeyTriggered(KEY_G) && (movestate == OnPlat || movestate == InPlat)) {
+			if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
 				start_transition(&player, &movestate);
 			}
 
