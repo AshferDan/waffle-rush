@@ -72,17 +72,22 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 				ply->movey += 1800.0f * dt;
 			}
 
-			// left
-			if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_LEFT) && (!CP_Input_KeyDown(KEY_D) || !CP_Input_KeyDown(KEY_RIGHT)) && (ply->movex > -speed)) {
-				ply->movex -= accel;
-				tempdirH = OnLeft;
+			if (!(CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))) {
+
+				// left
+				if (CP_Input_KeyDown(KEY_A) && (!CP_Input_KeyDown(KEY_D)) && (ply->movex > -speed)) {
+					ply->movex -= accel;
+					tempdirH = OnLeft;
+				}
+
+				// right
+				if (CP_Input_KeyDown(KEY_D) && (!CP_Input_KeyDown(KEY_A)) && (ply->movex < speed)) {
+					ply->movex += accel;
+					tempdirH = OnRight;
+				}
+
 			}
 
-			// right
-			if (CP_Input_KeyDown(KEY_D) || CP_Input_KeyDown(KEY_RIGHT) && (!CP_Input_KeyDown(KEY_A) || !CP_Input_KeyDown(KEY_LEFT)) && (ply->movex < speed)) {
-				ply->movex += accel;
-				tempdirH = OnRight;
-			}
 			if (tempdirH == Null) {
 				if (ply->movex < -100) {
 					ply->movex += accel;
@@ -91,7 +96,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 					ply->movex -= accel;
 				}
 			}
-			if (((((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))) || ((CP_Input_KeyDown(KEY_LEFT) && CP_Input_KeyDown(KEY_RIGHT))) || tempdirH == Null) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
+			if (((((CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D))) || tempdirH == Null) && (ply->movex <= 100.f && ply->movex >= -100.f))) {
 				ply->movex = 0;
 			}
 
@@ -111,7 +116,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 				ply->state = Idle;
 				wasSliding = false;
 				frameCounter = 0;
-				if (CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D) || CP_Input_KeyDown(KEY_LEFT) || CP_Input_KeyDown(KEY_RIGHT)) {
+				if ((CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_D)) && (!(CP_Input_KeyDown(KEY_A) && CP_Input_KeyDown(KEY_D)))) {
 					ply->state = Running;
 				}
 			}
@@ -125,7 +130,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 
 			// WASD keys
 			// W - Up
-			if ((CP_Input_KeyDown(KEY_W) || CP_Input_KeyDown(KEY_UP)) && (!CP_Input_KeyDown(KEY_S) || !CP_Input_KeyDown(KEY_DOWN))) {
+			if ((CP_Input_KeyDown(KEY_W)) && (!CP_Input_KeyDown(KEY_S))) {
 				ply->state = Crawling;
 				tempdirV = InUp;
 				if (ply->movey > -speed2) {
@@ -133,7 +138,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 				}
 			}
 			// A - Left
-			if ((CP_Input_KeyDown(KEY_A) || CP_Input_KeyDown(KEY_LEFT)) && (!CP_Input_KeyDown(KEY_D) || !CP_Input_KeyDown(KEY_RIGHT))) {
+			if ((CP_Input_KeyDown(KEY_A)) && (!CP_Input_KeyDown(KEY_D))) {
 				ply->state = Crawling;
 				tempdirH = InLeft;
 				if (ply->movex > -speed2) {
@@ -141,7 +146,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 				}
 			}
 			// S - Down
-			if ((CP_Input_KeyDown(KEY_S) || CP_Input_KeyDown(KEY_DOWN)) && (!CP_Input_KeyDown(KEY_W) || !CP_Input_KeyDown(KEY_UP))) {
+			if ((CP_Input_KeyDown(KEY_S)) && (!CP_Input_KeyDown(KEY_W))) {
 				ply->state = Crawling;
 				tempdirV = InDown;
 				if (ply->movey < speed2) {
@@ -150,7 +155,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 				}
 			}
 			// D - Right
-			if ((CP_Input_KeyDown(KEY_D) || CP_Input_KeyDown(KEY_RIGHT)) && (!CP_Input_KeyDown(KEY_A) || !CP_Input_KeyDown(KEY_LEFT))) {
+			if ((CP_Input_KeyDown(KEY_D)) && (!CP_Input_KeyDown(KEY_A))) {
 				ply->state = Crawling;
 				tempdirH = InRight;
 				if (ply->movex < speed2) {
