@@ -471,7 +471,7 @@ void Tutorial_Update(void)
 							if ((player.y + player.height + 30) >= traps[trap_index].y[1]) {
 								player.y = (traps[trap_index].y[1] - player.height - 15);
 								Kill_Player(&player, Crush, &deaths);
-								printf("active\n");
+								//printf("active\n");
 							}
 						}
 

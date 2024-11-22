@@ -55,6 +55,10 @@ int isCleared; // check if level cleared (player touches goal)
 int levelScore; // level score
 int highScore; // level high score
 int levelNumber; // level number
+int frameCounter;  //counts frames between last touch of wall while sliding
+bool wasSliding;  //checks is player was sliding
+int lastDir;  //saves last direction player was facing before wall jumping (for coyote time)
+int coyotetime;
 
 // Graphics
 CP_Image player_sprite, transition_sprite, spawn_sprite, burn_sprite, fall_sprite, crush_sprite, goal_sprite;
