@@ -402,7 +402,7 @@ void L1_Update(void)
 				EnterPlat - from OnPlat to InPlat
 				ExitPlat  - from InPlat to OnPlat
 				*/
-			if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
+			if (CP_Input_KeyTriggered(KEY_G) && (movestate == OnPlat || movestate == InPlat)) {
 				start_transition(&player, &movestate);
 			}
 
@@ -410,7 +410,7 @@ void L1_Update(void)
 				end_transition(&player, &movestate);
 			}
 			// reset with R or touch ground while movestate OnPlat
-			if (CP_Input_KeyTriggered(KEY_R) && !(player.state == Dead || player.state == Spawning) && !isCleared) {
+			if (CP_Input_KeyTriggered(KEY_K) && !(player.state == Dead || player.state == Spawning) && !isCleared) {
 				CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
 				Kill_Player(&player, reset, &deaths);
 			}
@@ -511,13 +511,13 @@ void L1_Update(void)
 		//camera.limitleftx =  camera.limitleftx  + offsetX;
 		//camera.limitrightx = camera.limitrightx + offsetX;
 #pragma region Camera
+
+		CamShift(&camera, mouseX, mouseY, width, height);
 		if (!(player.state == Dead)) {
+
 			playerCamColl(&player, &camera); //functionised my camera shift. 
 			//where worldshiftx is now the modifyable for all objects
 		}
-		CP_Settings_NoFill();
-		CP_Settings_RectMode(CP_POSITION_CORNER);
-		//CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop - camera.worldshifty, camera.width, camera.height); //code for rectangle
 	}
 	
 #pragma endregion
@@ -638,6 +638,8 @@ void L1_Update(void)
 			}
 		}
 
+		// Camera Shift Highlight
+		CamHighLight(&camera, mouseX, mouseY, width, height);
 
 		// DEATHS DRAWING
 		CP_Settings_Fill(black);
@@ -791,13 +793,6 @@ void L1_Update(void)
 	}
 #pragma endregion
 
-	// Back to main menu
-	if (CP_Input_KeyTriggered(KEY_Q) && levelstate == NotPaused) {
-		levelstate = InQuit;
-	}
-	else if (CP_Input_KeyTriggered(KEY_Q) && levelstate == InQuit) {
-		levelstate = NotPaused;
-	}
 }
 
 

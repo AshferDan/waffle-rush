@@ -13,7 +13,6 @@
   <ItemGroup>
     <ClCompile Include="camera.c" />
     <ClCompile Include="credits.c" />
-    <ClCompile Include="game.c" />
     <ClCompile Include="hazard.c" />
     <ClCompile Include="Level1.c" />
     <ClCompile Include="Level2.c" />

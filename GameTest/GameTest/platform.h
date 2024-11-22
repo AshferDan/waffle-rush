@@ -96,6 +96,8 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 		float limitbase;
 		float worldshiftx;
 		float worldshifty;
+		float camshiftx;
+		float camshifty;
 	} Camera;
 
 	Camera camera;
@@ -300,7 +302,14 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 
 		void CollWalls(platblocks walls[], int num, Player* pply, Player ply, MoveState movestate);
 	#pragma endregion 
-	
+
+	// Camera
+
+	void Cam_Init(Camera* camera, float screen_width, float screen_height, coords spawn);
+	void CamShift(Camera* camera, float mouse_x, float mouse_y, float screen_width, float screen_height);
+	void CamHighLight(Camera* camera, float mouse_x, float mouse_y, float screen_width, float screen_height);
+
+
 	// Player States
 	void Init_Player(float* speed, Player* player, int* deaths);
 	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths);

@@ -280,16 +280,7 @@ void Tutorial_Init(void)
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Camera Init + Transition Init
 
-	camera.spawnX = width * 0.35f; //
-	camera.spawnY = height * 0.45f; //
-	camera.width = 3.0f / 10.0f * width; //
-	camera.height = 0.1f * height; //since base is a bigger number than the top number.
-	camera.prespawnX = camera.respawnX = camera.limitleftx = spawn.x - (camera.width / 2.0f);
-	camera.limitrightx = camera.limitleftx + camera.width;
-	camera.prespawnY = camera.respawnY = camera.limittop = spawn.y - (camera.height * 3.0f / 4.0f);
-	camera.limitbase = camera.limittop + camera.height;
-	camera.worldshiftx = camera.limitleftx - camera.spawnX;
-	camera.worldshifty = camera.limittop - camera.spawnY;
+	Cam_Init(&camera, width, height, spawn);
 
 	playerLastX = player.x - camera.worldshiftx;
 	playerLastY = player.y - camera.worldshifty;
@@ -407,7 +398,7 @@ void Tutorial_Update(void)
 				EnterPlat - from OnPlat to InPlat
 				ExitPlat  - from InPlat to OnPlat
 				*/
-			if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat) && levelstate != Cleared) {
+			if (CP_Input_KeyTriggered(KEY_G) && (movestate == OnPlat || movestate == InPlat) && levelstate != Cleared) {
 				start_transition(&player, &movestate);
 			}
 
@@ -415,7 +406,7 @@ void Tutorial_Update(void)
 				end_transition(&player, &movestate);
 			}
 			// reset with R or touch ground while movestate OnPlat
-			if (CP_Input_KeyTriggered(KEY_R) && !(player.state == Dead || player.state == Spawning) && levelstate != Cleared) {
+			if (CP_Input_KeyTriggered(KEY_K) && !(player.state == Dead || player.state == Spawning) && levelstate != Cleared) {
 				CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
 				Kill_Player(&player, reset, &deaths);
 			}
@@ -516,13 +507,13 @@ void Tutorial_Update(void)
 		//camera.limitleftx =  camera.limitleftx  + offsetX;
 		//camera.limitrightx = camera.limitrightx + offsetX;
 #pragma region Camera
+
+		CamShift(&camera, mouseX, mouseY, width, height);
 		if (!(player.state == Dead)) {
+
 			playerCamColl(&player, &camera); //functionised my camera shift. 
 			//where worldshiftx is now the modifyable for all objects
 		}
-		CP_Settings_NoFill();
-		CP_Settings_RectMode(CP_POSITION_CORNER);
-		//CP_Graphics_DrawRect(camera.limitleftx - camera.worldshiftx, camera.limittop - camera.worldshifty, camera.width, camera.height); //code for rectangle
 	}
 #pragma endregion
 
@@ -621,6 +612,9 @@ void Tutorial_Update(void)
 			}
 		}
 
+		// Camera Shift Highlight
+		CamHighLight(&camera, mouseX, mouseY, width, height);
+
 		// DEATH COUNTER DRAWING
 		CP_Settings_Fill(black);
 		CP_Settings_TextSize(50);
@@ -693,7 +687,6 @@ void Tutorial_Update(void)
 	else if (levelstate == InQuit) {
 		QuitMenu();
 	}
-	printf("%d\n", levelstate);
 	//LEVEL TRANSITION EFFECTS
 	//keep the reset code bc if removed it leaves a black border around the screen grrrr RAA RAA WOOF WOOF WOOF
 	//printf("scaler1: %lf | scaler2: %lf | scaler3: %lf | scaler4: %lf\n", scaler1, scaler2, scaler3, scaler4);
@@ -732,13 +725,6 @@ void Tutorial_Update(void)
 	}
 #pragma endregion
 
-	// Back to main menu
-	if (CP_Input_KeyTriggered(KEY_Q) && levelstate == NotPaused) {
-		levelstate = InQuit;
-	}
-	else if (CP_Input_KeyTriggered(KEY_Q) && levelstate == InQuit) {
-		levelstate = NotPaused;
-	}
 }
 
 void Tutorial_Exit(void)
