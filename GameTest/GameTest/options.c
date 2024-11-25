@@ -9,7 +9,8 @@
 // Copyright © 2020 DigiPen, All rights reserved.
 //---------------------------------------------------------
 
-#include "options.h"
+#include "globals.h"
+#include "LevelSelect.h"
 
 CP_Font exo;
 
@@ -41,10 +42,10 @@ void Options_Init(void) {
 	icon2_height = 70.0f;
 
 	// set position for icons
-	icon_bgm_x = CP_System_GetWindowWidth() / 2;
-	icon_bgm_y = CP_System_GetWindowHeight() / 3;
-	icon_se_x = CP_System_GetWindowWidth() / 2;
-	icon_se_y = CP_System_GetWindowHeight() / 2;
+	icon_bgm_x = (float)(CP_System_GetWindowWidth() / 2);
+	icon_bgm_y = (float)(CP_System_GetWindowHeight() / 3);
+	icon_se_x = (float)(CP_System_GetWindowWidth() / 2);
+	icon_se_y = (float)(CP_System_GetWindowHeight() / 2);
 }
 
 void Options_Update(void) {

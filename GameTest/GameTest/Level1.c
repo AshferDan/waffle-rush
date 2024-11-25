@@ -9,14 +9,8 @@
 //---------------------------------------------------------
 
 #include "LevelSelect.h"
-#include "options.h"
-#include "utils.h"
+#include "globals.h"
 
-#define num_levels 5
-level levels[num_levels];
-float timeElapsed;
-int levelEnded;
-int buffstate;
 
 void L1_Init(void)
 {
@@ -119,13 +113,13 @@ void L1_Init(void)
 
 
 	// Walls
-	reset_walls(&walls);
+	reset_walls();
 	FILE* WallFile = fopen("Assets/Level_1/Wall.txt", "r");
 
-	if (WallFile == NULL) {
+	/*if (WallFile == NULL) {
 		printf("Failed to open wall file! Check if file exists\n");
-		CP_Engine_Terminate;
-	}
+		CP_Engine_Terminate();
+	}*/
 
 	fscanf_s(WallFile, "%d", &numwalls);
 
@@ -143,46 +137,13 @@ void L1_Init(void)
 	//HAZARDS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Hazard
-	reset_hazards(&traps);
+	reset_hazards();
 
 	FILE* HazardFile = fopen("Assets/Level_1/Hazard.txt", "r");
 	fscanf_s(HazardFile, "%d", &numberoftraps);
-
-	for (int i = 0; i < numberoftraps; ++i)
-	{
-		fscanf_s(HazardFile, "%d", &traps[i].type);
-		switch (traps[i].type)
-		{
-		case spike:
-		{
-			int j = 0;
-			for (; j < 3; ++j)
-			{
-				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
-			}
-			break;
-		}
-		case crusher:
-		{
-			int j = 0;
-			for (; j < 3; ++j)
-			{
-				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
-			}
-			break;
-		}
-		case shooter:
-		{
-			int j = 0;
-			for (; j < 3; ++j)
-			{
-				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
-			}
-			break;
-		}
-		}
-	}
+	init_hazards(HazardFile, numberoftraps);
 	fclose(HazardFile);
+
 #pragma endregion
 #pragma endregion
 	// PLAYER INITS
@@ -261,8 +222,6 @@ void L1_Init(void)
 
 	FILE* OptionsFile = fopen("Assets/Options.txt", "r");
 	fscanf_s(OptionsFile, "%f %f", &current_bgm_vol, &current_se_vol);
-	printf("BGM Volume: %lf\nSE Volume: %lf\n", current_bgm_vol, current_se_vol);
-	printf("---------------------------------------------------------------\n");
 	fclose(OptionsFile);
 
 	// Corner drawing
@@ -276,16 +235,7 @@ void L1_Init(void)
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Camera Init + Transition Init
 
-	camera.spawnX = width * 0.35f; //
-	camera.spawnY = height * 0.45f; //
-	camera.width = 3.0f / 10.0f * width; //
-	camera.height = 0.1f * height; //since base is a bigger number than the top number.
-	camera.prespawnX = camera.respawnX = camera.limitleftx = spawn.x - (camera.width / 2.0f);
-	camera.limitrightx = camera.limitleftx + camera.width;
-	camera.prespawnY = camera.respawnY = camera.limittop = spawn.y - (camera.height * 3.0f / 4.0f);
-	camera.limitbase = camera.limittop + camera.height;
-	camera.worldshiftx = camera.limitleftx - camera.spawnX;
-	camera.worldshifty = camera.limittop - camera.spawnY;
+	Cam_Init(&camera, width, height, spawn);
 
 	playerLastX = player.x - camera.worldshiftx;
 	playerLastY = player.y - camera.worldshifty;
@@ -303,7 +253,7 @@ void L1_Update(void)
 	CP_Graphics_ClearBackground(bg);
 
 	// getdt
-	float dt = CP_System_GetDt();
+	dt = CP_System_GetDt();
 	dt = CP_Math_ClampFloat(dt, 0.0f, 0.05f); //prevent excess lagspike clipping
 
 	// get mouse coords
@@ -423,86 +373,9 @@ void L1_Update(void)
 	// Hazard
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
-	//declaring top left of square for square triangle collision
-		Point squareTopLeft = { player.x, player.y };
-		for (int trap_index = 0; trap_index < numberoftraps; trap_index++) {
-			switch (traps[trap_index].type) {
-			case spike: {
-				Point A = { traps[trap_index].x[0], traps[trap_index].y[0] };
-				Point B = { traps[trap_index].x[1], traps[trap_index].y[1] };
-				Point C = { traps[trap_index].x[2], traps[trap_index].y[2] };
 
-				if (check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C)) {
-					Kill_Player(&player, Burn, &deaths);
-				}
-				break;
-			}
-			case crusher: {
-				float crushervely;
-				//CRUSHER MOVEMENT
-				// crusherstate = 0 if going down and crusherstate = 1 when going up
-				if (crusherstate == 0) {
-					crushervely = 1000.f * dt;
-					traps[trap_index].y[2] += crushervely;
-					if (traps[trap_index].y[2] > traps[trap_index].y[1]) {
-						traps[trap_index].y[2] = traps[trap_index].y[1];
-						crusherstate = 1;
-					}
-					// if the player hits the crusher at the bottom, add death and reset
-					if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], traps[trap_index].y[0], traps[trap_index].x[1] - traps[trap_index].x[0], traps[trap_index].y[2] - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning)) {
-						if (crusher_direction(traps[trap_index], player) == 1) {
-							if (player.x >= ((traps[trap_index].x[1] + traps[trap_index].x[0]) / 2.f)) {
-								player.x = traps[trap_index].x[1];
-								player.movex = 0;
-							}
-							else if (player.x <= ((traps[trap_index].x[1] + traps[trap_index].x[0]) / 2.f)) {
-								player.x = traps[trap_index].x[0] - player.width;
-								player.movex = 0;
-							}
-						}
-						else if (crusher_direction(traps[trap_index], player) == 2) {
-							player.y = traps[trap_index].y[2];
-							player.movey = 0;
-							if ((player.y + player.height + 30) >= traps[trap_index].y[1]) {
-								player.y = (traps[trap_index].y[1] - player.height - 15);
-								Kill_Player(&player, Crush, &deaths);
-								printf("active\n");
-							}
-						}
+		hazard_update();
 
-					}
-				}
-				if (crusherstate == 1) {
-					crushervely = -0.005f * dt;
-					traps[trap_index].y[2] += crushervely;
-					if (traps[trap_index].y[2] < traps[trap_index].y[0]) {
-						traps[trap_index].y[2] = traps[trap_index].y[0];
-						crusherstate = 0;
-					}
-					//if the player hits the crusher as it goes up, no death but cant go in
-					if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], traps[trap_index].y[0], traps[trap_index].x[1] - traps[trap_index].x[0], traps[trap_index].y[2] - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning)) {
-						if (crusher_direction(traps[trap_index], player) == 1) {
-							if (player.x >= ((traps[trap_index].x[1] + traps[trap_index].x[0]) / 2.f)) {
-								player.x = traps[trap_index].x[1];
-								player.movex = 0;
-							}
-							else if (player.x <= ((traps[trap_index].x[1] + traps[trap_index].x[0]) / 2.f)) {
-								player.x = traps[trap_index].x[0] - player.width;
-								player.movex = 0;
-							}
-						}
-						else if (crusher_direction(traps[trap_index], player) == 2) {
-							player.y = traps[trap_index].y[2];
-							player.movey = 0;
-						}
-
-					}
-				}
-				break;
-			}
-			default: {}
-			}
-		}
 #pragma endregion
 
 		// CAMERA UPDATE

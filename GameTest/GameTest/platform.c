@@ -14,7 +14,7 @@
 //---------------------------------------------------------
 
 #pragma once
-#include "platform.h"
+#include "globals.h"
 
 // MOVEMENT AND MOVESTATE LOGIC
 #pragma region Movement and movestate
@@ -106,7 +106,6 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			else {
 				ply->movex = CP_Math_ClampFloat(ply->movex, -1.5f * speed, 1.5f * speed);
 			}
-			printf("walljump %d | movex %f\n", ply->walljump, ply->movex);
 			// anim state
 			if (tempdirH != Null) {
 				ply->direction = tempdirH;
@@ -264,8 +263,6 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 			player->movey = -600;
 			if (buffstate & jumpBuff) {
 				player->movey -= Buff[jumpBuff].jumpIncrease;
-				printf("movey: %lf\n", player->movey);
-				printf("jumpincrease : %lf\n", Buff[jumpBuff].jumpIncrease);
 			}
 			else
 				player->movey = -600;
@@ -311,8 +308,8 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 	}
 
 	// Initializes platform coordinates
-	void platform_coordinates(int plat_index, int coord_index, float x, float y) {
-		Platform[plat_index].platcoords[coord_index] = (coords){ x,y };
+	void platform_coordinates(int plat_index, int coord_index, int x, int y) {
+		Platform[plat_index].platcoords[coord_index] = (coords){ (float)x,(float)y };
 	}
 
 	void platform_onblocks(int plat_index, int block_index, float x1, float y1, float x2, float y2) {
@@ -412,7 +409,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		checkpoint->active = 0;
 	}
 
-	void reset_walls(platblocks* walls) {
+	void reset_walls() {
 		for (int wall_index = 0; wall_index < max_walls; wall_index++) {
 			walls[wall_index] = (platblocks){ 0,0,0,0,0,0 };
 		}
@@ -441,10 +438,10 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		float px = (p.x + p.width / 2);
 		float py = (p.y + p.height / 2);
 		// how much the player goes into the platform
-		float leftcoll = (abs)((px + p.width/2) - plt.x1);
-		float rightcoll = (abs)(plt.x2 - (px - p.width/2));
-		float topcoll = (abs)((py + p.height/2) - plt.y1);
-		float botcoll = (abs)(plt.y2 - (py - p.height/2));
+		float leftcoll = (fabs)((px + p.width/2) - plt.x1);
+		float rightcoll = (fabs)(plt.x2 - (px - p.width/2));
+		float topcoll = (fabs)((py + p.height/2) - plt.y1);
+		float botcoll = (fabs)(plt.y2 - (py - p.height/2));
 
 		// return lower value for horizontal/vertical
 		float horizontal = (leftcoll < rightcoll) ? leftcoll : rightcoll;
@@ -708,7 +705,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 			player->deathcause = deathcause;
 			player->death_time = 0;
 			player->spawn_time = 0;
-			player->movey = (deathcause != Fall) ? 0 : -300;
+			player->movey = (deathcause != Fall) ? 0.0f : -300.0f;
 			++*deaths;
 		}
 	}
@@ -738,7 +735,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 	}
 
 	void Transition_Player(Player *player, MoveState *movestate) {
-		if (movestate == OnPlat || movestate == InPlat) {
+		if (*movestate == OnPlat || *movestate == InPlat) {
 			start_transition(player, movestate);
 		}
 
@@ -879,26 +876,26 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 			}
 			switch (player.state) {
 			case Idle:
-				sprite_x = (player.anim < 10) ? 0 : 18;
+				sprite_x = (player.anim < 10) ? 0.0f : 18.0f;
 				break;
 			case Running:
 			case Crawling:
-				sprite_x = ((int)player.anim % 2 == 0) ? 36 : 54;
+				sprite_x = ((int)player.anim % 2 == 0) ? 36.0f : 54.0f;
 				break;
 			case Jumping:
-				sprite_x = 72;
+				sprite_x = 72.0f;
 				break;
 			case Sliding:
-				sprite_x = 90;
+				sprite_x = 90.0f;
 				break;
 			}
 			CP_Image_DrawSubImageAdvanced(player_sprite, draw_posx, draw_posy, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 255, rot);
 		}
 		else
 		{
-			sprite_y = (movestate == EnterPlat) ? 36 : 0;
+			sprite_y = (movestate == EnterPlat) ? 36.0f : 0.0f;
 
-			sprite_x = ((int)player.transition_time / 1) * 18;
+			sprite_x = (float)(((int)player.transition_time / 1) * 18);
 			CP_Image_DrawSubImage(transition_sprite, draw_posx, draw_posy, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
 		}
 	}
@@ -909,28 +906,28 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 			death_sprite = burn_sprite;
 
 			switch (player.direction) {
-			case OnLeft: sprite_y = 0;
+			case OnLeft: sprite_y = 0.0f;
 				break;
-			case OnRight: sprite_y = 36;
+			case OnRight: sprite_y = 36.0f;
 				break;
-			default: sprite_y = 0;
+			default: sprite_y = 0.0f;
 			}
-			sprite_x = ((int)player.death_time) * 18;
+			sprite_x = ((int)player.death_time) * 18.0f;
 			if (!player.onplatform) {
-				sprite_x += 306;
+				sprite_x += 306.0f;
 			}
 			break;
 		}
 		case Fall: 
 			death_sprite = fall_sprite;
-			sprite_x = ((int)(player.anim) % 2 == 0) ? 0 : 18;
-			sprite_y = 0;
+			sprite_x = ((int)(player.anim) % 2 == 0) ? 0.0f : 18.0f;
+			sprite_y = 0.0f;
 			break;
 
 		case Crush: 
 			death_sprite = crush_sprite;
-			sprite_x = ((int)player.death_time < 3) ? (int)player.death_time * 18 : 54;
-			sprite_y = (player.direction == OnLeft) ? 36 : 0;
+			sprite_x = ((int)player.death_time < 3) ? (float)((int)player.death_time * 18.0f) : 54.0f;
+			sprite_y = (player.direction == OnLeft) ? 36.0f : 0.0f;
 			break;
 		
 		default:

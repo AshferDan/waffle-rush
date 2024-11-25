@@ -1,5 +1,5 @@
 //---------------------------------------------------------
-// file:	platform.h
+// file:	globals.h
 // author:	AVID WAFFLE ENJOYERS
 // email:	-
 //
@@ -7,8 +7,10 @@
 //			used in platformer logic
 // 
 //			Sections are broken down into:
-//				- Enums and Structs
-//				- Variables
+//				- Globals
+//					- Enums and Structs
+//					- Variables
+// 
 //				- Functions
 //					- Inits
 //					- Updates
@@ -18,134 +20,90 @@
 //---------------------------------------------------------
 
 #pragma once
-#include "utils.h"
-#include "hazard.h"
-#include "camera.h"
-#include "playerbuff.h"
+#include "cprocessing.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <math.h>
 
-
-#define max_coords 16
-#define max_platforms 20
-#define max_walls 20
-#define max_checkpoints 4
-
-// Platformer globals
-
-
-typedef enum LevelState {
-	NotPaused,
-	Paused,
-	InOptions,
-	InQuit,
-	Cleared,
-	EndLevel
-} LevelState;
-
-LevelState levelstate;
-
-// Level Variables
-int width, height; //window width/height
-float spawnx, spawny, goalx, goaly; // spawn and goal position
-int isPaused; // check if game paused
-int canMove;  //if player can move
-int isCleared; // check if level cleared (player touches goal)
-int levelScore; // level score
-int highScore; // level high score
-int levelNumber; // level number
-
-// Graphics
-
-float playerLastX, playerLastY;   //last player coords recorded, mainly used in level transition sequence
-float tutorialDataY, level1DataY, level2DataY, level3DataY; //display high score and time for each level
-float clear_timer;
-
-// Anim timer
-
-
-CP_Font text;
-CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
-
-
-// STRUCTS --------------------------------------------
-#pragma region Structs
-
-	// Camera struct
-
-
-	typedef struct Camera {
-		float limitleftx;
-		float limitrightx;
-		float spawnX;
-		float spawnY;
-		float prespawnX, respawnX;
-		float prespawnY, respawnY;
-		float width;
-		float height;
-		float limittop;
-		float limitbase;
-		float worldshiftx;
-		float worldshifty;
-	} Camera;
-
-	Camera camera;
-
-	// Time Struct
-	#pragma region Timer
-		typedef struct Timer {
-			float minutes, seconds, millis;
-		} Timer;
-
-		Timer timer;
-	#pragma endregion
-
-
-	
-
-
-	
-
-#pragma endregion
-
-
-
-// FUNCTIONS --------------------------------------------
-#pragma region Functions
-
-	
-	// HITBOX LOGIC (see platform.c)
-	#pragma region Hitboxes
-
-	#pragma endregion
-
-	// COLLISION LOGIC (see platform.c)
-	#pragma region Collision
-
-	#pragma endregion 
-	
-
-
-
-
-
-
-	// Draw Goal
-
-#pragma endregion
-
-// CAMERA
+// GENERAL LEVEL GLOBALS
 /*=====================================================================================================================*/
 #pragma region 
+#define num_levels 5
 	// ENUMS AND STRUCTS
 	/*
 		Enums:
-		- 
+		- LevelState
 	 
 		Structs:
-		- 
+		- Camera
+		- Timer
 	*/
 	/*---------------------------------------------------------------------------------------------------------*/
 	#pragma region 
+		// LevelState enum
+		typedef enum LevelState {
+			NotPaused,
+			Paused,
+			InOptions,
+			InQuit,
+			Cleared,
+			EndLevel
+		} LevelState;
 
+
+		// Camera struct
+		typedef struct Camera {
+			float limitleftx;
+			float limitrightx;
+			float spawnX;
+			float spawnY;
+			float prespawnX, respawnX;
+			float prespawnY, respawnY;
+			float width;
+			float height;
+			float limittop;
+			float limitbase;
+			float worldshiftx;
+			float worldshifty;
+			float camshiftx;
+			float camshifty;
+		} Camera;
+
+		// Timer struct
+		typedef struct Timer {
+			float seconds;
+			int minutes, millis;
+		} Timer;
+
+
+		// time struct (for level)
+		typedef struct time {
+			int minutes;
+			int seconds;
+			int millis;
+		} time;
+
+		// Level struct
+		typedef struct level {
+			int level_no;
+			int isUnlocked;
+			int isCleared;
+			int score;
+			struct time time;
+		} level;
+
+		// Level Transition
+		typedef struct EnterLevel
+		{
+			float posx, posy, height, width;
+		} EnterLevel;
+
+		typedef enum leveltrans {
+			end = 1,
+			start = 2,
+			reset = 0
+		}leveltrans;
 	#pragma endregion Enums and Structs
 	/*---------------------------------------------------------------------------------------------------------*/
 
@@ -155,36 +113,61 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 	//	
 	/*---------------------------------------------------------------------------------------------------------*/
 	#pragma region 
-		
+		LevelState levelstate;
+
+		Camera camera;
+
+		Timer timer;
+
+		// Level Variables
+		int numplats;
+		int numcheckpoints;
+
+		int deaths;
+		float speed; //speed
+
+		int width, height; //window width/height
+
+		float spawnx, spawny, goalx, goaly; // spawn and goal position
+
+		int isPaused; // check if game paused
+		int canMove;  //if player can move
+		int isCleared; // check if level cleared (player touches goal)
+		int levelScore; // level score
+		int highScore; // level high score
+		int levelNumber; // level number
+		int frameCounter;  //counts frames between last touch of wall while sliding
+		bool wasSliding;  //checks is player was sliding
+		int lastDir;  //saves last direction player was facing before wall jumping (for coyote time)
+		int coyotetime;
+		float timeElapsed;
+		int levelEnded;
+		int buffstate;
+
+		float dt;
+
+		// Text and colours
+		CP_Font text;
+		CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
+
+		// Graphics
+		float playerLastX, playerLastY;   //last player coords recorded, mainly used in level transition sequence
+		float tutorialDataY, level1DataY, level2DataY, level3DataY; //display high score and time for each level
+		float clear_timer;
+
+		// Mouse position
+		float mouseX, mouseY;
+
+		// Levels
+		level levels[num_levels];
+
+		// Level transition scalers
+		float scaler1, scaler2, scaler3, scaler4;
 	#pragma endregion VARIABLES
 	/*---------------------------------------------------------------------------------------------------------*/
 	
-	
-
-	// FUNCTIONS
-	/*---------------------------------------------------------------------------------------------------------*/
-	#pragma region
-		// Init:
-		/*-------------------------------------------------------------------------------------------------*/
-			
-		/*-------------------------------------------------------------------------------------------------*/
-
-
-		// Updates:
-		/*-------------------------------------------------------------------------------------------------*/
-		
-		/*-------------------------------------------------------------------------------------------------*/
-
-
-		// Renders:
-		/*-------------------------------------------------------------------------------------------------*/
-			
-		/*-------------------------------------------------------------------------------------------------*/
-	#pragma endregion FUNCTIONS
-#pragma endregion CAMERA
+#pragma endregion GENERAL LEVEL GLOBALS
 /*=====================================================================================================================*/
-
-
 
 
 // PLAYER AND MOVEMENT RELATED
@@ -273,6 +256,7 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 			EnterPlat,
 			ExitPlat,
 		} MoveState;
+
 	#pragma endregion Enums and Structs
 	/*---------------------------------------------------------------------------------------------------------*/
 
@@ -297,63 +281,77 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 
 		// MoveState
 		MoveState movestate;
+		
 	#pragma endregion VARIABLES
 	/*---------------------------------------------------------------------------------------------------------*/
 
-
-
-	// FUNCTIONS
-	/*---------------------------------------------------------------------------------------------------------*/
-	#pragma region
-		// Init:
-		/*-------------------------------------------------------------------------------------------------*/
-			// Initialize player w set values such as size etc.
-			void Init_Player(float* speed, Player* player, int* deaths, coords spawn);
-		/*-------------------------------------------------------------------------------------------------*/
-
-
-		// Updates:
-		/*-------------------------------------------------------------------------------------------------*/
-		// - MOVEMENT AND MOVESTATE
-		#pragma region 
-			// set movestate
-			void start_transition(Player* player, MoveState* movestate);
-			void end_transition(Player* player, MoveState* movestate);
-			// platformer and in platform movements
-			void movement(Player* p, MoveState movestate, float speed, float dt);
-			// jump >:)
-			void jump(Player* player, MoveState movestate, int buffstate);
-		#pragma endregion Movement and movestate
-		
-		// - PLAYER
-		#pragma region 
-			// Player States
-			void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths);
-			void Spawn_Player(Player* player, coords spawn, Camera* camera);
-			void Reset_Player(Player* player, MoveState* movestate);
-			void Transition_Player(Player* player, MoveState* movestate);
-
-			// Anim Updates
-			void player_anim_updates(Player* player, float dt, MoveState* movestate, Camera* camera, coords spawn);
-		#pragma endregion Player
-		/*-------------------------------------------------------------------------------------------------*/
-
-
-		// Renders:
-		/*-------------------------------------------------------------------------------------------------*/
-			// Draw Player
-			void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate);
-		/*-------------------------------------------------------------------------------------------------*/
-	#pragma endregion FUNCTIONS
 #pragma endregion PLAYER AND MOVEMENT RELATED
 /*=====================================================================================================================*/
 
 
+// BUFFS
+/*=====================================================================================================================*/
+#pragma region 
+	// ENUMS AND STRUCTS
+	/*
+		Enums:
+		- 
+	 
+		Structs:
+		- 
+	*/
+	/*---------------------------------------------------------------------------------------------------------*/
+	#pragma region 
+		// Buffs struct and enum
+		typedef struct buffs {//we use this to get the quantitative amount of these buffs
+			int state;
+			int canPickup; //whether its there
+			//int playerActive; //whether player has it
+			float X; //for drawing
+			float Y; //for drawing
+			float width; //for drawing
+			float height; //for drawing
+			float timeslowed; //if its timeslow
+			float jumpIncrease; //jumpIncrease
+			float invulActive; //invulnerable
+			float buffduration; //duration for each buff
+			float resetTimer;
+		}buffs;
+
+		enum playerQualities  //we use this as a qualitative indicator of player powerup state 
+		{
+			baseStat = 0b000,
+			slowTime = 0b001,
+			jumpBuff = 0b010,
+			invulBuff = 0b100
+		}; //states/bool
+
+	#pragma endregion Enums and Structs
+	/*---------------------------------------------------------------------------------------------------------*/
+
+
+
+	// VARIABLES
+	//	
+	/*---------------------------------------------------------------------------------------------------------*/
+	#pragma region 
+		// Buffs
+		buffs Buff[100];
+	#pragma endregion VARIABLES
+	/*---------------------------------------------------------------------------------------------------------*/
+	
+#pragma endregion BUFFS
+/*=====================================================================================================================*/
 
 
 // PLATFORMS, WALLS, GENERAL COLLISION
 /*=====================================================================================================================*/
 #pragma region 
+
+	#define max_coords 16
+	#define max_platforms 20
+	#define max_walls 20
+	#define max_checkpoints 4
 	// STRUCTS
 	/*
 		Structs:
@@ -363,10 +361,10 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 		- platform
 	*/
 	/*---------------------------------------------------------------------------------------------------------*/
-	#pragma region 
-		// Platform Struct
-		// InPlat
-		// coordinate struct
+#pragma region 
+	// Platform Struct
+	// InPlat
+	// coordinate struct
 		typedef struct coords {
 			float x, y;
 		} coords;
@@ -419,15 +417,15 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 			platblocks inblocks[max_coords]; // Wall hitboxes
 			platblocks onblocks[max_coords]; // Big block hitboxes
 		} platform;
-	#pragma endregion Structs
-	/*---------------------------------------------------------------------------------------------------------*/
+#pragma endregion Structs
+		/*---------------------------------------------------------------------------------------------------------*/
 
 
 
-	// VARIABLES
-	//	
-	/*---------------------------------------------------------------------------------------------------------*/
-	#pragma region 
+		// VARIABLES
+		//	
+		/*---------------------------------------------------------------------------------------------------------*/
+#pragma region 
 		int numplats;
 		platform Platform[max_platforms];
 
@@ -438,21 +436,195 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 		Checkpoint checkpoint;
 
 		coords spawn;
-	#pragma endregion VARIABLES
+#pragma endregion VARIABLES
+		/*---------------------------------------------------------------------------------------------------------*/
+
+#pragma endregion PLATFORMS, WALLS, GENERAL COLLISION
+/*=====================================================================================================================*/
+
+
+// HAZARDS
+/*=====================================================================================================================*/
+#pragma region 
+	#define MAX_TRAPS 50
+	// ENUMS AND STRUCTS
+	/*
+		Enums:
+		- Hazard type (e.g spike/crusher/shooter)
+
+		Structs:
+		- Hazard
+	*/
 	/*---------------------------------------------------------------------------------------------------------*/
+#pragma region 
+	// Hazard type enum
+	typedef enum hazardstype {
+		spike,
+		crusher,
+		shooter
+	}hazardstype;
+
+	// Hazard struct
+	typedef struct hazard {
+		float x[3], y[3];
+		hazardstype type;
+	}hazard;
+
+	// Point
+	typedef struct Point {
+		float x;
+		float y;
+	} Point;
+#pragma endregion Enums and Structs
+/*---------------------------------------------------------------------------------------------------------*/
 
 
 
-	// FUNCTIONS
-	/*---------------------------------------------------------------------------------------------------------*/
-	#pragma region
+// VARIABLES
+//	
+/*---------------------------------------------------------------------------------------------------------*/
+#pragma region 
+	hazard traps[MAX_TRAPS];
+
+	int numberoftraps;
+	int crusherstate;
+
+#pragma endregion VARIABLES
+/*---------------------------------------------------------------------------------------------------------*/
+
+#pragma endregion HAZARDS
+/*=====================================================================================================================*/
+
+// OPTIONS
+/*=====================================================================================================================*/
+#pragma region 
+
+// VARIABLES
+//	
+/*---------------------------------------------------------------------------------------------------------*/
+#pragma region 
+	// BGM volume bar
+	float current_bgm_vol, max_bgm_vol, prev_bgm_vol;
+
+	// Sound effects volume bar
+	float current_se_vol, max_se_vol, prev_se_vol;
+
+	// icons for volume bars
+	float icon1_width, icon1_height, icon2_width, icon2_height;
+	float icon_bgm_x, icon_bgm_y, icon_se_x, icon_se_y;
+#pragma endregion VARIABLES
+/*---------------------------------------------------------------------------------------------------------*/
+
+#pragma endregion OPTIONS
+/*=====================================================================================================================*/
+
+
+
+
+
+// CAMERA FUNCTIONS
+/*---------------------------------------------------------------------------------------------------------*/
+#pragma region
+	// Init:
+	/*-------------------------------------------------------------------------------------------------*/
+	void Cam_Init(Camera* camera, float screen_width, float screen_height, coords spawn);
+	/*-------------------------------------------------------------------------------------------------*/
+
+
+	// Updates:
+	/*-------------------------------------------------------------------------------------------------*/
+	void playerCamColl(Player* player, Camera* camera);
+	void CamShift(Camera* camera, float mouse_x, float mouse_y, float screen_width, float screen_height);
+	/*-------------------------------------------------------------------------------------------------*/
+
+
+	// Renders:
+	/*-------------------------------------------------------------------------------------------------*/
+	void CamHighLight(Camera* camera, float mouse_x, float mouse_y, float screen_width, float screen_height);
+	/*-------------------------------------------------------------------------------------------------*/
+#pragma endregion TEMPLATE FUNCTIONS
+
+// PLAYER AND MOVEMENT FUNCTIONS (player.c)
+/*---------------------------------------------------------------------------------------------------------*/
+#pragma region
+	// Init:
+	/*-------------------------------------------------------------------------------------------------*/
+		// Initialize player w set values such as size etc.
+		void Init_Player(float* speed, Player* player, int* deaths, coords spawn);
+		/*-------------------------------------------------------------------------------------------------*/
+
+
+		// Updates:
+		/*-------------------------------------------------------------------------------------------------*/
+		// - MOVEMENT AND MOVESTATE
+#pragma region 
+		// set movestate
+			void start_transition(Player* player, MoveState* movestate);
+			void end_transition(Player* player, MoveState* movestate);
+			// platformer and in platform movements
+			void movement(Player* p, MoveState movestate, float speed, float dt);
+			// jump >:)
+			void jump(Player* player, MoveState movestate, int buffstate);
+#pragma endregion Movement and movestate
+
+		// - PLAYER
+#pragma region 
+		// Player States
+			void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths);
+			void Spawn_Player(Player* player, coords spawn, Camera* camera);
+			void Reset_Player(Player* player, MoveState* movestate);
+			void Transition_Player(Player* player, MoveState* movestate);
+
+			// Anim Updates
+			void player_anim_updates(Player* player, float dt, MoveState* movestate, Camera* camera, coords spawn);
+#pragma endregion Player
+		/*-------------------------------------------------------------------------------------------------*/
+
+
+		// Renders:
+		/*-------------------------------------------------------------------------------------------------*/
+			// Draw Player
+			void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate);
+
+			// draw stat bar
+			void DrawStatBar(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float stat, float maxstat);
+
+		/*-------------------------------------------------------------------------------------------------*/
+#pragma endregion PLAYER AND MOVEMENT FUNCTIONS
+
+
+// BUFF FUNCTIONS
+/*---------------------------------------------------------------------------------------------------------*/
+#pragma region
+	// Init:
+	/*-------------------------------------------------------------------------------------------------*/
+
+	/*-------------------------------------------------------------------------------------------------*/
+
+
+	// Updates:
+	/*-------------------------------------------------------------------------------------------------*/
+		int buff_pickup(float x, float y, float height, float width);
+	/*-------------------------------------------------------------------------------------------------*/
+
+
+	// Renders:
+	/*-------------------------------------------------------------------------------------------------*/
+
+	/*-------------------------------------------------------------------------------------------------*/
+#pragma endregion TEMPLATE FUNCTIONS
+
+
+// PLATFORM FUNCTIONS (platform.c)
+/*---------------------------------------------------------------------------------------------------------*/
+#pragma region
 		// Init:
 		/*-------------------------------------------------------------------------------------------------*/
 			// PLATFORMS
 				// reset platform members to 0
 				void reset_platforms(void);
 				// assign platform coordinates
-				void platform_coordinates(int plat_index, int coord_index, float x, float y);
+				void platform_coordinates(int plat_index, int coord_index, int x, int y);
 				// assign onblock coordinates
 				void platform_onblocks(int plat_index, int block_index, float x1, float y1, float x2, float y2);
 				// initialize horizontal hitbox
@@ -466,7 +638,7 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 				// reset checkpoint members and set active checkpoint to 0th coordinates
 				void reset_checkpoints(Checkpoint* checkpoint);
 				// reset walls to 0
-				void reset_walls(platblocks* walls);
+				void reset_walls();
 		/*-------------------------------------------------------------------------------------------------*/
 
 
@@ -492,9 +664,108 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 			// Draw Platforms
 			void DrawPlatform(int plat_index);
 		/*-------------------------------------------------------------------------------------------------*/
-	#pragma endregion FUNCTIONS
-#pragma endregion PLATFORMS, WALLS, GENERAL COLLISION
-/*=====================================================================================================================*/
+	#pragma endregion PLATFORM FUNCTIONS
+
+
+// HAZARD FUNCTIONS (hazards.c)
+/*---------------------------------------------------------------------------------------------------------*/
+#pragma region
+		// Init:
+		/*-------------------------------------------------------------------------------------------------*/
+			void reset_hazards();
+			void init_hazards(FILE* HazardFile, int numberoftraps);
+		/*-------------------------------------------------------------------------------------------------*/
+
+
+		// Updates:
+		/*-------------------------------------------------------------------------------------------------*/
+			bool is_point_in_square(Point p, Point squareTopLeft, float width, float height);
+			int orientation(Point a, Point b, Point c);
+			bool lines_intersect(Point p1, Point q1, Point p2, Point q2);
+			bool check_square_triangle_collision(Point squareTopLeft, float width, float height,
+				Point A, Point B, Point C);
+
+			int crusher_direction(hazard crusher, Player p);
+
+			void hazard_update();
+		/*-------------------------------------------------------------------------------------------------*/
+
+
+		// Renders:
+		/*-------------------------------------------------------------------------------------------------*/
+
+		/*-------------------------------------------------------------------------------------------------*/
+#pragma endregion HAZARD FUNCTIONS
+
+// UTILITY FUNCTIONS (utils.c)
+/*---------------------------------------------------------------------------------------------------------*/
+#pragma region
+	// Init:
+	/*-------------------------------------------------------------------------------------------------*/
+
+	/*-------------------------------------------------------------------------------------------------*/
+
+
+	// Updates:
+	/*-------------------------------------------------------------------------------------------------*/
+		// check if position is within a rectangle
+		int IsAreaClicked(float area_center_x, float area_center_y, float area_width, float area_height, float click_x, float click_y);
+		int IsAreaCornerClicked(float area_corner_x, float area_corner_y, float area_width, float area_height, float click_x, float click_y);
+
+		// check if position is within a circle
+		int IsCircleClicked(float circle_center_x, float circle_center_y, float diameter, float click_x, float click_y);
+
+		// check if two circles intersect
+		int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c2_y, float r2);
+
+		// check if two squares intersect
+		int AreSquaresIntersecting(float s1_x, float s1_y, float s1_w, float s1_h, float s2_x, float s2_y, float s2_w, float s2_h);
+
+		// check if square collides with triangle
+		int SquareTriangleCollide(float squarex, float squarey, float squarewidth, float squareheight, float tri1x, float tri1y, float tri2x, float tri2y, float tri3x, float tri3y);
+
+
+		// update score
+		void AddScore(int *totalScore, int addScore, LevelState* levelstate);
+
+		// score increment animation
+		int IncrementScore(int startScore, int endScore, float* timeElapsed, float dt);
+	/*-------------------------------------------------------------------------------------------------*/
+
+
+	// Renders:
+	/*-------------------------------------------------------------------------------------------------*/
+		// create a text box
+		void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const char* text, CP_Color color);
+
+		// transition effect
+		void TransitionInBoxEffect(float playerX, float playerY, float boxX1, float boxX2, float boxY1, float boxY2, float scaler1, float scaler2, float scaler3, float scaler4);
+		void TransitionOutBoxEffect(float playerX, float playerY, float boxX1, float boxX2, float boxY1, float boxY2, float scaler1, float scaler2, float scaler3, float scaler4);
+	/*-------------------------------------------------------------------------------------------------*/
+#pragma endregion UTILITY FUNCTIONS
+
+// OPTIONS FUNCTIONS (options.c)
+/*---------------------------------------------------------------------------------------------------------*/
+#pragma region
+	/*-------------------------------------------------------------------------------------------------*/
+		void Options_Init(void);
+		void Options_Update(void);
+		void Options_Exit(void);
+
+		// menus when game is paused (pause, options, quit)
+		void PauseMenu();
+		void OptionsMenu();
+		void QuitMenu();
+
+		void SaveOptions(float current_bgm_vol, float current_se_vol);
+		void SaveOptionsInGame(float current_bgm_vol, float current_se_vol, float* prev_bgm_vol, float* prev_se_vol);
+	/*-------------------------------------------------------------------------------------------------*/
+#pragma endregion OPTIONS FUNCTIONS
+
+
+
+
+
 
 
 
@@ -527,29 +798,29 @@ CP_Color bg, pausebg, black, red, green, plat, wall, stamina; //colors
 	#pragma endregion VARIABLES
 	/*---------------------------------------------------------------------------------------------------------*/
 	
-	
-
-	// FUNCTIONS
-	/*---------------------------------------------------------------------------------------------------------*/
-	#pragma region
-		// Init:
-		/*-------------------------------------------------------------------------------------------------*/
-			
-		/*-------------------------------------------------------------------------------------------------*/
-
-
-		// Updates:
-		/*-------------------------------------------------------------------------------------------------*/
-		
-		/*-------------------------------------------------------------------------------------------------*/
-
-
-		// Renders:
-		/*-------------------------------------------------------------------------------------------------*/
-			
-		/*-------------------------------------------------------------------------------------------------*/
-	#pragma endregion FUNCTIONS
 #pragma endregion TEMPLATE
 /*=====================================================================================================================*/
 
+// FUNCTIONS
+/*---------------------------------------------------------------------------------------------------------*/
+#pragma region
+	// Init:
+	/*-------------------------------------------------------------------------------------------------*/
+			
+	/*-------------------------------------------------------------------------------------------------*/
 
+
+	// Updates:
+	/*-------------------------------------------------------------------------------------------------*/
+		
+	/*-------------------------------------------------------------------------------------------------*/
+
+
+	// Renders:
+	/*-------------------------------------------------------------------------------------------------*/
+			
+	/*-------------------------------------------------------------------------------------------------*/
+#pragma endregion TEMPLATE FUNCTIONS
+
+
+			

@@ -116,13 +116,13 @@ void Tutorial_Init(void)
 
 
 	// Walls
-	reset_walls(&walls);
+	reset_walls();
 	FILE* WallFile = fopen("Assets/Level_Tutorial/Wall.txt", "r");
 
-	if (WallFile == NULL) {
+	/*if (WallFile == NULL) {
 		printf("Failed to open wall file! Check if file exists\n");
 		CP_Engine_Terminate();
-	}
+	}*/
 
 	fscanf_s(WallFile, "%d", &numwalls);
 
@@ -140,45 +140,11 @@ void Tutorial_Init(void)
 	//HAZARDS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Hazard
-	reset_hazards(&traps);
+	reset_hazards();
 
 	FILE* HazardFile = fopen("Assets/Level_Tutorial/Hazard.txt", "r");
 	fscanf_s(HazardFile, "%d", &numberoftraps);
-
-	for (int i = 0; i < numberoftraps; ++i)
-	{
-		fscanf_s(HazardFile, "%d", &traps[i].type);
-		switch (traps[i].type)
-		{
-		case spike:
-		{
-			int j = 0;
-			for (; j < 3; ++j)
-			{
-				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
-			}
-			break;
-		}
-		case crusher:
-		{
-			int j = 0;
-			for (; j < 3; ++j)
-			{
-				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
-			}
-			break;
-		}
-		case shooter:
-		{
-			int j = 0;
-			for (; j < 3; ++j)
-			{
-				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
-			}
-			break;
-		}
-		}
-	}
+	init_hazards(HazardFile, numberoftraps);
 	fclose(HazardFile);
 #pragma endregion
 #pragma endregion

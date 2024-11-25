@@ -28,16 +28,10 @@
     <ClCompile Include="utils.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="camera.h" />
     <ClInclude Include="credits.h" />
     <ClInclude Include="globals.h" />
-    <ClInclude Include="hazard.h" />
     <ClInclude Include="LevelSelect.h" />
-    <ClInclude Include="options.h" />
-    <ClInclude Include="platform.h" />
     <ClInclude Include="mainmenu.h" />
-    <ClInclude Include="playerbuff.h" />
-    <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Assets\Credits.txt" />

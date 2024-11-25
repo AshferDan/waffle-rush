@@ -9,7 +9,7 @@
 //---------------------------------------------------------
 
 #include "LevelSelect.h"
-#include "utils.h"
+#include "globals.h"
 
 #define num_levels 5
 level levels[num_levels];
@@ -120,13 +120,13 @@ void LSelect_Init(void)
 
 
 	// Walls
-	reset_walls(&walls);
+	reset_walls();
 	FILE* WallFile = fopen("Assets/Level_Select/Wall.txt", "r");
 
-	if (WallFile == NULL) {
+	/*if (WallFile == NULL) {
 		printf("Failed to open wall file! Check if file exists\n");
-		CP_Engine_Terminate;
-	}
+		CP_Engine_Terminate();
+	}*/
 
 	fscanf_s(WallFile, "%d", &numwalls);
 
@@ -144,45 +144,11 @@ void LSelect_Init(void)
 	//HAZARDS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Hazard
-	reset_hazards(&traps);
+	reset_hazards();
 
 	FILE* HazardFile = fopen("Assets/Level_Select/Hazard.txt", "r");
 	fscanf_s(HazardFile, "%d", &numberoftraps);
-
-	for (int i = 0; i < numberoftraps; ++i)
-	{
-		fscanf_s(HazardFile, "%d", &traps[i].type);
-		switch (traps[i].type)
-		{
-		case spike:
-		{
-			int j = 0;
-			for (; j < 3; ++j)
-			{
-				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
-			}
-			break;
-		}
-		case crusher:
-		{
-			int j = 0;
-			for (; j < 3; ++j)
-			{
-				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
-			}
-			break;
-		}
-		case shooter:
-		{
-			int j = 0;
-			for (; j < 3; ++j)
-			{
-				fscanf_s(HazardFile, "%d %d", &traps[i].x[j], &traps[i].y[j]);
-			}
-			break;
-		}
-		}
-	}
+	init_hazards(HazardFile, numberoftraps);
 	fclose(HazardFile);
 #pragma endregion
 #pragma endregion
@@ -251,7 +217,7 @@ void LSelect_Init(void)
 	// CAMERA INIT
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Camera Init
-	Cam_Init(&camera, width, height, spawn);
+	Cam_Init(&camera, (float)width, (float)height, spawn);
 #pragma endregion
 
 #pragma region Level Transition Inits
@@ -284,12 +250,12 @@ void LSelect_Init(void)
 
 void LSelect_Update(void)
 {
-	//printf("camera.worldshiftx %f | camera.worldshifty %f\n", camera.worldshiftx, camera.worldshifty);
+	//printf("camshiftx %f | camshifty %f | worldx %f | worldy %f\n", camera.camshiftx, camera.camshifty, camera.worldshiftx, camera.worldshifty);
 	// background
 	CP_Graphics_ClearBackground(bg);
 
 	// getdt
-	float dt = CP_System_GetDt();
+	dt = CP_System_GetDt();
 	dt = CP_Math_ClampFloat(dt, 0.0f, 0.05f); //prevent excess lagspike clipping
 
 	// get mouse coords
@@ -452,7 +418,6 @@ void LSelect_Update(void)
 							if ((player.y + player.height + 30) >= traps[trap_index].y[1]) {
 								player.y = (traps[trap_index].y[1] - player.height - 15);
 								Kill_Player(&player, Crush, &deaths);
-								printf("active\n");
 							}
 						}
 
@@ -494,18 +459,12 @@ void LSelect_Update(void)
 
 #pragma endregion
 
-		// CAMERA UPDATE
-		/*---------------------------------------------------------------------------------------------------*/
-		//implement the below logic later. do the main camera first.
-		//camera.limitleftx =  camera.limitleftx  + offsetX;
-		//camera.limitrightx = camera.limitrightx + offsetX;
+// CAMERA UPDATE
+/*---------------------------------------------------------------------------------------------------*/
 #pragma region Camera
 
-		//CamShift(&camera, mouseX, mouseY, width, height);
 		if (!(player.state == Dead)) {
-
-			playerCamColl(&player, &camera); //functionised my camera shift. 
-			//where worldshiftx is now the modifyable for all objects
+			playerCamColl(&player, &camera); 
 		}
 	}
 

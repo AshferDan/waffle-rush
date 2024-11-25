@@ -10,8 +10,7 @@
 //---------------------------------------------------------
 
 #pragma once
-#include "playerbuff.h"
-#include "platform.h"
+#include "globals.h"
 
 //int buffstate = 0b000;  //init here, logic here, application in level2.c
 //init collision =0;
@@ -24,7 +23,7 @@ if // collision
 */
 
 //checking for collision
-int is_colliding(float x, float y, float height, float width) {
+int buff_pickup(float x, float y, float height, float width) {
 	float playerRight = player.x + player.width;
 	float playerBase = player.y + player.height;
 	
@@ -45,10 +44,6 @@ if (buffstate & jumpBuff){
 
 
 }
-
-
-
-
 
 //speedboost/slowtime
 if (/*buffstate & power[i] - box)*/) {

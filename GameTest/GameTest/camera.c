@@ -10,7 +10,7 @@
 //---------------------------------------------------------
 
 #pragma once
-#include "camera.h"
+#include "globals.h"
 
 void playerCamColl(Player *player, Camera* camera) {
 	float playerR = player->x + player->width;
