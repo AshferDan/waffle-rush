@@ -155,6 +155,8 @@
 		float tutorialDataY, level1DataY, level2DataY, level3DataY; //display high score and time for each level
 		float clear_timer;
 
+		CP_Image goal_pointer;
+
 		// Mouse position
 		float mouseX, mouseY;
 

@@ -45,12 +45,20 @@ void Tutorial_Init(void)
 
 	// load player sprite
 	player_sprite		= CP_Image_Load("Assets/Player_Sprites.png");
+	boot_sprite			= CP_Image_Load("Assets/Boot_Sprites.png");
+	bubble_sprite		= CP_Image_Load("Assets/Bubble.png");
 	transition_sprite	= CP_Image_Load("Assets/Transition.png");
 	spawn_sprite		= CP_Image_Load("Assets/Spawn_Sprite.png");
 	burn_sprite			= CP_Image_Load("Assets/Burnt.png");
 	fall_sprite			= CP_Image_Load("Assets/Fall_Sprite.png");
 	crush_sprite		= CP_Image_Load("Assets/Crush_Sprite.png");
+
 	goal_sprite			= CP_Image_Load("Assets/Plate.png");
+	goal_pointer		= CP_Image_Load("Assets/Arrow.png");
+
+	buff_sprite			= CP_Image_Load("Assets/Buff_Icon.png");
+
+	fire_sprite			= CP_Image_Load("Assets/Fire_Sprite.png");
 #pragma endregion
 
 	// LEVEL INIT
@@ -522,7 +530,7 @@ void Tutorial_Update(void)
 		CP_Font_DrawTextBox("Touch a closed waffle press to set your new checkpoint!\n\nTry it by\nKILLING the waffle (K)", 1500 - camera.worldshiftx, 550 - camera.worldshifty, 250);
 		CP_Font_DrawTextBox("Land on the golden plate to complete the level :D", 2350 - camera.worldshiftx, 700 - camera.worldshifty, 250);
 
-	// Platforms
+		// Platforms
 		CP_Settings_Fill(plat);
 		CP_Settings_Stroke(CP_Color_Create(100, 100, 100, 255));
 		for (int i = 0; i < numplats; i++) {
@@ -602,6 +610,43 @@ void Tutorial_Update(void)
 			}
 
 			}
+		}
+
+		// Goal pointer
+		if (!IsAreaCornerClicked(0, 0, width, height, goalx-camera.worldshiftx, goaly-camera.worldshifty)) {
+			float goalpointx = goalx + 50 - camera.worldshiftx;
+			float goalpointy = goaly + 50 - camera.worldshifty;
+			float goalpointspritex = (player.anim < 10) ? 0 : 32;
+			float goalpointspritey = 0;
+			float goalpointrot = 0;
+			if (goalpointx > 0 && goalpointx < width) {
+				goalpointspritey = (goalpointy < (float)(height / 2)) ? 64 : 96;
+			}
+			if (goalpointy > 0 && goalpointy < height) {
+				goalpointspritey = (goalpointx > (float)(width / 2)) ? 0 : 32;
+			}
+			if ((goalpointx > width || goalpointx < 0) && (goalpointy > height || goalpointy < 0)) {
+				if (goalpointx > 0.9f * (float)width && goalpointy < 0.2f * (float)height) {
+					goalpointspritey = 64;
+				}
+				if (goalpointx > 0.9f * (float)width && goalpointy > 0.8f * (float)height) {
+					goalpointspritey = 0;
+				}
+				if (goalpointx < 0.1f * (float)width && goalpointy < 0.2f * (float)height) {
+					goalpointspritey = 32;
+				}
+				if (goalpointx < 0.1f * (float)width && goalpointy > 0.8f * (float)height) {
+					goalpointspritey = 96;
+				}
+				goalpointrot = 45;
+
+			}
+			goalpointx = CP_Math_ClampFloat(goalpointx, 0.1f * (float)width, 0.9f * (float)width);
+			goalpointy = CP_Math_ClampFloat(goalpointy, 0.2f * (float)height, 0.8f * (float)height);
+			
+			CP_Image_DrawSubImageAdvanced(goal_pointer, goalpointx - 50, goalpointy - 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 255, goalpointrot);
+
+			//CP_Image_DrawSubImageAdvanced(goal_pointer, width/2-50, 200, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 255, goalpointrot);
 		}
 
 		// Camera Shift Highlight
@@ -722,12 +767,19 @@ void Tutorial_Update(void)
 void Tutorial_Exit(void)
 {
 	CP_Image_Free(&player_sprite);
+	CP_Image_Free(&boot_sprite);
+	CP_Image_Free(&bubble_sprite);
 	CP_Image_Free(&transition_sprite);
 	CP_Image_Free(&spawn_sprite);
 	CP_Image_Free(&burn_sprite);
 	CP_Image_Free(&fall_sprite);
 	CP_Image_Free(&crush_sprite);
 	CP_Image_Free(&goal_sprite);
+	CP_Image_Free(&buff_sprite);
+
+	CP_Image_Free(&goal_pointer);
+
+	CP_Image_Free(&fire_sprite);
 
 	CP_Sound_Free(&music);
 	CP_Sound_Free(&sfx);
