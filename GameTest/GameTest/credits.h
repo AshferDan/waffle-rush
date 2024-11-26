@@ -13,6 +13,12 @@
 
 #define name_length 20
 
+typedef enum credit_screen {
+	FIRST,
+	SECOND,
+	THIRD
+} credit_screen;
+
 typedef struct credits {
 	char name[name_length];
 } credits;
