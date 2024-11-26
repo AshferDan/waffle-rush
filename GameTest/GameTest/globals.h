@@ -447,6 +447,9 @@
 /*=====================================================================================================================*/
 #pragma region 
 	#define MAX_TRAPS 50
+	#define BULLET_SIZE 10
+	#define BULLET_SPEED 100
+	#define MAX_BULLETS 2
 	// ENUMS AND STRUCTS
 	/*
 		Enums:
@@ -467,6 +470,7 @@
 	// Hazard struct
 	typedef struct hazard {
 		float x[3], y[3];
+		int direction;
 		hazardstype type;
 	}hazard;
 
@@ -485,7 +489,8 @@
 /*---------------------------------------------------------------------------------------------------------*/
 #pragma region 
 	hazard traps[MAX_TRAPS];
-
+	CP_Image fire_sprite;
+	float bulletx, bullety;
 	int numberoftraps;
 	int crusherstate;
 
@@ -693,7 +698,7 @@
 
 		// Renders:
 		/*-------------------------------------------------------------------------------------------------*/
-
+			void Draw_Fire(CP_Image fire_sprite, hazard traps);
 		/*-------------------------------------------------------------------------------------------------*/
 #pragma endregion HAZARD FUNCTIONS
 
