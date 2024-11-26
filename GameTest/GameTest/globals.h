@@ -502,6 +502,7 @@
 	float bulletx, bullety;
 	int numberoftraps;
 	int crusherstate;
+	float firetimer;
 
 #pragma endregion VARIABLES
 /*---------------------------------------------------------------------------------------------------------*/

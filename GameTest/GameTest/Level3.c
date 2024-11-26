@@ -28,6 +28,7 @@ void L3_Init(void)
 	fall_sprite = CP_Image_Load("Assets/Fall_Sprite.png");
 	crush_sprite = CP_Image_Load("Assets/Crush_Sprite.png");
 	goal_sprite = CP_Image_Load("Assets/Plate.png");
+	fire_sprite = CP_Image_Load("Assets/Fire_Sprite.png");
 #pragma endregion
 
 	// LEVEL INIT
@@ -148,7 +149,7 @@ void L3_Init(void)
 	spawnInterval = 0.5f;  // Spawn a square every 0.5 seconds
 	bulletx = 800;
 	bullety = 800;
-	fire_sprite = CP_Image_Load("Assets/Fire_Sprite.png");
+	firetimer = 0;
 
 #pragma endregion
 	// PLAYER INITS
@@ -521,13 +522,20 @@ void L3_Update(void)
 
 		// TRAP DRAWING
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
+
+		firetimer += 0.5;
+		if (firetimer > 15) {
+			firetimer = 0;
+		}
+		float sprite_x = (int)firetimer * 32;
+
 		for (int i = 0; i < numberoftraps; ++i)
 		{
 			switch (traps[i].type)
 			{
 			case spike:
 			{
-				CP_Graphics_DrawRect(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
+				CP_Image_DrawSubImageAdvanced(fire_sprite, traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, 50, 50, sprite_x, 0, sprite_x + 32, 32, 255, 90 * traps[i].direction);
 				break;
 			}
 			case crusher:
