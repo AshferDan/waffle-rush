@@ -103,11 +103,13 @@ void init_hazards(FILE* HazardFile, int numberoftraps) {
         {
         case spike:
         {
-            for (int coordinate_index = 0; coordinate_index < 3; ++coordinate_index)
-            {
-                fscanf_s(HazardFile, "%f %f", &traps[hazard_index].x[coordinate_index], &traps[hazard_index].y[coordinate_index]);
-            }
-            break;
+			for (int coordinate_index = 0; coordinate_index < 3; ++coordinate_index)
+			{
+				fscanf_s(HazardFile, "%f %f", &traps[hazard_index].x[coordinate_index], &traps[hazard_index].y[coordinate_index]);
+			}
+			fscanf_s(HazardFile, "%d", &traps[hazard_index].direction);
+			break;
+            
         }
         case crusher:
         {

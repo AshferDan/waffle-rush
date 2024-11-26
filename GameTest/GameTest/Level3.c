@@ -144,6 +144,11 @@ void L3_Init(void)
 	fscanf_s(HazardFile, "%d", &numberoftraps);
 	init_hazards(HazardFile, numberoftraps);
 	fclose(HazardFile);
+	float spawnTimer = 0.0f;     // Timer to control spawning frequency
+	float spawnInterval = 0.5f;  // Spawn a square every 0.5 seconds
+	float bulletX = 300;
+	float bulletY = -200;
+	fire_sprite = CP_Image_Load("Assets/Fire_Sprite.png");
 
 #pragma endregion
 #pragma endregion
@@ -342,13 +347,6 @@ void L3_Update(void)
 			// Jump
 			jump(&player, movestate, Buff[jumpBuff].state);
 
-			// window clamps (eventually World Clamps)
-			/*player.x = CP_Math_ClampFloat(player.x, 0, 2600);
-			if (player.y + player.height > height || player.y < 0) {
-				player.movey = 0;
-			}
-			player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);*/
-
 			// change movestate
 				/*
 				OnPlat	  - on platform
@@ -377,6 +375,28 @@ void L3_Update(void)
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
+
+		spawnTimer += CP_System_GetDt();
+		if (spawnTimer >= spawnInterval) {
+			for (int i = 0; i < MAX_SQUARES; ++i) {
+				if (!squares[i].active) {
+					squares[i].x = bulletx; // Spawn at the defined starting point
+					squares[i].y = bullety; // Align along the defined line
+					squares[i].active = true;
+					break;
+				}
+			}
+			spawnTimer = 0.0f;
+		}
+
+		for (int i = 0; i < MAX_SQUARES; ++i) {
+			if (squares[i].active) {
+				squares[i].x -= SQUARE_SPEED * CP_System_GetDt(); // Move square left
+				if (squares[i].x + SQUARE_SIZE < 0) {            // Deactivate square if off-screen
+					squares[i].active = false;
+				}
+			}
+		}
 
 		hazard_update();
 
