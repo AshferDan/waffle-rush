@@ -474,7 +474,7 @@ void L1_Update(void)
 
 		// Player
 		if (levelstate != Cleared) {
-			Draw_Player(player_sprite, player, movestate);
+			Draw_Player(player, movestate);
 		}
 
 		// Stamina Bar

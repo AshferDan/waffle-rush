@@ -652,7 +652,7 @@ void LSelect_Update(void)
 
 	// Player
 	if (isCleared == 0) {
-		Draw_Player(player_sprite, player, movestate);
+		Draw_Player(player, movestate);
 	}
 
 	// HAZARD DRAWING

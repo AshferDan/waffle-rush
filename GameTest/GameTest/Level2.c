@@ -22,12 +22,15 @@ void L2_Init(void)
 
 	// load player sprite
 	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
+	boot_sprite = CP_Image_Load("Assets/Boot_Sprites.png");
+	bubble_sprite = CP_Image_Load("Assets/Bubble.png");
 	transition_sprite = CP_Image_Load("Assets/Transition.png");
 	spawn_sprite = CP_Image_Load("Assets/Spawn_Sprite.png");
 	burn_sprite = CP_Image_Load("Assets/Burnt.png");
 	fall_sprite = CP_Image_Load("Assets/Fall_Sprite.png");
 	crush_sprite = CP_Image_Load("Assets/Crush_Sprite.png");
 	goal_sprite = CP_Image_Load("Assets/Plate.png");
+	buff_sprite = CP_Image_Load("Assets/Buff_Icon.png");
 #pragma endregion
 
 	// LEVEL INIT
@@ -563,7 +566,7 @@ void L2_Update(void)
 
 		// Player
 		if (levelstate != Cleared) {
-			Draw_Player(player_sprite, player, movestate);
+			Draw_Player(player, movestate);
 		}
 
 		// Stamina Bar
@@ -601,13 +604,20 @@ void L2_Update(void)
 		}
 
 		//PowerUps drawing 
+		float buff_sprite_x = (player.anim < 10) ? 0 : 32;
 		if (Buff[jumpBuff].canPickup == 1) {
 			CP_Settings_Fill(CP_Color_Create(100, 100, 100, 255));
-			CP_Graphics_DrawRect(Buff[jumpBuff].X-camera.worldshiftx, Buff[jumpBuff].Y-camera.worldshifty, Buff[jumpBuff].width, Buff[jumpBuff].height);
+			//CP_Graphics_DrawRect(Buff[jumpBuff].X-camera.worldshiftx, Buff[jumpBuff].Y-camera.worldshifty, Buff[jumpBuff].width, Buff[jumpBuff].height);
+			float jumpbuff_x = Buff[jumpBuff].X - camera.worldshiftx - 20;
+			float jumpbuff_y = Buff[jumpBuff].Y - camera.worldshifty - 20;
+			CP_Image_DrawSubImage(buff_sprite, jumpbuff_x, jumpbuff_y, Buff[jumpBuff].width + 40, Buff[jumpBuff].height + 40, buff_sprite_x, 0, buff_sprite_x + 32, 32, 255);
 		}
 		if (Buff[invulBuff].canPickup == 1) {
 			CP_Settings_Fill(CP_Color_Create(100, 100, 100, 255));
-			CP_Graphics_DrawRect(Buff[invulBuff].X - camera.worldshiftx, Buff[invulBuff].Y - camera.worldshifty, Buff[invulBuff].width, Buff[invulBuff].height);
+			//CP_Graphics_DrawRect(Buff[invulBuff].X - camera.worldshiftx, Buff[invulBuff].Y - camera.worldshifty, Buff[invulBuff].width, Buff[invulBuff].height);
+			float invbuff_x = Buff[invulBuff].X - camera.worldshiftx - 20;
+			float invbuff_y = Buff[invulBuff].Y - camera.worldshifty - 20;
+			CP_Image_DrawSubImage(buff_sprite, invbuff_x, invbuff_y, Buff[jumpBuff].width + 40, Buff[jumpBuff].height + 40, buff_sprite_x, 32, buff_sprite_x + 32, 64, 255);
 		}
 
 		// Stamina Bar
@@ -781,10 +791,13 @@ void L2_Update(void)
 void L2_Exit(void)
 {
 	CP_Image_Free(&player_sprite);
+	CP_Image_Free(&boot_sprite);
+	CP_Image_Free(&bubble_sprite);
 	CP_Image_Free(&transition_sprite);
 	CP_Image_Free(&spawn_sprite);
 	CP_Image_Free(&burn_sprite);
 	CP_Image_Free(&fall_sprite);
 	CP_Image_Free(&crush_sprite);
 	CP_Image_Free(&goal_sprite);
+	CP_Image_Free(&buff_sprite);
 }

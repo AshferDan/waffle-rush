@@ -825,7 +825,7 @@ void DrawGoal(CP_Image goal_sprite, float goalx, float goaly, Camera camera, flo
 	}
 }
 
-void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
+void Draw_Player(Player player, MoveState movestate) {
 	// Normal Player
 	float draw_posx = player.x - 15 - camera.worldshiftx;
 	float draw_posy = player.y - 15 - camera.worldshifty;
@@ -890,6 +890,10 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 				break;
 			}
 			CP_Image_DrawSubImageAdvanced(player_sprite, draw_posx, draw_posy, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 255, rot);
+			if ((buffstate & 0b010) && Buff[jumpBuff].buffduration > 0.00f) {
+				CP_Image_DrawSubImageAdvanced(boot_sprite, draw_posx, draw_posy, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 180, rot);
+
+			}
 		}
 		else
 		{
@@ -897,6 +901,20 @@ void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate) {
 
 			sprite_x = (float)(((int)player.transition_time / 1) * 18);
 			CP_Image_DrawSubImage(transition_sprite, draw_posx, draw_posy, player.width + 30, (player.height + 30) * 2, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 35, 255);
+		}
+
+		if ((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f) {
+			float offset = 0;
+			if (movestate == EnterPlat) {
+				offset = player.transition_time*50/13;
+			}
+			else if (movestate == ExitPlat) {
+				offset = 50 - player.transition_time*50/13;
+			}
+
+			float bubble_x = draw_posx - 10;
+			float bubble_y = (draw_posy - 10)+offset;
+			CP_Image_Draw(bubble_sprite, bubble_x, bubble_y, player.width + 50, player.height + 50, 255);
 		}
 	}
 	else if (player.state == Dead) {
