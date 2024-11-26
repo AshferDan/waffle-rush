@@ -447,9 +447,9 @@
 /*=====================================================================================================================*/
 #pragma region 
 	#define MAX_TRAPS 50
-	#define BULLET_SIZE 10
-	#define BULLET_SPEED 100
-	#define MAX_BULLETS 2
+	#define BULLET_SIZE 50
+	#define BULLET_SPEED 200
+	#define MAX_BULLETS 20
 	// ENUMS AND STRUCTS
 	/*
 		Enums:

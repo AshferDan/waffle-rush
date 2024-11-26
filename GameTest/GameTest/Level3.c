@@ -61,7 +61,7 @@ void L3_Init(void)
 	// initialize goal
 	goalx = 2550;
 	goaly = 2000;
-
+#pragma endregion
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
@@ -144,13 +144,12 @@ void L3_Init(void)
 	fscanf_s(HazardFile, "%d", &numberoftraps);
 	init_hazards(HazardFile, numberoftraps);
 	fclose(HazardFile);
-	float spawnTimer = 0.0f;     // Timer to control spawning frequency
-	float spawnInterval = 0.5f;  // Spawn a square every 0.5 seconds
-	float bulletX = 300;
-	float bulletY = -200;
+	spawnTimer = 0.0f;     // Timer to control spawning frequency
+	spawnInterval = 0.5f;  // Spawn a square every 0.5 seconds
+	bulletx = 800;
+	bullety = 800;
 	fire_sprite = CP_Image_Load("Assets/Fire_Sprite.png");
 
-#pragma endregion
 #pragma endregion
 	// PLAYER INITS
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -702,4 +701,6 @@ void L3_Exit(void)
 	CP_Image_Free(&fall_sprite);
 	CP_Image_Free(&crush_sprite);
 	CP_Image_Free(&goal_sprite);
+	CP_Image_Free(&fire_sprite);
+
 }
