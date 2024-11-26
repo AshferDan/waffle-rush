@@ -14,9 +14,29 @@
 level levels[num_levels];
 float timeElapsed;
 int levelEnded;
+CP_Sound music;
+CP_Sound sfx;
 
 void Tutorial_Init(void)
 {
+	// VOLUME
+	// load options file (music volume)
+	FILE* file = fopen("Assets/Options.txt", "r");
+	fscanf_s(file, "%f %f", &current_bgm_vol, &current_se_vol);
+	printf("BGM Volume: %lf\nSE Volume: %lf\n", current_bgm_vol, current_se_vol);
+	printf("---------------------------------------------------------------\n");
+	fclose(file);
+
+	// load music
+	music = CP_Sound_LoadMusic("Assets/TutorialMusic.wav");
+	CP_Sound_PlayAdvanced(music, 1.0f, 1.0f, TRUE, CP_SOUND_GROUP_0);
+
+	// load sfx
+	sfx = CP_Sound_Load("Assets/PlayerSpawn.wav");
+	CP_Sound_PlayAdvanced(sfx, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
+
+	CP_Sound_ResumeGroup(CP_SOUND_GROUP_1);
+
 	// ASSET LOADS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Assets
@@ -264,6 +284,10 @@ void Tutorial_Update(void)
 	// background
 	CP_Graphics_ClearBackground(bg);
 
+	// set volumes
+	CP_Sound_SetGroupVolume(CP_SOUND_GROUP_0, current_bgm_vol / 100.0f);
+	CP_Sound_SetGroupVolume(CP_SOUND_GROUP_1, current_se_vol / 100.0f);
+
 	// getdt
 	float dt = CP_System_GetDt();
 	dt = CP_Math_ClampFloat(dt, 0.0f, 0.05f); //prevent excess lagspike clipping
@@ -275,9 +299,11 @@ void Tutorial_Update(void)
 	// pause/resume game with Esc
 	if (CP_Input_KeyTriggered(KEY_ESCAPE) && levelstate == NotPaused) {
 		levelstate = Paused;
+		CP_Sound_PauseGroup(CP_SOUND_GROUP_1);
 	}
 	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && levelstate == Paused) {
 		levelstate = NotPaused;
+		CP_Sound_ResumeGroup(CP_SOUND_GROUP_1);
 	}
 
 	// Timer updates
@@ -702,4 +728,7 @@ void Tutorial_Exit(void)
 	CP_Image_Free(&fall_sprite);
 	CP_Image_Free(&crush_sprite);
 	CP_Image_Free(&goal_sprite);
+
+	CP_Sound_Free(&music);
+	CP_Sound_Free(&sfx);
 }

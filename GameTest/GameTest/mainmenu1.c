@@ -18,8 +18,22 @@ float timeElapsed;
 EnterLevel Tutorial, level1, level2, level3;
 int levelEnded;
 
+CP_Sound music;
+
 void LSelect_Init(void)
 {
+	// VOLUME
+	// load options file (music volume)
+	FILE* file = fopen("Assets/Options.txt", "r");
+	fscanf_s(file, "%f %f", &current_bgm_vol, &current_se_vol);
+	printf("BGM Volume: %lf\nSE Volume: %lf\n", current_bgm_vol, current_se_vol);
+	printf("---------------------------------------------------------------\n");
+	fclose(file);
+
+	// load music
+	music = CP_Sound_LoadMusic("Assets/Levelselectthemeig.wav");
+	CP_Sound_PlayAdvanced(music, 0.5f, 1.0f, TRUE, CP_SOUND_GROUP_0);
+
 	// ASSET LOADS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Assets
@@ -253,6 +267,9 @@ void LSelect_Update(void)
 	//printf("camshiftx %f | camshifty %f | worldx %f | worldy %f\n", camera.camshiftx, camera.camshifty, camera.worldshiftx, camera.worldshifty);
 	// background
 	CP_Graphics_ClearBackground(bg);
+
+	// set volumes
+	CP_Sound_SetGroupVolume(CP_SOUND_GROUP_0, current_bgm_vol / 100.0f);
 
 	// getdt
 	dt = CP_System_GetDt();
@@ -906,4 +923,5 @@ void LSelect_Exit(void)
 	CP_Image_Free(&fall_sprite);
 	CP_Image_Free(&crush_sprite);
 	CP_Image_Free(&goal_sprite);
+	CP_Sound_Free(&music);
 }

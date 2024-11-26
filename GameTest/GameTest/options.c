@@ -13,6 +13,7 @@
 #include "LevelSelect.h"
 
 CP_Font exo;
+CP_Sound music;
 
 void Options_Init(void) {
 
@@ -81,6 +82,11 @@ void Options_Update(void) {
 	else if (current_bgm_vol < 0) {
 		current_bgm_vol = 0.0f;
 	}
+
+	CP_Sound_SetGroupVolume(CP_SOUND_GROUP_0, current_bgm_vol / max_bgm_vol);
+	CP_Sound_SetGroupVolume(CP_SOUND_GROUP_1, current_se_vol / max_se_vol);
+	printf("Current BGM Volume: %lf\n", current_bgm_vol / max_bgm_vol);
+	printf("Current SE Volume: %lf\n", current_se_vol / max_se_vol);
 	
 	// lower BGM volume button
 	TextBoxCreate(icon_bgm_x - 100, icon_bgm_y, 50, 50, "-", button_color);
@@ -199,7 +205,7 @@ void Options_Update(void) {
 }
 
 void Options_Exit(void) {
-
+	
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -227,6 +233,7 @@ void PauseMenu() {
 		CP_Graphics_DrawRect(400, 2 * height / 3, 300, 150);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
 			levelstate = NotPaused;
+			CP_Sound_ResumeGroup(CP_SOUND_GROUP_1);
 		}
 	}
 
@@ -276,7 +283,7 @@ void OptionsMenu() {
 	else if (current_bgm_vol < 0) {
 		current_bgm_vol = 0.0f;
 	}
-
+	CP_Sound_SetGroupVolume(CP_SOUND_GROUP_0, current_bgm_vol / max_bgm_vol);
 
 	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
 	CP_Settings_TextSize(70);
@@ -380,7 +387,7 @@ void OptionsMenu() {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 		CP_Graphics_DrawRect(3 * width / 8, height - 250, 200, 100);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
-			SaveOptions(current_bgm_vol, current_se_vol);
+			SaveOptionsInGame(current_bgm_vol, current_se_vol, &prev_bgm_vol, &prev_se_vol);
 		}
 	}
 

@@ -24,11 +24,11 @@ void Credits_Init(void) {
 
 	// load credits file
 
-	FILE* file = fopen("Assets/Credits.txt", "r");
+	FILE* file2 = fopen("Assets/Credits.txt", "r");
 	for (int i = 0; i < num_names; i++) {
-		fgets(names[i].name, sizeof(names[i].name), file);
+		fgets(names[i].name, sizeof(names[i].name), file2);
 	}
-	fclose(file);
+	fclose(file2);
 
 	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
 	CP_Settings_RectMode(CP_POSITION_CENTER);

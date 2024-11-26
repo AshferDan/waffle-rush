@@ -11,7 +11,9 @@
 #include "mainmenu.h"
 
 CP_Font exo;
+CP_Sound music;
 CP_Color button_color;
+bool inMenu = 0;
 
 void Main_Menu_Init(void)
 {
@@ -19,6 +21,20 @@ void Main_Menu_Init(void)
 	exo = CP_Font_Load("Assets/Exo2-Regular.ttf");
 	CP_Font_Set(exo);
 	CP_Settings_TextSize(150);
+
+	// load options file (music volume)
+	FILE* file = fopen("Assets/Options.txt", "r");
+	fscanf_s(file, "%f %f", &current_bgm_vol, &current_se_vol);
+	printf("BGM Volume: %lf\nSE Volume: %lf\n", current_bgm_vol, current_se_vol);
+	printf("---------------------------------------------------------------\n");
+	fclose(file);
+
+	// load music
+	if (inMenu == 0) {
+		music = CP_Sound_LoadMusic("Assets/Dumba.wav");
+		CP_Sound_PlayAdvanced(music, 1.0f, 1.0f, TRUE, CP_SOUND_GROUP_0);
+		inMenu = 1;
+	}
 }
 
 void Main_Menu_Update(void)
@@ -31,12 +47,14 @@ void Main_Menu_Update(void)
 	mouseX = CP_Input_GetMouseX();
 	mouseY = CP_Input_GetMouseY();
 
-
 	//button color
 	button_color = CP_Color_Create(200, 60, 60, 255);
 
 	//background
 	CP_Graphics_ClearBackground(CP_Color_Create(200, 200, 200, 255));
+
+	// set volumes
+	CP_Sound_SetGroupVolume(CP_SOUND_GROUP_0, current_bgm_vol / 100.0f);
 
 	////draw test play button (FOR ASH)
 	//TextBoxCreate(width / 2, height / 9, 500, 150, "ASH", button_color);
@@ -56,6 +74,8 @@ void Main_Menu_Update(void)
 		CP_Graphics_DrawRect(width / 2, height / 3, 500, 150);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
 			CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit); //go to game
+			inMenu = 0;
+			CP_Sound_Free(&music);
 		}
 	}
 
@@ -106,5 +126,5 @@ void Main_Menu_Update(void)
 
 void Main_Menu_Exit(void)
 {
-
+	//CP_Sound_Free(&music);
 }
