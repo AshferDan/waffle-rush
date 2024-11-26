@@ -479,6 +479,12 @@
 		float x;
 		float y;
 	} Point;
+
+	// Structure to represent a bullet
+	typedef struct {
+		float x, y;
+		bool active;
+	} Bullet;
 #pragma endregion Enums and Structs
 /*---------------------------------------------------------------------------------------------------------*/
 
@@ -489,7 +495,10 @@
 /*---------------------------------------------------------------------------------------------------------*/
 #pragma region 
 	hazard traps[MAX_TRAPS];
+	Bullet bullets[MAX_BULLETS];
 	CP_Image fire_sprite;
+	float spawnTimer;
+	float spawnInterval;
 	float bulletx, bullety;
 	int numberoftraps;
 	int crusherstate;

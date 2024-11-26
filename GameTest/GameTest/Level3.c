@@ -378,22 +378,22 @@ void L3_Update(void)
 
 		spawnTimer += CP_System_GetDt();
 		if (spawnTimer >= spawnInterval) {
-			for (int i = 0; i < MAX_SQUARES; ++i) {
-				if (!squares[i].active) {
-					squares[i].x = bulletx; // Spawn at the defined starting point
-					squares[i].y = bullety; // Align along the defined line
-					squares[i].active = true;
+			for (int i = 0; i < MAX_BULLETS; ++i) {
+				if (!bullets[i].active) {
+					bullets[i].x = bulletx; // Spawn at the defined starting point
+					bullets[i].y = bullety; // Align along the defined line
+					bullets[i].active = true;
 					break;
 				}
 			}
 			spawnTimer = 0.0f;
 		}
 
-		for (int i = 0; i < MAX_SQUARES; ++i) {
-			if (squares[i].active) {
-				squares[i].x -= SQUARE_SPEED * CP_System_GetDt(); // Move square left
-				if (squares[i].x + SQUARE_SIZE < 0) {            // Deactivate square if off-screen
-					squares[i].active = false;
+		for (int i = 0; i < MAX_BULLETS; ++i) {
+			if (bullets[i].active) {
+				bullets[i].x -= BULLET_SPEED * CP_System_GetDt(); // Move square left
+				if (bullets[i].x + BULLET_SIZE < 0) {            // Deactivate square if off-screen
+					bullets[i].active = false;
 				}
 			}
 		}
@@ -511,6 +511,16 @@ void L3_Update(void)
 		}
 
 		// HAZARD DRAWING
+
+		// BULLET DRAWING
+		CP_Settings_Fill(CP_Color_Create(255, 0, 0, 255)); // Red color
+		for (int i = 0; i < MAX_BULLETS; ++i) {
+			if (bullets[i].active) {
+				CP_Graphics_DrawRect(bullets[i].x - camera.worldshiftx, bullets[i].y - camera.worldshifty, BULLET_SIZE, BULLET_SIZE);
+			}
+		}
+
+		// TRAP DRAWING
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
 		for (int i = 0; i < numberoftraps; ++i)
 		{
@@ -518,7 +528,7 @@ void L3_Update(void)
 			{
 			case spike:
 			{
-				CP_Graphics_DrawTriangle(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - camera.worldshiftx, traps[i].y[1] - camera.worldshifty, traps[i].x[2] - camera.worldshiftx, traps[i].y[2] - camera.worldshifty);
+				CP_Graphics_DrawRect(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
 				break;
 			}
 			case crusher:
