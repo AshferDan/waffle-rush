@@ -48,6 +48,7 @@ void L3_Init(void)
 	fall_sprite = CP_Image_Load("Assets/Fall_Sprite.png");
 	crush_sprite = CP_Image_Load("Assets/Crush_Sprite.png");
 	goal_sprite = CP_Image_Load("Assets/Plate.png");
+	fire_sprite = CP_Image_Load("Assets/Fire_Sprite.png");
 #pragma endregion
 
 	// LEVEL INIT
@@ -81,7 +82,7 @@ void L3_Init(void)
 	// initialize goal
 	goalx = 2550;
 	goaly = 2000;
-
+#pragma endregion
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
@@ -164,8 +165,12 @@ void L3_Init(void)
 	fscanf_s(HazardFile, "%d", &numberoftraps);
 	init_hazards(HazardFile, numberoftraps);
 	fclose(HazardFile);
+	spawnTimer = 0.0f;     // Timer to control spawning frequency
+	spawnInterval = 0.5f;  // Spawn a square every 0.5 seconds
+	bulletx = 800;
+	bullety = 800;
+	firetimer = 0;
 
-#pragma endregion
 #pragma endregion
 	// PLAYER INITS
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -368,13 +373,6 @@ void L3_Update(void)
 			// Jump
 			jump(&player, movestate, Buff[jumpBuff].state);
 
-			// window clamps (eventually World Clamps)
-			/*player.x = CP_Math_ClampFloat(player.x, 0, 2600);
-			if (player.y + player.height > height || player.y < 0) {
-				player.movey = 0;
-			}
-			player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);*/
-
 			// change movestate
 				/*
 				OnPlat	  - on platform
@@ -403,6 +401,28 @@ void L3_Update(void)
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
+
+		spawnTimer += CP_System_GetDt();
+		if (spawnTimer >= spawnInterval) {
+			for (int i = 0; i < MAX_BULLETS; ++i) {
+				if (!bullets[i].active) {
+					bullets[i].x = bulletx; // Spawn at the defined starting point
+					bullets[i].y = bullety; // Align along the defined line
+					bullets[i].active = true;
+					break;
+				}
+			}
+			spawnTimer = 0.0f;
+		}
+
+		for (int i = 0; i < MAX_BULLETS; ++i) {
+			if (bullets[i].active) {
+				bullets[i].x -= BULLET_SPEED * CP_System_GetDt(); // Move square left
+				if (bullets[i].x + BULLET_SIZE < 0) {            // Deactivate square if off-screen
+					bullets[i].active = false;
+				}
+			}
+		}
 
 		hazard_update();
 
@@ -504,7 +524,7 @@ void L3_Update(void)
 
 		// Player
 		if (levelstate != Cleared) {
-			Draw_Player(player_sprite, player, movestate);
+			Draw_Player(player, movestate);
 		}
 
 		// Stamina Bar
@@ -517,14 +537,31 @@ void L3_Update(void)
 		}
 
 		// HAZARD DRAWING
+
+		// BULLET DRAWING
+		CP_Settings_Fill(CP_Color_Create(255, 0, 0, 255)); // Red color
+		for (int i = 0; i < MAX_BULLETS; ++i) {
+			if (bullets[i].active) {
+				CP_Graphics_DrawRect(bullets[i].x - camera.worldshiftx, bullets[i].y - camera.worldshifty, BULLET_SIZE, BULLET_SIZE);
+			}
+		}
+
+		// TRAP DRAWING
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
+
+		firetimer += 0.5;
+		if (firetimer > 15) {
+			firetimer = 0;
+		}
+		float sprite_x = (int)firetimer * 32;
+
 		for (int i = 0; i < numberoftraps; ++i)
 		{
 			switch (traps[i].type)
 			{
 			case spike:
 			{
-				CP_Graphics_DrawTriangle(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - camera.worldshiftx, traps[i].y[1] - camera.worldshifty, traps[i].x[2] - camera.worldshiftx, traps[i].y[2] - camera.worldshifty);
+				CP_Image_DrawSubImageAdvanced(fire_sprite, traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, 50, 50, sprite_x, 0, sprite_x + 32, 32, 255, 90 * traps[i].direction);
 				break;
 			}
 			case crusher:
@@ -698,6 +735,8 @@ void L3_Exit(void)
 	CP_Image_Free(&fall_sprite);
 	CP_Image_Free(&crush_sprite);
 	CP_Image_Free(&goal_sprite);
+	CP_Image_Free(&fire_sprite);
+
 
 	CP_Sound_Free(&music);
 	CP_Sound_Free(&sfx);

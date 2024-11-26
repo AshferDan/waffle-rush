@@ -270,7 +270,7 @@
 		float speed;
 
 		// Graphics and animation
-		CP_Image player_sprite, transition_sprite, spawn_sprite, burn_sprite, fall_sprite, crush_sprite, goal_sprite;
+		CP_Image player_sprite, boot_sprite, bubble_sprite, transition_sprite, spawn_sprite, burn_sprite, fall_sprite, crush_sprite, goal_sprite;
 
 		float player_sprite_x, player_sprite_y;
 		float transit_sprite_x, transit_sprite_y;
@@ -337,6 +337,8 @@
 	#pragma region 
 		// Buffs
 		buffs Buff[100];
+
+		CP_Image buff_sprite;
 	#pragma endregion VARIABLES
 	/*---------------------------------------------------------------------------------------------------------*/
 	
@@ -447,6 +449,9 @@
 /*=====================================================================================================================*/
 #pragma region 
 	#define MAX_TRAPS 50
+	#define BULLET_SIZE 50
+	#define BULLET_SPEED 200
+	#define MAX_BULLETS 20
 	// ENUMS AND STRUCTS
 	/*
 		Enums:
@@ -467,6 +472,7 @@
 	// Hazard struct
 	typedef struct hazard {
 		float x[3], y[3];
+		int direction;
 		hazardstype type;
 	}hazard;
 
@@ -475,6 +481,12 @@
 		float x;
 		float y;
 	} Point;
+
+	// Structure to represent a bullet
+	typedef struct {
+		float x, y;
+		bool active;
+	} Bullet;
 #pragma endregion Enums and Structs
 /*---------------------------------------------------------------------------------------------------------*/
 
@@ -485,9 +497,14 @@
 /*---------------------------------------------------------------------------------------------------------*/
 #pragma region 
 	hazard traps[MAX_TRAPS];
-
+	Bullet bullets[MAX_BULLETS];
+	CP_Image fire_sprite;
+	float spawnTimer;
+	float spawnInterval;
+	float bulletx, bullety;
 	int numberoftraps;
 	int crusherstate;
+	float firetimer;
 
 #pragma endregion VARIABLES
 /*---------------------------------------------------------------------------------------------------------*/
@@ -544,7 +561,8 @@
 	/*-------------------------------------------------------------------------------------------------*/
 #pragma endregion TEMPLATE FUNCTIONS
 
-// PLAYER AND MOVEMENT FUNCTIONS (player.c)
+
+// PLAYER AND MOVEMENT FUNCTIONS (platform.c)
 /*---------------------------------------------------------------------------------------------------------*/
 #pragma region
 	// Init:
@@ -584,7 +602,7 @@
 		// Renders:
 		/*-------------------------------------------------------------------------------------------------*/
 			// Draw Player
-			void Draw_Player(CP_Image player_sprite, Player player, MoveState movestate);
+			void Draw_Player(Player player, MoveState movestate);
 
 			// draw stat bar
 			void DrawStatBar(float pos_x1, float pos_y1, float pos_x2, float pos_y2, float stat, float maxstat);
@@ -693,7 +711,7 @@
 
 		// Renders:
 		/*-------------------------------------------------------------------------------------------------*/
-
+			void Draw_Fire(CP_Image fire_sprite, hazard traps);
 		/*-------------------------------------------------------------------------------------------------*/
 #pragma endregion HAZARD FUNCTIONS
 
