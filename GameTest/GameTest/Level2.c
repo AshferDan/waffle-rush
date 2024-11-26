@@ -49,8 +49,11 @@ void L2_Init(void)
 	burn_sprite = CP_Image_Load("Assets/Burnt.png");
 	fall_sprite = CP_Image_Load("Assets/Fall_Sprite.png");
 	crush_sprite = CP_Image_Load("Assets/Crush_Sprite.png");
+
 	goal_sprite = CP_Image_Load("Assets/Plate.png");
 	buff_sprite = CP_Image_Load("Assets/Buff_Icon.png");
+
+	fire_sprite = CP_Image_Load("Assets/Fire_Sprite.png");
 #pragma endregion
 
 	// LEVEL INIT
@@ -826,6 +829,8 @@ void L2_Exit(void)
 	CP_Image_Free(&crush_sprite);
 	CP_Image_Free(&goal_sprite);
 	CP_Image_Free(&buff_sprite);
+
+	CP_Image_Free(&fire_sprite);
 
 	CP_Sound_Free(&music);
 	CP_Sound_Free(&sfx);

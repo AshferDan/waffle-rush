@@ -42,12 +42,17 @@ void L3_Init(void)
 
 	// load player sprite
 	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
+	boot_sprite = CP_Image_Load("Assets/Boot_Sprites.png");
+	bubble_sprite = CP_Image_Load("Assets/Bubble.png");
 	transition_sprite = CP_Image_Load("Assets/Transition.png");
 	spawn_sprite = CP_Image_Load("Assets/Spawn_Sprite.png");
 	burn_sprite = CP_Image_Load("Assets/Burnt.png");
 	fall_sprite = CP_Image_Load("Assets/Fall_Sprite.png");
 	crush_sprite = CP_Image_Load("Assets/Crush_Sprite.png");
+
 	goal_sprite = CP_Image_Load("Assets/Plate.png");
+	buff_sprite = CP_Image_Load("Assets/Buff_Icon.png");
+
 	fire_sprite = CP_Image_Load("Assets/Fire_Sprite.png");
 #pragma endregion
 
@@ -729,14 +734,17 @@ void L3_Update(void)
 void L3_Exit(void)
 {
 	CP_Image_Free(&player_sprite);
+	CP_Image_Free(&boot_sprite);
+	CP_Image_Free(&bubble_sprite);
 	CP_Image_Free(&transition_sprite);
 	CP_Image_Free(&spawn_sprite);
 	CP_Image_Free(&burn_sprite);
 	CP_Image_Free(&fall_sprite);
 	CP_Image_Free(&crush_sprite);
 	CP_Image_Free(&goal_sprite);
-	CP_Image_Free(&fire_sprite);
+	CP_Image_Free(&buff_sprite);
 
+	CP_Image_Free(&fire_sprite);
 
 	CP_Sound_Free(&music);
 	CP_Sound_Free(&sfx);

@@ -29,6 +29,9 @@ void Main_Menu_Init(void)
 	logo = CP_Image_Load("Assets/DigiPen_Singapore_WEB_WHITE.png");
 	CP_Settings_ImageMode(CP_POSITION_CENTER);
 	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
+	
+	start_timer = 0;
+	logo_alpha = 0;
 
 
 	// load options file (music volume)
