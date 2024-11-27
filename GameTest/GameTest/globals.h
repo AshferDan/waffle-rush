@@ -152,7 +152,7 @@
 
 		// Graphics
 		float playerLastX, playerLastY;   //last player coords recorded, mainly used in level transition sequence
-		float tutorialDataY, level1DataY, level2DataY, level3DataY; //display high score and time for each level
+		float tutorialDataY, level1DataY, level2DataY, level3DataY, level4DataY, level5DataY; //display high score and time for each level
 		float clear_timer;
 
 		CP_Image goal_pointer;
@@ -163,8 +163,10 @@
 		// Levels
 		level levels[num_levels];
 
-		// Level transition scalers
-		float scaler1, scaler2, scaler3, scaler4;
+		// Level transition variables
+		float scaler1, scaler2, scaler3, scaler4; // for transition effect
+		FunctionPtr next_init, next_update, next_exit; // for next stage
+
 	#pragma endregion VARIABLES
 	/*---------------------------------------------------------------------------------------------------------*/
 	
@@ -533,6 +535,10 @@
 	// icons for volume bars
 	float icon1_width, icon1_height, icon2_width, icon2_height;
 	float icon_bgm_x, icon_bgm_y, icon_se_x, icon_se_y;
+
+	// Sound files
+	CP_Sound music;
+	CP_Sound sfx;
 #pragma endregion VARIABLES
 /*---------------------------------------------------------------------------------------------------------*/
 
@@ -633,7 +639,7 @@
 
 	// Renders:
 	/*-------------------------------------------------------------------------------------------------*/
-
+		void Draw_Buffs();
 	/*-------------------------------------------------------------------------------------------------*/
 #pragma endregion TEMPLATE FUNCTIONS
 
@@ -716,16 +722,17 @@
 
 		// Renders:
 		/*-------------------------------------------------------------------------------------------------*/
-			void Draw_Fire(CP_Image fire_sprite, hazard traps);
+			void Draw_Hazards();
 		/*-------------------------------------------------------------------------------------------------*/
 #pragma endregion HAZARD FUNCTIONS
 
 // UTILITY FUNCTIONS (utils.c)
 /*---------------------------------------------------------------------------------------------------------*/
 #pragma region
-	// Init:
+	// Init/Exit:
 	/*-------------------------------------------------------------------------------------------------*/
-
+		void Load_Images();
+		void Free_Images();
 	/*-------------------------------------------------------------------------------------------------*/
 
 
@@ -753,6 +760,9 @@
 
 		// score increment animation
 		int IncrementScore(int startScore, int endScore, float* timeElapsed, float dt);
+
+		// Set next stage for transition
+		void SetNext(FunctionPtr level_init, FunctionPtr level_update, FunctionPtr level_exit);
 	/*-------------------------------------------------------------------------------------------------*/
 
 
@@ -762,6 +772,7 @@
 		void TextBoxCreate(float pos_x, float pos_y, float size_x, float size_y, const char* text, CP_Color color);
 
 		// transition effect
+		void Level_Transition(FunctionPtr level_init, FunctionPtr level_update, FunctionPtr level_exit);
 		void TransitionInBoxEffect(float playerX, float playerY, float boxX1, float boxX2, float boxY1, float boxY2, float scaler1, float scaler2, float scaler3, float scaler4);
 		void TransitionOutBoxEffect(float playerX, float playerY, float boxX1, float boxX2, float boxY1, float boxY2, float scaler1, float scaler2, float scaler3, float scaler4);
 	/*-------------------------------------------------------------------------------------------------*/
@@ -785,6 +796,26 @@
 	/*-------------------------------------------------------------------------------------------------*/
 #pragma endregion OPTIONS FUNCTIONS
 
+// MAJOR FUNCTIONS
+/*---------------------------------------------------------------------------------------------------------*/
+#pragma region
+	// Init:
+	/*-------------------------------------------------------------------------------------------------*/
+
+	/*-------------------------------------------------------------------------------------------------*/
+
+
+	// Updates:
+	/*-------------------------------------------------------------------------------------------------*/
+
+	/*-------------------------------------------------------------------------------------------------*/
+
+
+	// Renders:
+	/*-------------------------------------------------------------------------------------------------*/
+		void RENDER_ALL(); // utils.c
+	/*-------------------------------------------------------------------------------------------------*/
+#pragma endregion TEMPLATE FUNCTIONS
 
 
 

@@ -11,8 +11,6 @@
 #include "LevelSelect.h"
 #include "globals.h"
 
-CP_Sound music;
-CP_Sound sfx;
 
 void L2_Init(void)
 {
@@ -35,28 +33,13 @@ void L2_Init(void)
 	CP_Sound_ResumeGroup(CP_SOUND_GROUP_1);
 
 	// ASSET LOADS
-		/*---------------------------------------------------------------------------------------------------------------------*/
+	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Assets
-// load font
-	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
+	// load font
+	text				= CP_Font_Load("Assets/Exo2-Regular.ttf");
 
-	// load sprites
-	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
-	boot_sprite = CP_Image_Load("Assets/Boot_Sprites.png");
-	bubble_sprite = CP_Image_Load("Assets/Bubble.png");
-	transition_sprite = CP_Image_Load("Assets/Transition.png");
-	spawn_sprite = CP_Image_Load("Assets/Spawn_Sprite.png");
-	burn_sprite = CP_Image_Load("Assets/Burnt.png");
-	fall_sprite = CP_Image_Load("Assets/Fall_Sprite.png");
-	crush_sprite = CP_Image_Load("Assets/Crush_Sprite.png");
-
-	goal_sprite = CP_Image_Load("Assets/Plate.png");
-	goal_pointer = CP_Image_Load("Assets/Arrow.png");
-
-	buff_sprite = CP_Image_Load("Assets/Buff_Icon.png");
-	buff_bg = CP_Image_Load("Assets/Buff_Background.png");
-
-	fire_sprite = CP_Image_Load("Assets/Fire_Sprite.png");
+	// loads images (all original assets woooo lets goooo)
+	Load_Images();
 #pragma endregion
 
 	// LEVEL INIT
@@ -88,8 +71,8 @@ void L2_Init(void)
 	spawn.x = checkpoint.coordinates[0].x - 10;
 	spawn.y = checkpoint.coordinates[0].y - 60;
 	// initialize goal
-	goalx = 1500;
-	goaly = 950;
+	goalx = 2000;
+	goaly = 1050;
 
 	// initialize powerups location
 	buffstate = 0b000;
@@ -320,6 +303,7 @@ void L2_Update(void)
 	mouseX = CP_Input_GetMouseX();
 	mouseY = CP_Input_GetMouseY();
 
+
 	// pause/resume game with Esc
 	if (CP_Input_KeyTriggered(KEY_ESCAPE) && levelstate == NotPaused) {
 		levelstate = Paused;
@@ -400,12 +384,6 @@ void L2_Update(void)
 			// Jump
 			jump(&player, movestate, buffstate);
 
-			// window clamps (eventually World Clamps)
-			/*player.x = CP_Math_ClampFloat(player.x, 0, 2600);
-			if (player.y + player.height > height || player.y < 0) {
-				player.movey = 0;
-			}
-			player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);*/
 
 			// change movestate
 				/*
@@ -502,12 +480,33 @@ void L2_Update(void)
 			Buff[invulBuff].buffduration = 3; //maybe can functionise these two to reset
 		}
 
-
-
 #pragma endregion
+
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
+
+		spawnTimer += CP_System_GetDt();
+		if (spawnTimer >= spawnInterval) {
+			for (int i = 0; i < MAX_BULLETS; ++i) {
+				if (!bullets[i].active) {
+					bullets[i].x = bulletx; // Spawn at the defined starting point
+					bullets[i].y = bullety; // Align along the defined line
+					bullets[i].active = true;
+					break;
+				}
+			}
+			spawnTimer = 0.0f;
+		}
+
+		for (int i = 0; i < MAX_BULLETS; ++i) {
+			if (bullets[i].active) {
+				bullets[i].x -= BULLET_SPEED * CP_System_GetDt(); // Move square left
+				if (bullets[i].x + BULLET_SIZE < 0) {            // Deactivate square if off-screen
+					bullets[i].active = false;
+				}
+			}
+		}
 
 		hazard_update();
 
@@ -519,9 +518,7 @@ void L2_Update(void)
 
 		CamShift(&camera, mouseX, mouseY, width, height);
 		if (!(player.state == Dead)) {
-
-			playerCamColl(&player, &camera); //functionised my camera shift. 
-			//where worldshiftx is now the modifyable for all objects
+			playerCamColl(&player, &camera);
 		}
 	}
 
@@ -531,190 +528,9 @@ void L2_Update(void)
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
 
-		// Platforms
-		CP_Settings_Fill(plat);
-		CP_Settings_Stroke(CP_Color_Create(100, 100, 100, 255));
-		for (int i = 0; i < numplats; i++) {
-			DrawPlatform(i);
-		}
 
-		// Wall
-		CP_Settings_Fill(wall);
-		for (int i = 0; i < numwalls; i++) {
-			CP_Graphics_DrawRect(walls[i].x1 + 15 - camera.worldshiftx, walls[i].y1 + 15 - camera.worldshifty, walls[i].w - 30, walls[i].h - 30);
-		}
-		CP_Settings_Stroke(black);
-
-		// Goal
-		if (levelstate != Cleared) {
-			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, 0, 0, 32, 32, 255);
-		}
-		else {
-			if (clear_timer <= 5) {
-				clear_timer += 6 * dt;
-			}
-			int sprite_x = ((int)clear_timer <= 3) ? 32 + (32 * (int)clear_timer) : 32*4;
-			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, sprite_x, 0, sprite_x + 32, 32, 255);
-		}
-
-		if (AreSquaresIntersecting(player.x, player.y, player.height, player.width, goalx, goaly + 70, 100, 30)) {
-			// calculate score and mark the level as cleared
-			AddScore(&levelScore, 10000 + (10000 - ((int)timer.seconds * 50) - ((int)timer.minutes * 3000)) - deaths * 100, &levelstate);
-			if (levelstate != EndLevel) {
-				levelstate = Cleared;
-				// if cleared for the first time, unlock the next level
-				if (levels[levelNumber - 1].isCleared == 0) {
-					levels[levelNumber - 1].isCleared = 1;
-					levels[levelNumber].isUnlocked = 1;
-				}
-				// update high score if current score is greater than previous high score
-				if (levelScore > levels[levelNumber - 1].score) {
-					levels[levelNumber - 1].score = levelScore;
-				}
-				// update best time if current time is less than previous best time
-				if ((levels[levelNumber - 1].time.minutes == 0 && levels[levelNumber - 1].time.seconds == 0 &&
-					levels[levelNumber - 1].time.millis == 0) ||
-					(timer.minutes < levels[levelNumber - 1].time.minutes) ||
-					(timer.minutes == levels[levelNumber - 1].time.minutes && timer.seconds < levels[levelNumber - 1].time.seconds) ||
-					(timer.minutes == levels[levelNumber - 1].time.minutes && timer.seconds == levels[levelNumber - 1].time.seconds && timer.millis < levels[levelNumber - 1].time.millis)
-					) {
-					levels[levelNumber - 1].time.minutes = (int)timer.minutes;
-					levels[levelNumber - 1].time.seconds = (int)timer.seconds;
-					levels[levelNumber - 1].time.millis = (int)timer.millis;
-				}
-				// update the values in LevelSelect.txt
-				FILE* LevelFile = fopen("Assets/LevelSelect.txt", "w");
-				for (int i = 0; i < num_levels; i++) {
-					fprintf_s(LevelFile, "%d %d %d %d %02d:%02d:%02d\n", levels[i].level_no, levels[i].isUnlocked, levels[i].isCleared, levels[i].score,
-						levels[i].time.minutes, levels[i].time.seconds, levels[i].time.millis);
-				}
-				fclose(LevelFile);
-			}
-		}
-
-
-		// Checkpoint
-		for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
-			if (checkpoint_index != checkpoint.active) {
-				CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50 - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, 1472, 0, 1536, 64, 255);
-			}
-			if (checkpoint_index == checkpoint.active) {
-				float spawn_sprite_x = (int)player.spawn_time * 64;
-				CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50 - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, spawn_sprite_x, 0, spawn_sprite_x + 64, 64, 255);
-			}
-		}
-
-		// Player
-		if (levelstate != Cleared) {
-			Draw_Player(player, movestate);
-		}
-
-		// Stamina Bar
-		if (player.stamina < 100.0f && !(player.state == Dead || player.state == Spawning)) {
-			CP_Settings_Fill(stamina);
-			if (player.stamina <= 35.0f) {
-				CP_Settings_Fill(red);
-			}
-			DrawStatBar(player.x - 15 - camera.worldshiftx, player.y - 30 - camera.worldshifty, player.x + 35 - camera.worldshiftx, player.y - 23 - camera.worldshifty, player.stamina, 100);
-		}
-
-		// HAZARD DRAWING
-		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
-		for (int i = 0; i < numberoftraps; ++i)
-		{
-			switch (traps[i].type)
-			{
-			case spike:
-			{
-				CP_Graphics_DrawTriangle(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - camera.worldshiftx, traps[i].y[1] - camera.worldshifty, traps[i].x[2] - camera.worldshiftx, traps[i].y[2] - camera.worldshifty);
-				break;
-			}
-			case crusher:
-			{
-				CP_Graphics_DrawRect(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
-				break;
-			}
-			case shooter:
-			{
-				CP_Graphics_DrawRect(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
-				break;
-			}
-
-			}
-		}
-
-		//PowerUps drawing 
-		float buff_sprite_x = (player.anim < 10) ? 0 : 32;
-		if (Buff[jumpBuff].canPickup == 1) {
-			CP_Settings_Fill(CP_Color_Create(100, 100, 100, 255));
-			//CP_Graphics_DrawRect(Buff[jumpBuff].X-camera.worldshiftx, Buff[jumpBuff].Y-camera.worldshifty, Buff[jumpBuff].width, Buff[jumpBuff].height);
-			float jumpbuff_x = Buff[jumpBuff].X - camera.worldshiftx - 20;
-			float jumpbuff_y = Buff[jumpBuff].Y - camera.worldshifty - 20;
-			CP_Image_DrawSubImage(buff_sprite, jumpbuff_x, jumpbuff_y, Buff[jumpBuff].width + 40, Buff[jumpBuff].height + 40, buff_sprite_x, 0, buff_sprite_x + 32, 32, 255);
-		}
-		if (Buff[invulBuff].canPickup == 1) {
-			CP_Settings_Fill(CP_Color_Create(100, 100, 100, 255));
-			//CP_Graphics_DrawRect(Buff[invulBuff].X - camera.worldshiftx, Buff[invulBuff].Y - camera.worldshifty, Buff[invulBuff].width, Buff[invulBuff].height);
-			float invbuff_x = Buff[invulBuff].X - camera.worldshiftx - 20;
-			float invbuff_y = Buff[invulBuff].Y - camera.worldshifty - 20;
-			CP_Image_DrawSubImage(buff_sprite, invbuff_x, invbuff_y, Buff[jumpBuff].width + 40, Buff[jumpBuff].height + 40, buff_sprite_x, 32, buff_sprite_x + 32, 64, 255);
-		}
-
-		// Stamina Bar
-		if (player.stamina < 100.0f) {
-			CP_Settings_Fill(stamina);
-			if (player.stamina <= 35.0f) {
-				CP_Settings_Fill(red);
-			}
-			DrawStatBar(player.x - 15 - camera.worldshiftx, player.y - 30 - camera.worldshifty, player.x + 35 - camera.worldshiftx, player.y - 23 - camera.worldshifty, player.stamina, 100);
-		}
-
-		// Buff indicator
-		CP_Settings_ImageMode(CP_POSITION_CENTER);
-		
-		CP_Settings_NoStroke;
-		CP_Settings_Fill(stamina);
-
-		// jump buff
-		if (jumpalpha == 255) {
-			DrawStatBar(110, 810, 190, 817, Buff[jumpBuff].buffduration, 3);
-		}
-		CP_Image_Draw(buff_bg, 150, 750, 100, 100, jumpalpha);
-		CP_Image_DrawSubImage(buff_sprite, 150, 750, 90, 90, 0, 0, 32, 32, jumpalpha);
-
-		// shield buff
-		if (shieldalpha == 255) {
-			DrawStatBar(260, 810, 340, 817, Buff[invulBuff].buffduration, 3);
-		}
-		CP_Image_Draw(buff_bg, 300, 750, 100, 100, shieldalpha);
-		CP_Image_DrawSubImage(buff_sprite, 300, 750, 90, 90, 0, 32, 32, 64, shieldalpha);
-
-		CP_Settings_Stroke(CP_Color_Create(0, 0, 0, 255));
-		CP_Settings_ImageMode(CP_POSITION_CORNER);
-
-		// Guide arrow that points to goal
-		Guide_Arrow();
-
-		// Camera Shift Highlight
-		CamHighLight(&camera, mouseX, mouseY, width, height);
-
-		// DEATHS DRAWING
-		CP_Settings_Fill(black);
-		CP_Settings_TextSize(50);
-		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
-		char deathcount[20] = { 0 };
-		if (deaths < 100) {
-			sprintf_s(deathcount, 20, "Deaths: %d", deaths);
-			CP_Font_DrawText(deathcount, 50, 50);
-		}
-		else {
-			CP_Font_DrawText("Bruh", 50, 50);
-		}
-
-		// TIMER DRAWING
-		char time[16] = { 0 };
-		sprintf_s(time, 16, "TIME: %02d:%02d:%02d", (int)timer.minutes, (int)timer.seconds, (int)timer.millis);
-		CP_Font_DrawText(time, 1200, 50);
+	// render ALL THE THINGS
+	RENDER_ALL();
 
 		// LEVEL COMPLETE PAGE
 		if (levelstate == Cleared) {
@@ -769,8 +585,7 @@ void L2_Update(void)
 					CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 					CP_Graphics_DrawRect(500, 720, 250, 100);
 					if (CP_Input_MouseClicked()) { //if LMB1 pressed
-						levelEnded = end;
-						levelstate = EndLevel;
+						SetNext(&L3_Init, &L3_Update, &L3_Exit);
 					}
 				}
 
@@ -792,7 +607,7 @@ void L2_Update(void)
 					CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 					CP_Graphics_DrawRect(1100, 720, 250, 100);
 					if (CP_Input_MouseClicked()) { //if LMB1 pressed
-						CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit);
+						SetNext(&LSelect_Init, &LSelect_Update, &LSelect_Exit);
 					}
 				}
 
@@ -814,41 +629,7 @@ void L2_Update(void)
 		}
 
 		//LEVEL TRANSITION EFFECTS
-		//keep the reset code bc if removed it leaves a black border around the screen grrrr RAA RAA WOOF WOOF WOOF
-		//printf("scaler1: %lf | scaler2: %lf | scaler3: %lf | scaler4: %lf\n", scaler1, scaler2, scaler3, scaler4);
-		//printf("playerlastx: %lf\n", playerLastX);
-		playerLastX = player.x - camera.worldshiftx;
-		playerLastY = player.y - camera.worldshifty;
-
-		if (levelEnded == end) {
-			canMove = 0;
-			scaler1 += (playerLastX + player.width / 2) * dt;
-			scaler2 += (width - playerLastX + player.width / 2) * dt;
-			scaler3 += (playerLastY + player.height / 2) * dt;
-			scaler4 += (height - playerLastY + player.height / 2) * dt;
-			TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
-
-			if (scaler1 >= playerLastX) {
-				levelEnded = start;
-				CP_Engine_SetNextGameState(L3_Init, L3_Update, L3_Exit);
-			}
-		}
-
-		if (levelEnded == start) {
-			canMove = 1;
-			scaler1 -= (playerLastX + player.width / 2) * dt;
-			scaler2 -= (width - playerLastX + player.width / 2) * dt;
-			scaler3 -= (playerLastY + player.height / 2) * dt;
-			scaler4 -= (height - playerLastY + player.height / 2) * dt;
-			TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
-
-			if (scaler1 <= 0 && scaler2 <= 0 && scaler3 <= 0 && scaler4 <= 0) {
-				levelEnded = reset;
-			}
-		}
-		if (levelEnded == reset) {
-			scaler1 = scaler2 = scaler3 = scaler4 = 0;
-		}
+		Level_Transition(next_init, next_update, next_exit);
 
 #pragma endregion
 
@@ -856,22 +637,8 @@ void L2_Update(void)
 
 void L2_Exit(void)
 {
-	CP_Image_Free(&player_sprite);
-	CP_Image_Free(&boot_sprite);
-	CP_Image_Free(&bubble_sprite);
-	CP_Image_Free(&transition_sprite);
-	CP_Image_Free(&spawn_sprite);
-	CP_Image_Free(&burn_sprite);
-	CP_Image_Free(&fall_sprite);
-	CP_Image_Free(&crush_sprite);
-	CP_Image_Free(&goal_sprite);
-
-	CP_Image_Free(&buff_sprite);
-	CP_Image_Free(&buff_bg);
-
-	CP_Image_Free(&goal_pointer);
-
-	CP_Image_Free(&fire_sprite);
+	// Frees images :D say no to memory leak
+	Free_Images();
 
 	CP_Sound_Free(&music);
 	CP_Sound_Free(&sfx);

@@ -14,9 +14,6 @@
 CP_Font exo;
 CP_Color button_color, button_color_locked, button_color_cleared;
 
-#define num_levels 5
-level levels[num_levels];
-
 void LSelectx_Init(void)
 {
 	//load font

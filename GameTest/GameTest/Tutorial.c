@@ -9,13 +9,7 @@
 //---------------------------------------------------------
 
 #include "LevelSelect.h"
-
-#define num_levels 5
-level levels[num_levels];
-float timeElapsed;
-int levelEnded;
-CP_Sound music;
-CP_Sound sfx;
+#include "globals.h"
 
 void Tutorial_Init(void)
 {
@@ -40,25 +34,11 @@ void Tutorial_Init(void)
 	// ASSET LOADS
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Assets
-// load font
-	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
+	// load font
+	text				= CP_Font_Load("Assets/Exo2-Regular.ttf");
 
-	// load sprites
-	player_sprite		= CP_Image_Load("Assets/Player_Sprites.png");
-	boot_sprite			= CP_Image_Load("Assets/Boot_Sprites.png");
-	bubble_sprite		= CP_Image_Load("Assets/Bubble.png");
-	transition_sprite	= CP_Image_Load("Assets/Transition.png");
-	spawn_sprite		= CP_Image_Load("Assets/Spawn_Sprite.png");
-	burn_sprite			= CP_Image_Load("Assets/Burnt.png");
-	fall_sprite			= CP_Image_Load("Assets/Fall_Sprite.png");
-	crush_sprite		= CP_Image_Load("Assets/Crush_Sprite.png");
-
-	goal_sprite			= CP_Image_Load("Assets/Plate.png");
-	goal_pointer		= CP_Image_Load("Assets/Arrow.png");
-
-	buff_sprite			= CP_Image_Load("Assets/Buff_Icon.png");
-
-	fire_sprite			= CP_Image_Load("Assets/Fire_Sprite.png");
+	// loads images (all original assets woooo lets goooo)
+	Load_Images();
 #pragma endregion
 
 	// LEVEL INIT
@@ -419,102 +399,43 @@ void Tutorial_Update(void)
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
-		//declaring top left of square for square triangle collision
-		Point squareTopLeft = { player.x, player.y };
-		for (int trap_index = 0; trap_index < numberoftraps; trap_index++) {
-			switch (traps[trap_index].type) {
-			case spike: {
-				Point A = { traps[trap_index].x[0], traps[trap_index].y[0] };
-				Point B = { traps[trap_index].x[1], traps[trap_index].y[1] };
-				Point C = { traps[trap_index].x[2], traps[trap_index].y[2] };
 
-				if (check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C)) {
-					Kill_Player(&player, Burn, &deaths);
+		spawnTimer += CP_System_GetDt();
+		if (spawnTimer >= spawnInterval) {
+			for (int i = 0; i < MAX_BULLETS; ++i) {
+				if (!bullets[i].active) {
+					bullets[i].x = bulletx; // Spawn at the defined starting point
+					bullets[i].y = bullety; // Align along the defined line
+					bullets[i].active = true;
+					break;
 				}
-				break;
 			}
-			case crusher: {
-				float crushervely;
-				//CRUSHER MOVEMENT
-				// crusherstate = 0 if going down and crusherstate = 1 when going up
-				if (crusherstate == 0) {
-					crushervely = 1000.f * dt;
-					traps[trap_index].y[2] += crushervely;
-					if (traps[trap_index].y[2] > traps[trap_index].y[1]) {
-						traps[trap_index].y[2] = traps[trap_index].y[1];
-						crusherstate = 1;
-					}
-					// if the player hits the crusher at the bottom, add death and reset
-					if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[4].x[0], traps[4].y[0], traps[4].x[1] - traps[4].x[0], traps[4].y[2] - traps[4].y[0]) && !(player.state == Dead || player.state == Spawning)) {
-						if (crusher_direction(traps[trap_index], player) == 1) {
-							if (player.x >= ((traps[trap_index].x[1] + traps[trap_index].x[0]) / 2.f)) {
-								player.x = traps[trap_index].x[1];
-								player.movex = 0;
-							}
-							else if (player.x <= ((traps[trap_index].x[1] + traps[trap_index].x[0]) / 2.f)) {
-								player.x = traps[trap_index].x[0] - player.width;
-								player.movex = 0;
-							}
-						}
-						else if (crusher_direction(traps[trap_index], player) == 2) {
-							player.y = traps[trap_index].y[2];
-							player.movey = 0;
-							if ((player.y + player.height + 30) >= traps[trap_index].y[1]) {
-								player.y = (traps[trap_index].y[1] - player.height - 15);
-								Kill_Player(&player, Crush, &deaths);
-								//printf("active\n");
-							}
-						}
+			spawnTimer = 0.0f;
+		}
 
-					}
+		for (int i = 0; i < MAX_BULLETS; ++i) {
+			if (bullets[i].active) {
+				bullets[i].x -= BULLET_SPEED * CP_System_GetDt(); // Move square left
+				if (bullets[i].x + BULLET_SIZE < 0) {            // Deactivate square if off-screen
+					bullets[i].active = false;
 				}
-				if (crusherstate == 1) {
-					crushervely = -0.005f * dt;
-					traps[trap_index].y[2] += crushervely;
-					if (traps[trap_index].y[2] < traps[trap_index].y[0]) {
-						traps[trap_index].y[2] = traps[trap_index].y[0];
-						crusherstate = 0;
-					}
-					//if the player hits the crusher as it goes up, no death but cant go in
-					if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], traps[trap_index].y[0], traps[trap_index].x[1] - traps[trap_index].x[0], traps[trap_index].y[2] - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning)) {
-						if (crusher_direction(traps[trap_index], player) == 1) {
-							if (player.x >= ((traps[trap_index].x[1] + traps[trap_index].x[0]) / 2.f)) {
-								player.x = traps[trap_index].x[1];
-								player.movex = 0;
-							}
-							else if (player.x <= ((traps[trap_index].x[1] + traps[trap_index].x[0]) / 2.f)) {
-								player.x = traps[trap_index].x[0] - player.width;
-								player.movex = 0;
-							}
-						}
-						else if (crusher_direction(traps[trap_index], player) == 2) {
-							player.y = traps[trap_index].y[2];
-							player.movey = 0;
-						}
-
-					}
-				}
-				break;
-			}
-			default: {}
 			}
 		}
+
+		hazard_update();
+
 #pragma endregion
 
 		// CAMERA UPDATE
 		/*---------------------------------------------------------------------------------------------------*/
-		//implement the below logic later. do the main camera first.
-		//camera.limitleftx =  camera.limitleftx  + offsetX;
-		//camera.limitrightx = camera.limitrightx + offsetX;
 #pragma region Camera
 
 		CamShift(&camera, mouseX, mouseY, width, height);
 		if (!(player.state == Dead)) {
-
-			playerCamColl(&player, &camera); //functionised my camera shift. 
-			//where worldshiftx is now the modifyable for all objects
+			playerCamColl(&player, &camera);
 		}
 	}
+
 #pragma endregion
 
 	// RENDER
@@ -530,111 +451,8 @@ void Tutorial_Update(void)
 		CP_Font_DrawTextBox("Touch a closed waffle press to set your new checkpoint!\n\nTry it by\nKILLING the waffle (K)", 1500 - camera.worldshiftx, 550 - camera.worldshifty, 250);
 		CP_Font_DrawTextBox("Land on the golden plate to complete the level :D", 2350 - camera.worldshiftx, 700 - camera.worldshifty, 250);
 
-		// Platforms
-		CP_Settings_Fill(plat);
-		CP_Settings_Stroke(CP_Color_Create(100, 100, 100, 255));
-		for (int i = 0; i < numplats; i++) {
-			DrawPlatform(i);
-		}
-
-		// Wall
-		CP_Settings_Fill(wall);
-		for (int i = 0; i < numwalls; i++) {
-			CP_Graphics_DrawRect(walls[i].x1 + 15 - camera.worldshiftx, walls[i].y1 + 15 - camera.worldshifty, walls[i].w - 30, walls[i].h - 30);
-		}
-		CP_Settings_Stroke(black);
-
-		// Goal
-		if (levelstate != Cleared) {
-			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, 0, 0, 32, 32, 255);
-		}
-		else {
-			if (clear_timer <= 5) {
-				clear_timer += 6 * dt;
-			}
-			int sprite_x = ((int)clear_timer <= 3) ? 32 + (32 * (int)clear_timer) : 32 * 4;
-			CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, sprite_x, 0, sprite_x + 32, 32, 255);
-		}
-
-		if (AreSquaresIntersecting(player.x - 15, player.y - 15, player.height + 30, player.width + 30, goalx, goaly, 50, 50)) {
-			if (levelstate != EndLevel) {
-				levelstate = Cleared;
-			}
-		}
-
-		// Checkpoint
-		for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
-			if (checkpoint_index != checkpoint.active) {
-				CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50 - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, 1472, 0, 1536, 64, 255);
-			}
-			if (checkpoint_index == checkpoint.active) {
-				float spawn_sprite_x = (int)player.spawn_time * 64;
-				CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50 - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, spawn_sprite_x, 0, spawn_sprite_x + 64, 64, 255);
-			}
-		}
-
-		// Player
-		if (levelstate != Cleared) {
-			Draw_Player(player, movestate);
-		}
-
-		// Stamina Bar
-		if (player.stamina < 100.0f && !(player.state == Dead || player.state == Spawning)) {
-			CP_Settings_Fill(stamina);
-			if (player.stamina <= 35.0f) {
-				CP_Settings_Fill(red);
-			}
-			DrawStatBar(player.x - 15 - camera.worldshiftx, player.y - 30 - camera.worldshifty, player.x + 35 - camera.worldshiftx, player.y - 23 - camera.worldshifty, player.stamina, 100);
-		}
-
-		// HAZARD DRAWING
-		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
-		for (int i = 0; i < numberoftraps; ++i)
-		{
-			switch (traps[i].type)
-			{
-			case spike:
-			{
-				CP_Graphics_DrawTriangle(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - camera.worldshiftx, traps[i].y[1] - camera.worldshifty, traps[i].x[2] - camera.worldshiftx, traps[i].y[2] - camera.worldshifty);
-				break;
-			}
-			case crusher:
-			{
-				CP_Graphics_DrawRect(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
-				break;
-			}
-			case shooter:
-			{
-				CP_Graphics_DrawRect(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
-				break;
-			}
-
-			}
-		}
-
-		// Guide arrow that points to goal
-		Guide_Arrow();
-
-		// Camera Shift Highlight
-		CamHighLight(&camera, mouseX, mouseY, width, height);
-
-		// DEATH COUNTER DRAWING
-		CP_Settings_Fill(black);
-		CP_Settings_TextSize(50);
-		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
-		char deathcount[20] = { 0 };
-		if (deaths < 100) {
-			sprintf_s(deathcount, 20, "Deaths: %d", deaths);
-			CP_Font_DrawText(deathcount, 50, 50);
-		}
-		else {
-			CP_Font_DrawText("Bruh", 50, 50);
-		}
-
-		// TIMER DRAWING
-		char time[16] = { 0 };
-		sprintf_s(time, 16, "TIME: %02d:%02d:%02d", (int)timer.minutes, (int)timer.seconds, (int)timer.millis);
-		CP_Font_DrawText(time, 1200, 50);
+		// render ALL THE THINGS
+		RENDER_ALL();
 
 	// LEVEL COMPLETE PAGE
 	if (levelstate == Cleared) {
@@ -658,6 +476,7 @@ void Tutorial_Update(void)
 				CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 				CP_Graphics_DrawRect(600, 520, 250, 100);
 				if (CP_Input_MouseClicked()) { //if LMB1 pressed
+					SetNext(&LSelect_Init, &LSelect_Update, &LSelect_Exit);
 					levelEnded = end;
 					levelstate = EndLevel;
 				}
@@ -690,62 +509,19 @@ void Tutorial_Update(void)
 	else if (levelstate == InQuit) {
 		QuitMenu();
 	}
-	//LEVEL TRANSITION EFFECTS
-	//keep the reset code bc if removed it leaves a black border around the screen grrrr RAA RAA WOOF WOOF WOOF
-	//printf("scaler1: %lf | scaler2: %lf | scaler3: %lf | scaler4: %lf\n", scaler1, scaler2, scaler3, scaler4);
-	//printf("playerlastx: %lf\n", playerLastX);
-	playerLastX = player.x - camera.worldshiftx;
-	playerLastY = player.y - camera.worldshifty;
 
-	if (levelEnded == end) {
-		canMove = 0;
-		scaler1 += (playerLastX + player.width / 2) * dt;
-		scaler2 += (width - playerLastX + player.width / 2) * dt;
-		scaler3 += (playerLastY + player.height / 2) * dt;
-		scaler4 += (height - playerLastY + player.height / 2) * dt;
-		TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
 
-		if (scaler1 >= playerLastX) {
-			levelEnded = start;
-			CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit);
-		}
-	}
+	// LEVEL TRANSITION EFFECTS
+	Level_Transition(next_init, next_update, next_exit);
 
-	if (levelEnded == start) {
-		canMove = 1;
-		scaler1 -= (playerLastX + player.width / 2) * dt;
-		scaler2 -= (width - playerLastX + player.width / 2) * dt;
-		scaler3 -= (playerLastY + player.height / 2) * dt;
-		scaler4 -= (height - playerLastY + player.height / 2) * dt;
-		TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
-
-		if (scaler1 <= 0 && scaler2 <= 0 && scaler3 <= 0 && scaler4 <= 0) {
-			levelEnded = reset;
-		}
-	}
-	if (levelEnded == reset) {
-		scaler1 = scaler2 = scaler3 = scaler4 = 0;
-	}
 #pragma endregion
 
 }
 
 void Tutorial_Exit(void)
 {
-	CP_Image_Free(&player_sprite);
-	CP_Image_Free(&boot_sprite);
-	CP_Image_Free(&bubble_sprite);
-	CP_Image_Free(&transition_sprite);
-	CP_Image_Free(&spawn_sprite);
-	CP_Image_Free(&burn_sprite);
-	CP_Image_Free(&fall_sprite);
-	CP_Image_Free(&crush_sprite);
-	CP_Image_Free(&goal_sprite);
-	CP_Image_Free(&buff_sprite);
-
-	CP_Image_Free(&goal_pointer);
-
-	CP_Image_Free(&fire_sprite);
+	// Frees images :D say no to memory leak
+	Free_Images();
 
 	CP_Sound_Free(&music);
 	CP_Sound_Free(&sfx);

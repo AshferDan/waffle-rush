@@ -87,6 +87,12 @@ int crusher_direction(hazard crusher, Player p) {
 	}
 
 void reset_hazards() {
+	for (int i = 0; i < MAX_BULLETS; i++) {
+		bullets[i].x = 0;
+		bullets[i].y = 0;
+		bullets[i].active = false;
+	}
+
     for (int i = 0; i < MAX_TRAPS; i++) {
         for (int j = 0; j < 3; j++) {
             traps[i].x[j] = 0;
@@ -209,6 +215,48 @@ void hazard_update() {
 			break;
 		}
 		default: {}
+		}
+	}
+}
+
+void Draw_Hazards() {
+	// BULLET DRAWING
+	CP_Settings_Fill(CP_Color_Create(255, 0, 0, 255)); // Red color
+	for (int i = 0; i < MAX_BULLETS; ++i) {
+		if (bullets[i].active) {
+			CP_Graphics_DrawRect(bullets[i].x - camera.worldshiftx, bullets[i].y - camera.worldshifty, BULLET_SIZE, BULLET_SIZE);
+		}
+	}
+
+	// TRAP DRAWING
+	CP_Settings_Fill(CP_Color_Create(255, 255, 255, 255));
+
+	firetimer += 0.25;
+	if (firetimer > 15) {
+		firetimer = 0;
+	}
+	float sprite_x = (int)firetimer * 32;
+
+	for (int i = 0; i < numberoftraps; ++i)
+	{
+		switch (traps[i].type)
+		{
+		case spike:
+		{
+			CP_Image_DrawSubImageAdvanced(fire_sprite, traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, 50, 50, sprite_x, 0, sprite_x + 32, 32, 255, 90 * traps[i].direction);
+			break;
+		}
+		case crusher:
+		{
+			CP_Graphics_DrawRect(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
+			break;
+		}
+		case shooter:
+		{
+			CP_Graphics_DrawRect(traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, traps[i].x[1] - traps[i].x[0], traps[i].y[2] - traps[i].y[0]);
+			break;
+		}
+
 		}
 	}
 }

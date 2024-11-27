@@ -17,6 +17,8 @@
     <ClCompile Include="Level1.c" />
     <ClCompile Include="Level2.c" />
     <ClCompile Include="Level3.c" />
+    <ClCompile Include="Level4.c" />
+    <ClCompile Include="Level5.c" />
     <ClCompile Include="LevelSelect.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="mainmenu.c" />
@@ -52,6 +54,10 @@
     <Text Include="..\Assets\Level_4\Hazard.txt" />
     <Text Include="..\Assets\Level_4\Platform.txt" />
     <Text Include="..\Assets\Level_4\Wall.txt" />
+    <Text Include="..\Assets\Level_5\Checkpoint.txt" />
+    <Text Include="..\Assets\Level_5\Hazard.txt" />
+    <Text Include="..\Assets\Level_5\Platform.txt" />
+    <Text Include="..\Assets\Level_5\Wall.txt" />
     <Text Include="..\Assets\Level_Select\Checkpoint.txt" />
     <Text Include="..\Assets\Level_Select\Hazard.txt" />
     <Text Include="..\Assets\Level_Select\Platform.txt" />
