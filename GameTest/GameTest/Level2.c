@@ -40,7 +40,7 @@ void L2_Init(void)
 // load font
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
-	// load player sprite
+	// load sprites
 	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
 	boot_sprite = CP_Image_Load("Assets/Boot_Sprites.png");
 	bubble_sprite = CP_Image_Load("Assets/Bubble.png");
@@ -51,7 +51,10 @@ void L2_Init(void)
 	crush_sprite = CP_Image_Load("Assets/Crush_Sprite.png");
 
 	goal_sprite = CP_Image_Load("Assets/Plate.png");
+	goal_pointer = CP_Image_Load("Assets/Arrow.png");
+
 	buff_sprite = CP_Image_Load("Assets/Buff_Icon.png");
+	buff_bg = CP_Image_Load("Assets/Buff_Background.png");
 
 	fire_sprite = CP_Image_Load("Assets/Fire_Sprite.png");
 #pragma endregion
@@ -98,6 +101,7 @@ void L2_Init(void)
 	Buff[jumpBuff].buffduration = 0; //seconds?
 	Buff[jumpBuff].jumpIncrease = 800;
 	Buff[jumpBuff].resetTimer = 3;
+	jumpalpha = 50;
 
 
 	Buff[invulBuff].canPickup = 1; //if active,
@@ -108,6 +112,7 @@ void L2_Init(void)
 	Buff[invulBuff].buffduration = 0; //seconds?
 	Buff[invulBuff].invulActive = 0;
 	Buff[invulBuff].resetTimer = 3;
+	shieldalpha = 50;
 	
 
 	// PLATFORMS INITIALIZATION
@@ -467,8 +472,11 @@ void L2_Update(void)
 		}
 
 		//Set the stats for jumpboost below the first if statement
+
+		jumpalpha = 50;
 		if ((buffstate & 0b010) && Buff[jumpBuff].buffduration > 0.00f) { //here jumpbuff is active
 			Buff[jumpBuff].buffduration -= 1 * dt;
+			jumpalpha = 255;
 			printf("JUMP BUFF ACTIVE!\n");
 			//printf("buff: %d\n", buffstate); 
 			//printf("jump increase duration: %f\n", Buff[jumpBuff].buffduration);
@@ -480,8 +488,11 @@ void L2_Update(void)
 
 
 		//Set the stats for invulnerability below the first if statement
+
+		shieldalpha = 50;
 		if ((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f) { //here invulbuff is active
 			Buff[invulBuff].buffduration -= 1 * dt;
+			shieldalpha = 255;
 			printf("INVUL BUFF ACTIVE!\n");
 			//printf("buff: %d\n", buffstate);
 			//printf("invul duration: %f\n", Buff[invulBuff].buffduration);
@@ -658,6 +669,32 @@ void L2_Update(void)
 			DrawStatBar(player.x - 15 - camera.worldshiftx, player.y - 30 - camera.worldshifty, player.x + 35 - camera.worldshiftx, player.y - 23 - camera.worldshifty, player.stamina, 100);
 		}
 
+		// Buff indicator
+		CP_Settings_ImageMode(CP_POSITION_CENTER);
+		
+		CP_Settings_NoStroke;
+		CP_Settings_Fill(stamina);
+
+		// jump buff
+		if (jumpalpha == 255) {
+			DrawStatBar(110, 810, 190, 817, Buff[jumpBuff].buffduration, 3);
+		}
+		CP_Image_Draw(buff_bg, 150, 750, 100, 100, jumpalpha);
+		CP_Image_DrawSubImage(buff_sprite, 150, 750, 90, 90, 0, 0, 32, 32, jumpalpha);
+
+		// shield buff
+		if (shieldalpha == 255) {
+			DrawStatBar(260, 810, 340, 817, Buff[invulBuff].buffduration, 3);
+		}
+		CP_Image_Draw(buff_bg, 300, 750, 100, 100, shieldalpha);
+		CP_Image_DrawSubImage(buff_sprite, 300, 750, 90, 90, 0, 32, 32, 64, shieldalpha);
+
+		CP_Settings_Stroke(CP_Color_Create(0, 0, 0, 255));
+		CP_Settings_ImageMode(CP_POSITION_CORNER);
+
+		// Guide arrow that points to goal
+		Guide_Arrow();
+
 		// Camera Shift Highlight
 		CamHighLight(&camera, mouseX, mouseY, width, height);
 
@@ -828,7 +865,11 @@ void L2_Exit(void)
 	CP_Image_Free(&fall_sprite);
 	CP_Image_Free(&crush_sprite);
 	CP_Image_Free(&goal_sprite);
+
 	CP_Image_Free(&buff_sprite);
+	CP_Image_Free(&buff_bg);
+
+	CP_Image_Free(&goal_pointer);
 
 	CP_Image_Free(&fire_sprite);
 

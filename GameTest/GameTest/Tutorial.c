@@ -43,7 +43,7 @@ void Tutorial_Init(void)
 // load font
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
-	// load player sprite
+	// load sprites
 	player_sprite		= CP_Image_Load("Assets/Player_Sprites.png");
 	boot_sprite			= CP_Image_Load("Assets/Boot_Sprites.png");
 	bubble_sprite		= CP_Image_Load("Assets/Bubble.png");
@@ -612,42 +612,8 @@ void Tutorial_Update(void)
 			}
 		}
 
-		// Goal pointer
-		if (!IsAreaCornerClicked(0, 0, width, height, goalx-camera.worldshiftx, goaly-camera.worldshifty)) {
-			float goalpointx = goalx + 50 - camera.worldshiftx;
-			float goalpointy = goaly + 50 - camera.worldshifty;
-			float goalpointspritex = (player.anim < 10) ? 0 : 32;
-			float goalpointspritey = 0;
-			float goalpointrot = 0;
-			if (goalpointx > 0 && goalpointx < width) {
-				goalpointspritey = (goalpointy < (float)(height / 2)) ? 64 : 96;
-			}
-			if (goalpointy > 0 && goalpointy < height) {
-				goalpointspritey = (goalpointx > (float)(width / 2)) ? 0 : 32;
-			}
-			if ((goalpointx > width || goalpointx < 0) && (goalpointy > height || goalpointy < 0)) {
-				if (goalpointx > 0.9f * (float)width && goalpointy < 0.2f * (float)height) {
-					goalpointspritey = 64;
-				}
-				if (goalpointx > 0.9f * (float)width && goalpointy > 0.8f * (float)height) {
-					goalpointspritey = 0;
-				}
-				if (goalpointx < 0.1f * (float)width && goalpointy < 0.2f * (float)height) {
-					goalpointspritey = 32;
-				}
-				if (goalpointx < 0.1f * (float)width && goalpointy > 0.8f * (float)height) {
-					goalpointspritey = 96;
-				}
-				goalpointrot = 45;
-
-			}
-			goalpointx = CP_Math_ClampFloat(goalpointx, 0.1f * (float)width, 0.9f * (float)width);
-			goalpointy = CP_Math_ClampFloat(goalpointy, 0.2f * (float)height, 0.8f * (float)height);
-			
-			CP_Image_DrawSubImageAdvanced(goal_pointer, goalpointx - 50, goalpointy - 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 255, goalpointrot);
-
-			//CP_Image_DrawSubImageAdvanced(goal_pointer, width/2-50, 200, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 255, goalpointrot);
-		}
+		// Guide arrow that points to goal
+		Guide_Arrow();
 
 		// Camera Shift Highlight
 		CamHighLight(&camera, mouseX, mouseY, width, height);

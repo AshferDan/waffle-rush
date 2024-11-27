@@ -340,7 +340,9 @@
 		// Buffs
 		buffs Buff[100];
 
-		CP_Image buff_sprite;
+		CP_Image buff_sprite, buff_bg;
+
+		float jumpalpha, shieldalpha, jumpstatalpha, shieldstatalpha;
 	#pragma endregion VARIABLES
 	/*---------------------------------------------------------------------------------------------------------*/
 	
@@ -560,6 +562,7 @@
 	// Renders:
 	/*-------------------------------------------------------------------------------------------------*/
 	void CamHighLight(Camera* camera, float mouse_x, float mouse_y, float screen_width, float screen_height);
+	void Guide_Arrow();
 	/*-------------------------------------------------------------------------------------------------*/
 #pragma endregion TEMPLATE FUNCTIONS
 

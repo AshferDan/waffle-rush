@@ -40,7 +40,7 @@ void L1_Init(void)
 // load font
 	text = CP_Font_Load("Assets/Exo2-Regular.ttf");
 
-	// load player sprite
+	// load sprites
 	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
 	boot_sprite = CP_Image_Load("Assets/Boot_Sprites.png");
 	bubble_sprite = CP_Image_Load("Assets/Bubble.png");
@@ -51,6 +51,8 @@ void L1_Init(void)
 	crush_sprite = CP_Image_Load("Assets/Crush_Sprite.png");
 
 	goal_sprite = CP_Image_Load("Assets/Plate.png");
+	goal_pointer = CP_Image_Load("Assets/Arrow.png");
+
 	buff_sprite = CP_Image_Load("Assets/Buff_Icon.png");
 
 	fire_sprite = CP_Image_Load("Assets/Fire_Sprite.png");
@@ -543,6 +545,9 @@ void L1_Update(void)
 			}
 		}
 
+		// Guide arrow that points to goal
+		Guide_Arrow();
+
 		// Camera Shift Highlight
 		CamHighLight(&camera, mouseX, mouseY, width, height);
 
@@ -713,6 +718,8 @@ void L1_Exit(void)
 	CP_Image_Free(&crush_sprite);
 	CP_Image_Free(&goal_sprite);
 	CP_Image_Free(&buff_sprite);
+
+	CP_Image_Free(&goal_pointer);
 
 	CP_Image_Free(&fire_sprite);
 

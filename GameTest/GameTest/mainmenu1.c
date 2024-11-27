@@ -923,5 +923,6 @@ void LSelect_Exit(void)
 	CP_Image_Free(&fall_sprite);
 	CP_Image_Free(&crush_sprite);
 	CP_Image_Free(&goal_sprite);
+
 	CP_Sound_Free(&music);
 }
