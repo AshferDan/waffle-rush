@@ -456,7 +456,7 @@
 #pragma region 
 #define MAX_TRAPS 50
 #define BULLET_SIZE 15
-#define BULLET_SPEED 200
+#define BULLET_SPEED 250
 #define MAX_BULLETS 3
 	// ENUMS AND STRUCTS
 	/*
