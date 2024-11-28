@@ -402,6 +402,10 @@ void LSelect_Update(void)
 	CP_Font_DrawText("INSTRUCTIONS:", -500 - camera.worldshiftx, 400 - camera.worldshifty);
 	CP_Font_DrawTextBox("WASD to move\nE to enter a level,\ncrawl all the way down to start!", -500 - camera.worldshiftx, 450 - camera.worldshifty, 500);
 
+	
+	float displaysprite_x = ((int)player.anim % 2 == 0) ? 36 : 54;
+	CP_Image_DrawSubImage(player_sprite, 20 - camera.worldshiftx, 300 - camera.worldshifty, 100, 100, displaysprite_x, 18, displaysprite_x+18, 36, 255);
+
 
 
 	CP_Settings_TextSize(70);
