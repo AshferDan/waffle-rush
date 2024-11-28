@@ -73,10 +73,10 @@ int crusher_direction(hazard crusher, Player p) {
 		float px = (p.x + p.width / 2);
 		float py = (p.y + p.height / 2);
 		// how much the player goes into the platform
-		float leftcoll = (fabs)((px + p.width/2) - crusher.x[0]);
-		float rightcoll = (fabs)(crusher.x[1] - (px - p.width / 2));
-		float topcoll = (fabs)((py + p.height/2) - crusher.y[0]);
-		float botcoll = (fabs)(crusher.y[2] - (py - p.height / 2));
+		float leftcoll = (float)(fabs)((px + p.width/2) - crusher.x[0]);
+		float rightcoll = (float)(fabs)(crusher.x[1] - (px - p.width / 2));
+		float topcoll = (float)(fabs)((py + p.height/2) - crusher.y[0]);
+		float botcoll = (float)(fabs)(crusher.y[2] - (py - p.height / 2));
 
 		// return lower value for horizontal/vertical
 		float horizontal = (leftcoll < rightcoll) ? leftcoll : rightcoll;
@@ -235,7 +235,7 @@ void Draw_Hazards() {
 	if (firetimer > 15) {
 		firetimer = 0;
 	}
-	float sprite_x = (int)firetimer * 32;
+	float sprite_x = (int)firetimer * 32.0f;
 
 	for (int i = 0; i < numberoftraps; ++i)
 	{
@@ -243,7 +243,7 @@ void Draw_Hazards() {
 		{
 		case spike:
 		{
-			CP_Image_DrawSubImageAdvanced(fire_sprite, traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, 50, 50, sprite_x, 0, sprite_x + 32, 32, 255, 90 * traps[i].direction);
+			CP_Image_DrawSubImageAdvanced(fire_sprite, traps[i].x[0] - camera.worldshiftx, traps[i].y[0] - camera.worldshifty, 50.0f, 50.0f, sprite_x, 0.0f, sprite_x + 32.0f, 32.0f, 255, 90.0f * traps[i].direction);
 			break;
 		}
 		case crusher:

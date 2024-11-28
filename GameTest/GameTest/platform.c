@@ -315,6 +315,40 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		}
 	}
 
+	void init_platforms(FILE* PlatformFile) {
+		// read how many platforms in level
+		fscanf_s(PlatformFile, "%d", &numplats);
+
+		// plat_index - platform index
+		// plat_coord_index - platform coordinate index
+		int plat_index = 0; int plat_coord_index = 0;
+		while (plat_index < numplats) {
+			// coordinate ints to read
+			// scan how many coordinates
+
+			fscanf_s(PlatformFile, "%d", &Platform[plat_index].numcoords);
+			// for how many coordinates in platform
+			while (plat_coord_index < Platform[plat_index].numcoords) {
+				int x, y;
+				// scan coordinates
+				fscanf_s(PlatformFile, "%d %d", &x, &y);
+				// assign coordinates to array
+				platform_coordinates(plat_index, plat_coord_index, x, y);
+				plat_coord_index++;
+			}
+			plat_coord_index = 0;
+			fscanf_s(PlatformFile, "%d", &Platform[plat_index].numblocks);
+			while (plat_coord_index < Platform[plat_index].numblocks) {
+				int x1, y1, x2, y2;
+				fscanf_s(PlatformFile, "%d %d %d %d", &x1, &y1, &x2, &y2);
+				platform_onblocks(plat_index, plat_coord_index, (float)x1, (float)y1, (float)x2, (float)y2);
+				plat_coord_index++;
+			}
+			plat_coord_index = 0;
+			plat_index++;
+		}
+	}
+
 	// Initializes platform coordinates
 	void platform_coordinates(int plat_index, int coord_index, int x, int y) {
 		Platform[plat_index].platcoords[coord_index] = (coords){ (float)x,(float)y };
@@ -417,9 +451,30 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		checkpoint->active = 0;
 	}
 
+	void init_checkpoints(FILE* CheckpointFile) {
+		fscanf_s(CheckpointFile, "%d", &numcheckpoints);
+		for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
+			int x = 0;
+			int y = 0;
+			fscanf_s(CheckpointFile, "%d %d", &x, &y);
+			checkpoint.coordinates[checkpoint_index] = (coords){ (float)x, (float)y };
+		}
+	}
+
+
+	// Walls
 	void reset_walls() {
 		for (int wall_index = 0; wall_index < max_walls; wall_index++) {
 			walls[wall_index] = (platblocks){ 0,0,0,0,0,0 };
+		}
+	}
+
+	void init_walls(FILE* WallFile) {
+		for (int wall_index = 0; wall_index < numwalls; wall_index++) {
+			int x1, y1, x2, y2;
+			float buffer = 15.0f;
+			fscanf_s(WallFile, "%d %d %d %d", &x1, &y1, &x2, &y2);
+			walls[wall_index] = (platblocks){ (float)x1 - buffer, (float)x2 + buffer, (float)y1 - buffer, (float)y2 + buffer, ((float)x2 + buffer) - ((float)x1 - buffer), ((float)y2 + buffer) - ((float)y1 - buffer) };
 		}
 	}
 #pragma endregion
@@ -446,10 +501,10 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		float px = (p.x + p.width / 2);
 		float py = (p.y + p.height / 2);
 		// how much the player goes into the platform
-		float leftcoll = (fabs)((px + p.width/2) - plt.x1);
-		float rightcoll = (fabs)(plt.x2 - (px - p.width/2));
-		float topcoll = (fabs)((py + p.height/2) - plt.y1);
-		float botcoll = (fabs)(plt.y2 - (py - p.height/2));
+		float leftcoll = (float)(fabs)((px + p.width/2) - plt.x1);
+		float rightcoll = (float)(fabs)(plt.x2 - (px - p.width/2));
+		float topcoll = (float)(fabs)((py + p.height/2) - plt.y1);
+		float botcoll = (float)(fabs)(plt.y2 - (py - p.height/2));
 
 		// return lower value for horizontal/vertical
 		float horizontal = (leftcoll < rightcoll) ? leftcoll : rightcoll;
@@ -814,16 +869,17 @@ void DrawPlatform(int plat_index) {
 	CP_Graphics_EndShape();
 }
 
+
 void DrawGoal(CP_Image goal_sprite, float goalx, float goaly, Camera camera, float dt, float clear_timer) {
 	if (!isCleared) {
-		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, 0, 0, 32, 32, 255);
+		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100.0f, 100.0f, 0.0f, 0.0f, 32.0f, 32.0f, 255);
 	}
 	else {
-		if (clear_timer <= 3) {
-			clear_timer += 6 * dt;
+		if (clear_timer <= 3.0f) {
+			clear_timer += 6.0f * dt;
 		}
-		int sprite_x = 32 + (32 * (int)clear_timer);
-		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, sprite_x, 0, sprite_x + 32, 32, 255);
+		float sprite_x = 32.0f + (32.0f * (int)clear_timer);
+		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100.0f, 100.0f, sprite_x, 0.0f, sprite_x + 32.0f, 32.0f, 255);
 	}
 }
 

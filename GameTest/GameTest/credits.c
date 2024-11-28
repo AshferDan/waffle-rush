@@ -56,7 +56,7 @@ void Credits_Update(void) {
 	//header text
 	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 255));
 	CP_Settings_TextSize(100);
-	CP_Font_DrawText("CREDITS:", (float)width / 2.0f, (float)100);
+	CP_Font_DrawText("CREDITS:", width / 2.0f, (float)100);
 
 	CP_Settings_TextSize(100);
 	char credits[500] = { 0 };
@@ -65,14 +65,14 @@ void Credits_Update(void) {
 
 	// credit screens
 	CP_Settings_TextSize(30);
-	CP_Font_DrawText("All content \xC2\xA9 2024 DigiPen Institute of Technology Singapore. All Rights Reserved.", (float)width / 2, (float)700.0f);
+	CP_Font_DrawText("All content \xC2\xA9 2024 DigiPen Institute of Technology Singapore. All Rights Reserved.", width / 2.0f, 700.0f);
 
 	if (screen_num == FIRST) {
 		CP_Settings_TextSize(50);
-		CP_Font_DrawText("THE TEAM", (float)width / 4.0f, (float)200.0f);
+		CP_Font_DrawText("THE TEAM", width / 4.0f, (float)200.0f);
 		for (int i = 0; i < num_names; i++) {
 			sprintf_s(credits, sizeof(credits), names[i].name);
-			CP_Font_DrawText(credits, (float)width / 4.0f, (float)(300 + (i * 75)));
+			CP_Font_DrawText(credits, width / 4.0f, (float)(300 + (i * 75)));
 		}
 		CP_Font_DrawText("INSTRUCTORS", (float)2 * width / 3.0f, (float)200.0f);
 		CP_Font_DrawText("Ding Xiang Cheng", (float)2 * width / 3.0f, (float)300.0f);
@@ -84,24 +84,24 @@ void Credits_Update(void) {
 	}
 	else if (screen_num == SECOND) {
 		CP_Settings_TextSize(50);
-		CP_Font_DrawText("PRESIDENT", (float)width / 2.0f, (float)200.0f);
-		CP_Font_DrawText("Claude COMAIR", (float)width / 2.0f, (float)250.0f);
-		CP_Font_DrawText("EXECUTIVES", (float)width / 2.0f, (float)350.0f);
-		CP_Font_DrawText("CHU Jason Yeu Tat", (float)width / 4.0f, (float)400.0f);
-		CP_Font_DrawText("Michele COMAIR", (float)width / 2.0f, (float)400.0f);
+		CP_Font_DrawText("PRESIDENT", width / 2.0f, (float)200.0f);
+		CP_Font_DrawText("Claude COMAIR", width / 2.0f, (float)250.0f);
+		CP_Font_DrawText("EXECUTIVES", width / 2.0f, (float)350.0f);
+		CP_Font_DrawText("CHU Jason Yeu Tat", width / 4.0f, (float)400.0f);
+		CP_Font_DrawText("Michele COMAIR", width / 2.0f, (float)400.0f);
 		CP_Font_DrawText("Christopher COMAIR", (float)3 * width / 4.0f, (float)400.0f);
-		CP_Font_DrawText("Alexander COMAIR", (float)width / 4.0f, (float)500.0f);
-		CP_Font_DrawText("Michael GATS", (float)width / 2.0f, (float)500.0f);
+		CP_Font_DrawText("Alexander COMAIR", width / 4.0f, (float)500.0f);
+		CP_Font_DrawText("Michael GATS", width / 2.0f, (float)500.0f);
 		CP_Font_DrawText("TAN Chek Ming", (float)3 * width / 4.0f, (float)500.0f);
-		CP_Font_DrawText("Prasanna GHALI", (float)width / 4.0f, (float)600.0f);
-		CP_Font_DrawText("Mandy WONG", (float)width / 2.0f, (float)600.0f);
+		CP_Font_DrawText("Prasanna GHALI", width / 4.0f, (float)600.0f);
+		CP_Font_DrawText("Mandy WONG", width / 2.0f, (float)600.0f);
 		CP_Font_DrawText("Johnny DEEK", (float)3 * width / 4.0f, (float)600.0f);
 
 		CP_Settings_TextSize(100);
 	}
 	else if (screen_num == THIRD) {
 		CP_Settings_TextSize(50);
-		CP_Font_DrawText("INSERT REFERENCES HERE", (float)width / 2.0f, (float)height / 2.0f);
+		CP_Font_DrawText("INSERT REFERENCES HERE", width / 2.0f, height / 2.0f);
 		CP_Settings_TextSize(100);
 	}
 

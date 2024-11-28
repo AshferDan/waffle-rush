@@ -54,9 +54,6 @@
     <ClCompile Include="Level1.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LevelSelect.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="hazard.c">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -35,20 +35,20 @@ int buff_pickup(float x, float y, float height, float width) {
 }
 
 void Draw_Buffs() {
-	float buff_sprite_x = (player.anim < 10) ? 0 : 32;
+	float buff_sprite_x = (player.anim < 10) ? 0.0f : 32.0f;
 	if (Buff[jumpBuff].canPickup == 1) {
 		CP_Settings_Fill(CP_Color_Create(100, 100, 100, 255));
 		//CP_Graphics_DrawRect(Buff[jumpBuff].X-camera.worldshiftx, Buff[jumpBuff].Y-camera.worldshifty, Buff[jumpBuff].width, Buff[jumpBuff].height);
-		float jumpbuff_x = Buff[jumpBuff].X - camera.worldshiftx - 20;
-		float jumpbuff_y = Buff[jumpBuff].Y - camera.worldshifty - 20;
-		CP_Image_DrawSubImage(buff_sprite, jumpbuff_x, jumpbuff_y, Buff[jumpBuff].width + 40, Buff[jumpBuff].height + 40, buff_sprite_x, 0, buff_sprite_x + 32, 32, 255);
+		float jumpbuff_x = Buff[jumpBuff].X - camera.worldshiftx - 20.0f;
+		float jumpbuff_y = Buff[jumpBuff].Y - camera.worldshifty - 20.0f;
+		CP_Image_DrawSubImage(buff_sprite, jumpbuff_x, jumpbuff_y, Buff[jumpBuff].width + 40.0f, Buff[jumpBuff].height + 40.0f, buff_sprite_x, 0.0f, buff_sprite_x + 32.0f, 32.0f, 255);
 	}
 	if (Buff[invulBuff].canPickup == 1) {
 		CP_Settings_Fill(CP_Color_Create(100, 100, 100, 255));
 		//CP_Graphics_DrawRect(Buff[invulBuff].X - camera.worldshiftx, Buff[invulBuff].Y - camera.worldshifty, Buff[invulBuff].width, Buff[invulBuff].height);
-		float invbuff_x = Buff[invulBuff].X - camera.worldshiftx - 20;
-		float invbuff_y = Buff[invulBuff].Y - camera.worldshifty - 20;
-		CP_Image_DrawSubImage(buff_sprite, invbuff_x, invbuff_y, Buff[jumpBuff].width + 40, Buff[jumpBuff].height + 40, buff_sprite_x, 32, buff_sprite_x + 32, 64, 255);
+		float invbuff_x = Buff[invulBuff].X - camera.worldshiftx - 20.0f;
+		float invbuff_y = Buff[invulBuff].Y - camera.worldshifty - 20.0f;
+		CP_Image_DrawSubImage(buff_sprite, invbuff_x, invbuff_y, Buff[jumpBuff].width + 40.0f, Buff[jumpBuff].height + 40.0f, buff_sprite_x, 32.0f, buff_sprite_x + 32.0f, 64.0f, 255);
 	}
 
 	// Stamina Bar
@@ -63,22 +63,22 @@ void Draw_Buffs() {
 	// Buff indicator
 	CP_Settings_ImageMode(CP_POSITION_CENTER);
 
-	CP_Settings_NoStroke;
+	CP_Settings_NoStroke();
 	CP_Settings_Fill(stamina);
 
 	// jump buff
-	if (jumpalpha == 255) {
-		DrawStatBar(110, 810, 190, 817, Buff[jumpBuff].buffduration, 3);
+	if (jumpalpha == 255.0f) {
+		DrawStatBar(110.0f, 810.0f, 190.0f, 817.0f, Buff[jumpBuff].buffduration, 3.0f);
 	}
-	CP_Image_Draw(buff_bg, 150, 750, 100, 100, jumpalpha);
-	CP_Image_DrawSubImage(buff_sprite, 150, 750, 75, 75, 0, 0, 32, 32, jumpalpha);
+	CP_Image_Draw(buff_bg, 150.0f, 750.0f, 100.0f, 100.0f, (int)jumpalpha);
+	CP_Image_DrawSubImage(buff_sprite, 150.0f, 750.0f, 75.0f, 75.0f, 0.0f, 0.0f, 32.0f, 32.0f, (int)jumpalpha);
 
 	// shield buff
-	if (shieldalpha == 255) {
-		DrawStatBar(260, 810, 340, 817, Buff[invulBuff].buffduration, 3);
+	if (shieldalpha == 255.0f) {
+		DrawStatBar(260.0f, 810.0f, 340.0f, 817.0f, Buff[invulBuff].buffduration, 3.0f);
 	}
-	CP_Image_Draw(buff_bg, 300, 750, 100, 100, shieldalpha);
-	CP_Image_DrawSubImage(buff_sprite, 300, 750, 70, 70, 0, 32, 32, 64, shieldalpha);
+	CP_Image_Draw(buff_bg, 300.0f, 750.0f, 100.0f, 100.0f, (int)shieldalpha);
+	CP_Image_DrawSubImage(buff_sprite, 300.0f, 750.0f, 70.0f, 70.0f, 0.0f, 32.0f, 32.0f, 64.0f, (int)shieldalpha);
 
 	CP_Settings_Stroke(CP_Color_Create(0, 0, 0, 255));
 	CP_Settings_ImageMode(CP_POSITION_CORNER);

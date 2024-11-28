@@ -104,38 +104,37 @@ void Cam_Init(Camera* camera, float screen_width, float screen_height, coords sp
 
 void Guide_Arrow() {
 	if (!IsAreaCornerClicked(0, 0, width, height, goalx - camera.worldshiftx, goaly - camera.worldshifty)) {
-		float goalpointx = goalx + 50 - camera.worldshiftx;
-		float goalpointy = goaly + 50 - camera.worldshifty;
-		float goalpointspritex = (player.anim < 10) ? 0 : 32;
-		float goalpointspritey = 0;
-		float goalpointrot = 0;
-		if (goalpointx > 0 && goalpointx < width) {
-			goalpointspritey = (goalpointy < (float)(height / 2)) ? 64 : 96;
+		float goalpointx = goalx + 50.0f - camera.worldshiftx;
+		float goalpointy = goaly + 50.0f - camera.worldshifty;
+		float goalpointspritex = (player.anim < 10.0f) ? 0.0f : 32.0f;
+		float goalpointspritey = 0.0f;
+		float goalpointrot = 0.0f;
+		if (goalpointx > 0.0f && goalpointx < width) {
+			goalpointspritey = (goalpointy < (float)(height / 2.0f)) ? 64.0f : 96.0f;
 		}
-		if (goalpointy > 0 && goalpointy < height) {
-			goalpointspritey = (goalpointx > (float)(width / 2)) ? 0 : 32;
+		if (goalpointy > 0.0f && goalpointy < height) {
+			goalpointspritey = (goalpointx > (float)(width / 2.0f)) ? 0.0f : 32.0f;
 		}
-		if ((goalpointx > width || goalpointx < 0) && (goalpointy > height || goalpointy < 0)) {
-			if (goalpointx > 0.9f * (float)width && goalpointy < 0.2f * (float)height) {
-				goalpointspritey = 64;
+		if ((goalpointx > width || goalpointx < 0.0f) && (goalpointy > height || goalpointy < 0.0f)) {
+			if (goalpointx > 0.9f * width && goalpointy < 0.2f * height) {
+				goalpointspritey = 64.0f;
 			}
-			if (goalpointx > 0.9f * (float)width && goalpointy > 0.8f * (float)height) {
-				goalpointspritey = 0;
+			if (goalpointx > 0.9f * width && goalpointy > 0.8f * height) {
+				goalpointspritey = 0.0f;
 			}
-			if (goalpointx < 0.1f * (float)width && goalpointy < 0.2f * (float)height) {
-				goalpointspritey = 32;
+			if (goalpointx < 0.1f * width && goalpointy < 0.2f * height) {
+				goalpointspritey = 32.0f;
 			}
-			if (goalpointx < 0.1f * (float)width && goalpointy > 0.8f * (float)height) {
-				goalpointspritey = 96;
+			if (goalpointx < 0.1f * width && goalpointy > 0.8f * height) {
+				goalpointspritey = 96.0f;
 			}
-			goalpointrot = 45;
+			goalpointrot = 45.0f;
 
 		}
-		goalpointx = CP_Math_ClampFloat(goalpointx, 0.1f * (float)width, 0.9f * (float)width);
-		goalpointy = CP_Math_ClampFloat(goalpointy, 0.2f * (float)height, 0.8f * (float)height);
+		goalpointx = CP_Math_ClampFloat(goalpointx, 0.1f * width, 0.9f * width);
+		goalpointy = CP_Math_ClampFloat(goalpointy, 0.2f * height, 0.8f * height);
 
-		CP_Image_DrawSubImageAdvanced(goal_pointer, goalpointx - 50, goalpointy - 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 255, goalpointrot);
+		CP_Image_DrawSubImageAdvanced(goal_pointer, goalpointx - 50.0f, goalpointy - 50.0f, 100.0f, 100.0f, goalpointspritex, goalpointspritey, goalpointspritex + 32.0f, goalpointspritey + 32.0f, 255, goalpointrot);
 
-		//CP_Image_DrawSubImageAdvanced(goal_pointer, width/2-50, 200, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 255, goalpointrot);
 	}
 }

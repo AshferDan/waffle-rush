@@ -231,11 +231,11 @@ void Level_Transition(FunctionPtr level_init, FunctionPtr level_update, Function
 
 	if (levelEnded == end) {
 		canMove = 0;
-		scaler1 += (playerLastX + player.width / 2) * dt;
-		scaler2 += (width - playerLastX + player.width / 2) * dt;
-		scaler3 += (playerLastY + player.height / 2) * dt;
-		scaler4 += (height - playerLastY + player.height / 2) * dt;
-		TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
+		scaler1 += (playerLastX + player.width / 2.0f) * dt;
+		scaler2 += (width - playerLastX + player.width / 2.0f) * dt;
+		scaler3 += (playerLastY + player.height / 2.0f) * dt;
+		scaler4 += (height - playerLastY + player.height / 2.0f) * dt;
+		TransitionInBoxEffect(playerLastX, playerLastY, 0.0f, width, 0.0f, height, scaler1, scaler2, scaler3, scaler4);
 
 		if (scaler1 >= playerLastX) {
 			levelEnded = start;
@@ -249,7 +249,7 @@ void Level_Transition(FunctionPtr level_init, FunctionPtr level_update, Function
 		scaler2 -= (width - playerLastX + player.width / 2) * dt;
 		scaler3 -= (playerLastY + player.height / 2) * dt;
 		scaler4 -= (height - playerLastY + player.height / 2) * dt;
-		TransitionInBoxEffect(playerLastX, playerLastY, 0, width, 0, height, scaler1, scaler2, scaler3, scaler4);
+		TransitionInBoxEffect(playerLastX, playerLastY, 0.0f, width, 0.0f, height, scaler1, scaler2, scaler3, scaler4);
 
 		if (scaler1 <= 0 && scaler2 <= 0 && scaler3 <= 0 && scaler4 <= 0) {
 			levelEnded = reset;
@@ -260,7 +260,7 @@ void Level_Transition(FunctionPtr level_init, FunctionPtr level_update, Function
 	}
 }
 
-void SetNext(FunctionPtr *level_init, FunctionPtr *level_update, FunctionPtr *level_exit) {
+void SetNext(FunctionPtr level_init, FunctionPtr level_update, FunctionPtr level_exit) {
 	next_init = level_init;
 	next_update = level_update;
 	next_exit = level_exit;
@@ -280,23 +280,23 @@ void RENDER_ALL() {
 	// Wall
 	CP_Settings_Fill(wall);
 	for (int i = 0; i < numwalls; i++) {
-		CP_Graphics_DrawRect(walls[i].x1 + 15 - camera.worldshiftx, walls[i].y1 + 15 - camera.worldshifty, walls[i].w - 30, walls[i].h - 30);
+		CP_Graphics_DrawRect(walls[i].x1 + 15.0f - camera.worldshiftx, walls[i].y1 + 15.0f - camera.worldshifty, walls[i].w - 30.0f, walls[i].h - 30.0f);
 	}
 	CP_Settings_Stroke(black);
 
 	// Goal
 	if (levelstate != Cleared) {
-		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, 0, 0, 32, 32, 255);
+		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100.0f, 100.0f, 0.0f, 0.0f, 32.0f, 32.0f, 255);
 	}
 	else {
-		if (clear_timer <= 5) {
-			clear_timer += 6 * dt;
+		if (clear_timer <= 5.0f) {
+			clear_timer += 6.0f * dt;
 		}
-		int sprite_x = ((int)clear_timer <= 3) ? 32 + (32 * (int)clear_timer) : 32 * 4;
-		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100, 100, sprite_x, 0, sprite_x + 32, 32, 255);
+		float sprite_x = ((int)clear_timer <= 3) ? 32.0f + (float)(32 * (int)clear_timer) : 32.0f * 4.0f;
+		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100.0f, 100.0f, sprite_x, 0.0f, sprite_x + 32.0f, 32.0f, 255);
 	}
 
-	if (AreSquaresIntersecting(player.x, player.y, player.height, player.width, goalx, goaly + 70, 100, 30)) {
+	if (AreSquaresIntersecting(player.x, player.y, player.height, player.width, goalx, goaly + 70.0f, 100.0f, 30.0f)) {
 		// calculate score and mark the level as cleared
 		AddScore(&levelScore, 10000 + (10000 - ((int)timer.seconds * 50) - ((int)timer.minutes * 3000)) - deaths * 100, &levelstate);
 		if (levelstate != EndLevel) {
@@ -333,15 +333,15 @@ void RENDER_ALL() {
 
 
 	// Checkpoint
-	for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
-		if (checkpoint_index != checkpoint.active) {
-			CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50 - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, 1472, 0, 1536, 64, 255);
+		for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
+			if (checkpoint_index != checkpoint.active) {
+				CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50.0f - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, 1472, 0, 1536, 64, 255);
+			}
+			if (checkpoint_index == checkpoint.active) {
+				float spawn_sprite_x = (int)player.spawn_time * 64.0f;
+				CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50.0f - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, spawn_sprite_x, 0, spawn_sprite_x + 64, 64, 255);
+			}
 		}
-		if (checkpoint_index == checkpoint.active) {
-			float spawn_sprite_x = (int)player.spawn_time * 64;
-			CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50 - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, spawn_sprite_x, 0, spawn_sprite_x + 64, 64, 255);
-		}
-	}
 	
 	// Buffs
 	Draw_Buffs();

@@ -126,7 +126,7 @@
 		int deaths;
 		float speed; //speed
 
-		int width, height; //window width/height
+		float width, height; //window width/height
 
 		float spawnx, spawny, goalx, goaly; // spawn and goal position
 
@@ -652,6 +652,8 @@
 			// PLATFORMS
 				// reset platform members to 0
 				void reset_platforms(void);
+				// init platforms from file
+				void init_platforms(FILE* PlatformFile);
 				// assign platform coordinates
 				void platform_coordinates(int plat_index, int coord_index, int x, int y);
 				// assign onblock coordinates
@@ -666,8 +668,14 @@
 			// CHECKPOINTS
 				// reset checkpoint members and set active checkpoint to 0th coordinates
 				void reset_checkpoints(Checkpoint* checkpoint);
+				// init checkpoints
+				void init_checkpoints(FILE* CheckpointFile);
+
+			// WALLS
 				// reset walls to 0
 				void reset_walls();
+				// init walls from file
+				void init_walls(FILE* WallFile);
 		/*-------------------------------------------------------------------------------------------------*/
 
 

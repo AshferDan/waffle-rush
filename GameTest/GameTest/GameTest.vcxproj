@@ -19,7 +19,6 @@
     <ClCompile Include="Level3.c" />
     <ClCompile Include="Level4.c" />
     <ClCompile Include="Level5.c" />
-    <ClCompile Include="LevelSelect.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="mainmenu.c" />
     <ClCompile Include="mainmenu1.c" />

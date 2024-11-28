@@ -57,13 +57,9 @@ void L3_Init(void)
 	// Initialize checkpoints and first spawn
 	reset_checkpoints(&checkpoint);
 	FILE* CheckpointFile = fopen("Assets/Level_3/Checkpoint.txt", "r");
-	fscanf_s(CheckpointFile, "%d", &numcheckpoints);
-	for (int checkpoint_index = 0; checkpoint_index < numcheckpoints; checkpoint_index++) {
-		int x = 0;
-		int y = 0;
-		fscanf_s(CheckpointFile, "%d %d", &x, &y);
-		checkpoint.coordinates[checkpoint_index] = (coords){ x, y };
-	}
+
+	init_checkpoints(CheckpointFile);
+
 	fclose(CheckpointFile);
 
 
@@ -102,6 +98,9 @@ void L3_Init(void)
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
+
+// Platforms
+	// resets all platforms to 0
 	reset_platforms();
 
 	FILE* PlatformFile = fopen("Assets/Level_3/Platform.txt", "r");
@@ -110,37 +109,9 @@ void L3_Init(void)
 		printf("Failed to open platform file! Check if file exists\n");
 		CP_Engine_Terminate();
 	}
-	// read how many platforms in level
-	fscanf_s(PlatformFile, "%d", &numplats);
 
-	// plat_index - platform index
-	// plat_coord_index - platform coordinate index
-	int plat_index = 0; int plat_coord_index = 0;
-	while (plat_index < numplats) {
-		// coordinate ints to read
-		// scan how many coordinates
+	init_platforms(PlatformFile);
 
-		fscanf_s(PlatformFile, "%d", &Platform[plat_index].numcoords);
-		// for how many coordinates in platform
-		while (plat_coord_index < Platform[plat_index].numcoords) {
-			int x, y;
-			// scan coordinates
-			fscanf_s(PlatformFile, "%d %d", &x, &y);
-			// assign coordinates to array
-			platform_coordinates(plat_index, plat_coord_index, x, y);
-			plat_coord_index++;
-		}
-		plat_coord_index = 0;
-		fscanf_s(PlatformFile, "%d", &Platform[plat_index].numblocks);
-		while (plat_coord_index < Platform[plat_index].numblocks) {
-			int x1, y1, x2, y2;
-			fscanf_s(PlatformFile, "%d %d %d %d", &x1, &y1, &x2, &y2);
-			platform_onblocks(plat_index, plat_coord_index, x1, y1, x2, y2);
-			plat_coord_index++;
-		}
-		plat_coord_index = 0;
-		plat_index++;
-	}
 	fclose(PlatformFile);
 
 	// initialize all platform hitboxes
@@ -150,22 +121,19 @@ void L3_Init(void)
 
 
 	// Walls
+		// resets all walls to 0
 	reset_walls();
 
 	FILE* WallFile = fopen("Assets/Level_3/Wall.txt", "r");
 
-	/*if (WallFile == NULL) {
+	if (WallFile == NULL) {
 		printf("Failed to open wall file! Check if file exists\n");
 		CP_Engine_Terminate();
-	}*/
+	}
 
 	fscanf_s(WallFile, "%d", &numwalls);
 
-	for (int wall_index = 0; wall_index < numwalls; wall_index++) {
-		int x1, y1, x2, y2;
-		fscanf_s(WallFile, "%d %d %d %d", &x1, &y1, &x2, &y2);
-		walls[wall_index] = (platblocks){ x1 - 15, x2 + 15, y1 - 15, y2 + 15, (x2 + 15) - (x1 - 15), (y2 + 15) - (y1 - 15) };
-	}
+	init_walls(WallFile);
 
 	fclose(WallFile);
 
@@ -228,8 +196,8 @@ void L3_Init(void)
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Misc inits and settings
 	// Window size
-	width = CP_System_GetWindowWidth();
-	height = CP_System_GetWindowHeight();
+	width = (float)CP_System_GetWindowWidth();
+	height = (float)CP_System_GetWindowHeight();
 
 	// Initialize colors
 	pausebg = CP_Color_Create(0, 0, 0, 100);
