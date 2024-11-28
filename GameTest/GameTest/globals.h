@@ -325,7 +325,7 @@
 		enum playerQualities  //we use this as a qualitative indicator of player powerup state 
 		{
 			baseStat = 0b000,
-			slowTime = 0b001,
+			JUMPYBuff = 0b001,
 			jumpBuff = 0b010,
 			invulBuff = 0b100
 		}; //states/bool
@@ -344,7 +344,7 @@
 
 		CP_Image buff_sprite, buff_bg;
 
-		float jumpalpha, shieldalpha, jumpstatalpha, shieldstatalpha;
+		float jumpyalpha,jumpalpha, shieldalpha, jumpstatalpha, shieldstatalpha;
 	#pragma endregion VARIABLES
 	/*---------------------------------------------------------------------------------------------------------*/
 	

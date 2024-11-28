@@ -27,6 +27,7 @@ int buff_pickup(float x, float y, float height, float width) {
 	float playerRight = player.x + player.width;
 	float playerBase = player.y + player.height;
 	
+	//if player touches the buff, buff is picked up
 	if (playerRight > x && player.y < y+height && player.x < x + width && playerBase > y) {
 		return 1;
 	}
@@ -34,7 +35,10 @@ int buff_pickup(float x, float y, float height, float width) {
 		return 0;
 }
 
+
+
 void Draw_Buffs() {
+
 	float buff_sprite_x = (player.anim < 10) ? 0.0f : 32.0f;
 	if (Buff[jumpBuff].canPickup == 1) {
 		CP_Settings_Fill(CP_Color_Create(100, 100, 100, 255));
@@ -49,6 +53,14 @@ void Draw_Buffs() {
 		float invbuff_x = Buff[invulBuff].X - camera.worldshiftx - 20.0f;
 		float invbuff_y = Buff[invulBuff].Y - camera.worldshifty - 20.0f;
 		CP_Image_DrawSubImage(buff_sprite, invbuff_x, invbuff_y, Buff[jumpBuff].width + 40.0f, Buff[jumpBuff].height + 40.0f, buff_sprite_x, 32.0f, buff_sprite_x + 32.0f, 64.0f, 255);
+	}
+
+	if (Buff[JUMPYBuff].canPickup == 1) {
+		CP_Settings_Fill(CP_Color_Create(100, 100, 100, 255));
+		float jumpybuff_x = Buff[JUMPYBuff].X - camera.worldshiftx - 20.0f;
+		float jumpybuff_y = Buff[JUMPYBuff].Y - camera.worldshifty - 20.0f;
+		CP_Image_DrawSubImage(buff_sprite, jumpybuff_x, jumpybuff_y, Buff[JUMPYBuff].width + 40.0f, Buff[JUMPYBuff].height + 40.0f, buff_sprite_x, 0.0f, buff_sprite_x + 32.0f, 32.0f, 255);
+
 	}
 
 	// Stamina Bar
@@ -72,6 +84,15 @@ void Draw_Buffs() {
 	}
 	CP_Image_Draw(buff_bg, 150.0f, 750.0f, 100.0f, 100.0f, (int)jumpalpha);
 	CP_Image_DrawSubImage(buff_sprite, 150.0f, 750.0f, 75.0f, 75.0f, 0.0f, 0.0f, 32.0f, 32.0f, (int)jumpalpha);
+
+	// jumpy buff
+	if (jumpyalpha == 255.0f) {
+		DrawStatBar(110.0f, 810.0f, 190.0f, 817.0f, Buff[JUMPYBuff].buffduration, 3.0f);
+	}
+	CP_Image_Draw(buff_bg, 150.0f, 750.0f, 100.0f, 100.0f, (int)jumpyalpha);
+	CP_Image_DrawSubImage(buff_sprite, 150.0f, 750.0f, 75.0f, 75.0f, 0.0f, 0.0f, 32.0f, 32.0f, (int)jumpyalpha);
+	
+
 
 	// shield buff
 	if (shieldalpha == 255.0f) {
