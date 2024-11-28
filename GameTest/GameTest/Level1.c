@@ -178,6 +178,11 @@ void L1_Init(void)
 	fscanf_s(HazardFile, "%d", &numberoftraps);
 	init_hazards(HazardFile, numberoftraps);
 	fclose(HazardFile);
+	spawnTimer = 0.0f;     // Timer to control spawning frequency
+	spawnInterval = 2.f;  // Spawn a square every 2 seconds
+	bulletx = 1800;
+	bullety = 550;
+	firetimer = 0;
 
 #pragma endregion
 #pragma endregion
@@ -427,7 +432,7 @@ void L1_Update(void)
 		for (int i = 0; i < MAX_BULLETS; ++i) {
 			if (bullets[i].active) {
 				bullets[i].x -= BULLET_SPEED * CP_System_GetDt(); // Move square left
-				if (bullets[i].x + BULLET_SIZE < 0) {            // Deactivate square if off-screen
+				if (bullets[i].x + BULLET_SIZE < 1400+BULLET_SIZE) {            // Deactivate square if off-screen
 					bullets[i].active = false;
 				}
 			}

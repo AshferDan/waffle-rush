@@ -182,7 +182,7 @@ void L3_Init(void)
 	init_hazards(HazardFile, numberoftraps);
 	fclose(HazardFile);
 	spawnTimer = 0.0f;     // Timer to control spawning frequency
-	spawnInterval = 0.5f;  // Spawn a square every 0.5 seconds
+	spawnInterval = 2.f;  // Spawn a square every 2 seconds
 	bulletx = 800;
 	bullety = 800;
 	firetimer = 0;
@@ -410,7 +410,7 @@ void L3_Update(void)
 				CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
 				Kill_Player(&player, reset, &deaths);
 			}
-			if ((player.y >= 1600) && movestate == OnPlat && player.deathcause != Fall) {
+			if ((player.y >= 2500) && movestate == OnPlat && player.deathcause != Fall) {
 				Kill_Player(&player, Fall, &deaths);
 			}
 		}
