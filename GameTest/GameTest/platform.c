@@ -756,13 +756,14 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		*deaths = 0;
 	}
 
-	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths) {
+	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths, int *buffstate) {
 		if (player->state != Dead) {
 			player->state = Dead;
 			player->deathcause = deathcause;
 			player->death_time = 0;
 			player->spawn_time = 0;
 			player->movey = (deathcause != Fall) ? 0.0f : -300.0f;
+			*buffstate = 0b000;
 			++*deaths;
 		}
 	}

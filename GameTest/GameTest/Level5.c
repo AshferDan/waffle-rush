@@ -339,7 +339,7 @@ void L5_Update(void)
 					CollPlatforms(plat_index, Platform[plat_index], &player, player);
 				}
 				if (player.stamina <= 0) {
-					Kill_Player(&player, Fall, &deaths);
+					Kill_Player(&player, Fall, &deaths, &buffstate);
 				}
 			}
 			player.stamina = CP_Math_ClampFloat(player.stamina, 0, 100);
@@ -377,10 +377,10 @@ void L5_Update(void)
 			// reset with R or touch ground while movestate OnPlat
 			if (CP_Input_KeyTriggered(KEY_K) && !(player.state == Dead || player.state == Spawning) && !isCleared) {
 				CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
-				Kill_Player(&player, reset, &deaths);
+				Kill_Player(&player, reset, &deaths, &buffstate);
 			}
 			if ((player.y >= 1600) && movestate == OnPlat && player.deathcause != Fall) {
-				Kill_Player(&player, Fall, &deaths);
+				Kill_Player(&player, Fall, &deaths, &buffstate);
 			}
 		}
 

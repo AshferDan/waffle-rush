@@ -148,7 +148,7 @@ void hazard_update() {
 			Point C = { traps[trap_index].x[2], traps[trap_index].y[2] };
 
 			if (check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C) && !((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f)) {
-				Kill_Player(&player, Burn, &deaths);
+				Kill_Player(&player, Burn, &deaths, &buffstate);
 			}
 			break;
 		}
@@ -180,7 +180,7 @@ void hazard_update() {
 						player.movey = 0;
 						if ((player.y + player.height + 30) >= traps[trap_index].y[1]) {
 							player.y = (traps[trap_index].y[1] - player.height - 15);
-							Kill_Player(&player, Crush, &deaths);
+							Kill_Player(&player, Crush, &deaths, &buffstate);
 						}
 					}
 
