@@ -230,11 +230,14 @@ void L4_Init(void)
 	icon_se_x = 700.0f;
 	icon_se_y = 500.0f;
 
+	// Options
 	FILE* OptionsFile = fopen("Assets/Options.txt", "r");
 	fscanf_s(OptionsFile, "%f %f", &current_bgm_vol, &current_se_vol);
-	printf("BGM Volume: %lf\nSE Volume: %lf\n", current_bgm_vol, current_se_vol);
-	printf("---------------------------------------------------------------\n");
 	fclose(OptionsFile);
+
+	reset_init		= L4_Init;
+	reset_update	= L4_Update;
+	reset_exit		= L4_Exit;
 
 	// Corner drawing
 	CP_Settings_RectMode(CP_POSITION_CORNER);

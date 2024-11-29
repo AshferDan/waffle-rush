@@ -249,7 +249,6 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 	if (!wasSliding) {
 		walldir = 0;
 	}
-	printf("walldir %d\n", walldir);
 	if (CP_Input_KeyTriggered(KEY_SPACE) && movestate == OnPlat) {
 		if (((player->onplatform == 0) && player->state == Sliding && player->walljump == 1)) {
 			player->walljump = 0;
@@ -761,7 +760,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		player->direction = OnRight;
 
 		// initialize deaths
-		deaths = 0;
+		*deaths = 0;
 	}
 
 	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths, int *buffstate) {

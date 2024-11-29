@@ -299,7 +299,7 @@ void PauseMenu() {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 		CP_Graphics_DrawRect(600, 2 * height / 3, 300, 120);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
-			printf("Reset clicked uwu\n");
+			CP_Engine_SetNextGameStateForced(reset_init, reset_update, reset_exit);
 		}
 	}
 

@@ -230,11 +230,14 @@ void L5_Init(void)
 	icon_se_x = 700.0f;
 	icon_se_y = 500.0f;
 
+	// Options
 	FILE* OptionsFile = fopen("Assets/Options.txt", "r");
 	fscanf_s(OptionsFile, "%f %f", &current_bgm_vol, &current_se_vol);
-	printf("BGM Volume: %lf\nSE Volume: %lf\n", current_bgm_vol, current_se_vol);
-	printf("---------------------------------------------------------------\n");
 	fclose(OptionsFile);
+
+	reset_init		= L5_Init;
+	reset_update	= L5_Update;
+	reset_exit		= L5_Exit;
 
 	// Corner drawing
 	CP_Settings_RectMode(CP_POSITION_CORNER);
@@ -277,8 +280,6 @@ void L5_Update(void)
 	// get mouse coords
 	mouseX = CP_Input_GetMouseX();
 	mouseY = CP_Input_GetMouseY();
-
-	printf("world x: %f | world y: %f\n", mouseX + camera.worldshiftx, mouseY + camera.worldshifty);
 
 	// pause/resume game with Esc
 	if (CP_Input_KeyTriggered(KEY_ESCAPE) && levelstate == NotPaused) {

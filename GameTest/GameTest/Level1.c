@@ -231,9 +231,14 @@ void L1_Init(void)
 	icon_se_x = 700.0f;
 	icon_se_y = 500.0f;
 
+	// Options
 	FILE* OptionsFile = fopen("Assets/Options.txt", "r");
 	fscanf_s(OptionsFile, "%f %f", &current_bgm_vol, &current_se_vol);
 	fclose(OptionsFile);
+
+	reset_init		= L1_Init;
+	reset_update	= L1_Update;
+	reset_exit		= L1_Exit;
 
 	// Corner drawing
 	CP_Settings_RectMode(CP_POSITION_CORNER);
