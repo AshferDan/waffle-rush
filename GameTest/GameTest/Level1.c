@@ -73,8 +73,8 @@ void L1_Init(void)
 	// initialize powerups location
 	buffstate = 0b000;
 	Buff[jumpBuff].canPickup = 1; //if active,
-	Buff[jumpBuff].X = 500; //draw
-	Buff[jumpBuff].Y = 575; //draw
+	Buff[jumpBuff].X = -500; //draw
+	Buff[jumpBuff].Y = -675; //draw
 	Buff[jumpBuff].width = 20; //draw
 	Buff[jumpBuff].height = 20; //draw
 	Buff[jumpBuff].buffduration = 0; //seconds?
@@ -84,8 +84,8 @@ void L1_Init(void)
 
 
 	Buff[invulBuff].canPickup = 1; //if active,
-	Buff[invulBuff].X = 750; //draw
-	Buff[invulBuff].Y = 575; //draw
+	Buff[invulBuff].X = -750; //draw
+	Buff[invulBuff].Y = -675; //draw
 	Buff[invulBuff].width = 20; //draw
 	Buff[invulBuff].height = 20; //draw
 	Buff[invulBuff].buffduration = 0; //seconds?
@@ -377,12 +377,85 @@ void L1_Update(void)
 				CauseOfDeath reset = (movestate == InPlat) ? Fall : Burn;
 				Kill_Player(&player, reset, &deaths);
 			}
-			if ((player.y >= 2500) && movestate == OnPlat && player.deathcause != Fall) {
+			if ((player.y >= 1800) && movestate == OnPlat && player.deathcause != Fall) {
 				Kill_Player(&player, Fall, &deaths);
 			}
 		}
 
 #pragma endregion
+
+
+		// Powerups
+		/*---------------------------------------------------------------------------------------------------*/
+#pragma region Powerups Update
+
+
+
+		//checking for collision between players and buff
+		//buff_pickup(Buff[jumpBuff].X+camera.worldshiftx, Buff[jumpBuff].Y+camera.worldshifty, Buff[jumpBuff].width, Buff[jumpBuff].height);
+		if (buff_pickup(Buff[jumpBuff].X, Buff[jumpBuff].Y, Buff[jumpBuff].height, Buff[jumpBuff].width) && Buff[jumpBuff].canPickup == 1) {
+			buffstate = buffstate | jumpBuff;
+			Buff[jumpBuff].canPickup = 0; //availability of the buff on the map
+			Buff[jumpBuff].buffduration = 3;  //this resets the duration so that you can pick up the same buff while its still active
+
+		}
+		if (buff_pickup(Buff[invulBuff].X, Buff[invulBuff].Y, Buff[invulBuff].height, Buff[invulBuff].width) && Buff[invulBuff].canPickup == 1) {
+			buffstate = buffstate | invulBuff;
+			Buff[invulBuff].canPickup = 0; //availability of the buff on the map
+			Buff[invulBuff].buffduration = 3;  //this resets the duration so that you can pick up the same buff while its still active
+		}
+
+		//Reset the spawn of the buffs
+		if (Buff[jumpBuff].canPickup == 0 && Buff[jumpBuff].resetTimer > 0) {
+			Buff[jumpBuff].resetTimer -= 1 * dt;
+			//printf("jump reset timer: %f\n", Buff[jumpBuff].resetTimer);
+			if (Buff[jumpBuff].resetTimer <= 0) {
+				Buff[jumpBuff].canPickup = 1;
+				Buff[jumpBuff].resetTimer = 3;
+			}
+		}
+		if (Buff[invulBuff].canPickup == 0 && Buff[invulBuff].resetTimer > 0) {
+			Buff[invulBuff].resetTimer -= 1 * dt;
+			//printf("invul reset timer: %f\n", Buff[invulBuff].resetTimer);
+			if (Buff[invulBuff].resetTimer <= 0) {
+				Buff[invulBuff].canPickup = 1;
+				Buff[invulBuff].resetTimer = 3;
+			}
+		}
+
+		//Set the stats for jumpboost below the first if statement
+
+		jumpalpha = 50;
+		if ((buffstate & 0b010) && Buff[jumpBuff].buffduration > 0.00f) { //here jumpbuff is active
+			Buff[jumpBuff].buffduration -= 1 * dt;
+			jumpalpha = 255;
+			printf("JUMP BUFF ACTIVE!\n");
+			//printf("buff: %d\n", buffstate); 
+			//printf("jump increase duration: %f\n", Buff[jumpBuff].buffduration);
+		}
+		else if ((buffstate & 0b010) && Buff[jumpBuff].buffduration <= 0.00f) {
+			buffstate &= ~0b010;
+			Buff[jumpBuff].buffduration = 3; //maybe can functionise these two to reset
+		}
+
+
+		//Set the stats for invulnerability below the first if statement
+
+		shieldalpha = 50;
+		if ((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f) { //here invulbuff is active
+			Buff[invulBuff].buffduration -= 1 * dt;
+			shieldalpha = 255;
+			printf("INVUL BUFF ACTIVE!\n");
+			//printf("buff: %d\n", buffstate);
+			//printf("invul duration: %f\n", Buff[invulBuff].buffduration);
+		}
+		else if ((buffstate & 0b100) && Buff[invulBuff].buffduration <= 0.00f) {
+			buffstate &= ~0b100;
+			Buff[invulBuff].buffduration = 3; //maybe can functionise these two to reset
+		}
+
+#pragma endregion
+
 	// Hazard
 	/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
@@ -405,7 +478,8 @@ void L1_Update(void)
 			if (bullets[i].active) {
 				bullets[i].x -= BULLET_SPEED * CP_System_GetDt();     // Move square left
 				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, bullets[i].x, bullets[i].y, BULLET_SIZE, BULLET_SIZE)) {
-					Kill_Player(&player, Burn, &deaths);
+					CauseOfDeath pewpew = (movestate == OnPlat) ? Burn : Fall;
+					Kill_Player(&player, pewpew, &deaths);
 				}
 				if (bullets[i].x + BULLET_SIZE < 1400 + BULLET_SIZE) {   // Deactivate square if off-screen
 					bullets[i].active = false;

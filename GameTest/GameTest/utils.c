@@ -342,7 +342,11 @@ void RENDER_ALL() {
 				CP_Image_DrawSubImage(spawn_sprite, checkpoint.coordinates[checkpoint_index].x - 50.0f - camera.worldshiftx, checkpoint.coordinates[checkpoint_index].y - 100 - camera.worldshifty, 100, 100, spawn_sprite_x, 0, spawn_sprite_x + 64, 64, 255);
 			}
 		}
-	
+
+		// HAZARD DRAWING
+
+		Draw_Hazards();
+
 	// Buffs
 	Draw_Buffs();
 
@@ -360,9 +364,6 @@ void RENDER_ALL() {
 		DrawStatBar(player.x - 15 - camera.worldshiftx, player.y - 30 - camera.worldshifty, player.x + 35 - camera.worldshiftx, player.y - 23 - camera.worldshifty, player.stamina, 100);
 	}
 
-	// HAZARD DRAWING
-
-	Draw_Hazards();
 
 	// Guide arrow that points to goal
 	Guide_Arrow();

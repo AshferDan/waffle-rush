@@ -74,7 +74,7 @@ void L3_Init(void)
 	buffstate = 0b000;
 	Buff[jumpBuff].canPickup = 1; //if active,
 	Buff[jumpBuff].X = 500; //draw
-	Buff[jumpBuff].Y = 575; //draw
+	Buff[jumpBuff].Y = -1400; //draw
 	Buff[jumpBuff].width = 20; //draw
 	Buff[jumpBuff].height = 20; //draw
 	Buff[jumpBuff].buffduration = 0; //seconds?
@@ -85,7 +85,7 @@ void L3_Init(void)
 
 	Buff[invulBuff].canPickup = 1; //if active,
 	Buff[invulBuff].X = 750; //draw
-	Buff[invulBuff].Y = 575; //draw
+	Buff[invulBuff].Y = -1400; //draw
 	Buff[invulBuff].width = 20; //draw
 	Buff[invulBuff].height = 20; //draw
 	Buff[invulBuff].buffduration = 0; //seconds?
@@ -478,7 +478,8 @@ void L3_Update(void)
 			if (bullets[i].active) {
 				bullets[i].x -= BULLET_SPEED * CP_System_GetDt();     // Move square left
 				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, bullets[i].x, bullets[i].y, BULLET_SIZE, BULLET_SIZE)) {
-					Kill_Player(&player, Burn, &deaths);
+					CauseOfDeath pewpew = (movestate == OnPlat) ? Burn : Fall;
+					Kill_Player(&player, pewpew, &deaths);
 				}
 				if (bullets[i].x + BULLET_SIZE < 400 + BULLET_SIZE) {   // Deactivate square if off-screen
 					bullets[i].active = false;

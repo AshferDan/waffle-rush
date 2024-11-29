@@ -84,8 +84,8 @@ void L2_Init(void)
 
 
 	Buff[invulBuff].canPickup = 1; //if active,
-	Buff[invulBuff].X = 750; //draw
-	Buff[invulBuff].Y = 575; //draw
+	Buff[invulBuff].X = 390; //draw
+	Buff[invulBuff].Y = 0; //draw
 	Buff[invulBuff].width = 20; //draw
 	Buff[invulBuff].height = 20; //draw
 	Buff[invulBuff].buffduration = 0; //seconds?
@@ -478,7 +478,8 @@ void L2_Update(void)
 			if (bullets[i].active) {
 				bullets[i].x -= BULLET_SPEED * CP_System_GetDt();     // Move square left
 				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, bullets[i].x, bullets[i].y, BULLET_SIZE, BULLET_SIZE)) {
-					Kill_Player(&player, Burn, &deaths);
+					CauseOfDeath pewpew = (movestate == OnPlat) ? Burn : Fall;
+					Kill_Player(&player, pewpew, &deaths);
 				}
 				if (bullets[i].x + BULLET_SIZE < 0) {   // Deactivate square if off-screen
 					bullets[i].active = false;

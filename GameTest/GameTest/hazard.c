@@ -147,7 +147,7 @@ void hazard_update() {
 			Point B = { traps[trap_index].x[1], traps[trap_index].y[1] };
 			Point C = { traps[trap_index].x[2], traps[trap_index].y[2] };
 
-			if (check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C)) {
+			if (check_square_triangle_collision(squareTopLeft, player.width, player.height, A, B, C) && !((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f)) {
 				Kill_Player(&player, Burn, &deaths);
 			}
 			break;
@@ -164,7 +164,7 @@ void hazard_update() {
 					crusherstate = 1;
 				}
 				// if the player hits the crusher at the bottom, add death and reset
-				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], traps[trap_index].y[0], traps[trap_index].x[1] - traps[trap_index].x[0], traps[trap_index].y[2] - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning)) {
+				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], traps[trap_index].y[0], traps[trap_index].x[1] - traps[trap_index].x[0], traps[trap_index].y[2] - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning) && !((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f)) {
 					if (crusher_direction(traps[trap_index], player) == 1) {
 						if (player.x >= ((traps[trap_index].x[1] + traps[trap_index].x[0]) / 2.f)) {
 							player.x = traps[trap_index].x[1];
@@ -194,7 +194,7 @@ void hazard_update() {
 					crusherstate = 0;
 				}
 				//if the player hits the crusher as it goes up, no death but cant go in
-				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], traps[trap_index].y[0], traps[trap_index].x[1] - traps[trap_index].x[0], traps[trap_index].y[2] - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning)) {
+				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], traps[trap_index].y[0], traps[trap_index].x[1] - traps[trap_index].x[0], traps[trap_index].y[2] - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning) && !((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f)) {
 					if (crusher_direction(traps[trap_index], player) == 1) {
 						if (player.x >= ((traps[trap_index].x[1] + traps[trap_index].x[0]) / 2.f)) {
 							player.x = traps[trap_index].x[1];

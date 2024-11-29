@@ -27,7 +27,7 @@ int buff_pickup(float x, float y, float height, float width) {
 	float playerRight = player.x + player.width;
 	float playerBase = player.y + player.height;
 	
-	if (playerRight > x && player.y < y+height && player.x < x + width && playerBase > y) {
+	if (playerRight > x-10.0f && player.y < y+height+10.0f && player.x < x+10.0f + width && playerBase > y-10.0f) {
 		return 1;
 	}
 	else

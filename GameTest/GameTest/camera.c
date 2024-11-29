@@ -40,21 +40,50 @@ void playerCamColl(Player *player, Camera* camera) {
 
 
 void CamShift(Camera* camera, float mouse_x, float mouse_y, float screen_width, float screen_height) {
+
+	int shifting = 0;
 	// left
-	if (IsAreaCornerClicked(0, 0, 0.1f * screen_width, screen_height, mouse_x, mouse_y) && camera->camshiftx > -screen_width*0.6f) {
-		camera->camshiftx -= 10;
+	if (IsAreaCornerClicked(0, 0, 0.1f * screen_width, screen_height, mouse_x, mouse_y)) {
+		if (camera->camshiftx > -screen_width * 0.6f) {
+			camera->camshiftx -= 10.0f;
+		}
+		shifting = 1;
 	}
 	// up
-	if (IsAreaCornerClicked(0, 0, screen_width, 0.1f * screen_height, mouse_x, mouse_y) && camera->camshifty > -screen_height*0.6f) {
-		camera->camshifty -= 10;
+	if (IsAreaCornerClicked(0, 0, screen_width, 0.1f * screen_height, mouse_x, mouse_y)) {
+		if (camera->camshifty > -screen_height * 0.6f) {
+			camera->camshifty -= 10.0f;
+		}
+		shifting = 1;
 	}
 	// right
-	if (IsAreaCornerClicked(0.9f * screen_width, 0, 0.1f * screen_width, screen_height, mouse_x, mouse_y) && camera->camshiftx < screen_width*0.6f) {
-		camera->camshiftx += 10;
+	if (IsAreaCornerClicked(0.9f * screen_width, 0, 0.1f * screen_width, screen_height, mouse_x, mouse_y)) {
+		if (camera->camshiftx < screen_width * 0.6f) {
+			camera->camshiftx += 10.0f;
+		}
+		shifting = 1;
 	}
 	// down
-	if (IsAreaCornerClicked(0, 0.9f * screen_height, screen_width, 0.1f * screen_height, mouse_x, mouse_y) && camera->camshifty < screen_height*0.6f) {
-		camera->camshifty += 10;
+	if (IsAreaCornerClicked(0, 0.9f * screen_height, screen_width, 0.1f * screen_height, mouse_x, mouse_y)) {
+		if (camera->camshifty < screen_height * 0.6f) {
+			camera->camshifty += 10.0f;
+		}
+		shifting = 1;
+	}
+
+	if (!shifting) {
+		if (camera->camshiftx > 20.0f) {
+			camera->camshiftx -= 5.0f;
+		}
+		else if (camera->camshiftx < -20.0f) {
+			camera->camshiftx += 5.0f;
+		}
+		if (camera->camshifty > 20.0f) {
+			camera->camshifty -= 5.0f;
+		}
+		else if (camera->camshifty < -20.0f) {
+			camera->camshifty += 5.0f;
+		}
 	}
 
 	if (CP_Input_KeyTriggered(KEY_R)) {

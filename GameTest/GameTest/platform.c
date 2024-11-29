@@ -1002,7 +1002,7 @@ void Draw_Player(Player player, MoveState movestate) {
 
 		case Crush: 
 			death_sprite = crush_sprite;
-			sprite_x = ((int)player.death_time < 3) ? (float)((int)player.death_time * 18.0f) : 54.0f;
+			sprite_x = ((int)player.death_time < 2) ? (float)((int)player.death_time * 36.0f) : 54.0f;
 			sprite_y = (player.direction == OnLeft) ? 36.0f : 0.0f;
 			break;
 		
