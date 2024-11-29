@@ -479,7 +479,7 @@ void L1_Update(void)
 				bullets[i].x -= BULLET_SPEED * CP_System_GetDt();     // Move square left
 				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, bullets[i].x, bullets[i].y, BULLET_SIZE, BULLET_SIZE)) {
 					CauseOfDeath pewpew = (movestate == OnPlat) ? Burn : Fall;
-					Kill_Player(&player, pewpew, &deaths);
+					Kill_Player(&player, pewpew, &deaths, &buffstate);
 				}
 				if (bullets[i].x + BULLET_SIZE < 1400 + BULLET_SIZE) {   // Deactivate square if off-screen
 					bullets[i].active = false;
