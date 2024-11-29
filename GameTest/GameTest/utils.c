@@ -220,6 +220,15 @@ void Free_Images() {
 	CP_Image_Free(&fire_sprite);
 }
 
+void AudioPitch() {
+	if (levelstate == Paused || levelstate == Cleared) {
+		CP_Sound_SetGroupPitch(CP_SOUND_GROUP_0, 0.85);
+	}
+	else
+	{
+		CP_Sound_SetGroupPitch(CP_SOUND_GROUP_0, 1);
+	}
+}
 
 // LEVEL TRANSITION EFFECTS
 void Level_Transition(FunctionPtr level_init, FunctionPtr level_update, FunctionPtr level_exit) {

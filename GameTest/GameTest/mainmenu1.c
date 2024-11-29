@@ -224,8 +224,8 @@ void LSelect_Update(void)
 	//printf("camshiftx %f | camshifty %f | worldx %f | worldy %f\n", camera.camshiftx, camera.camshifty, camera.worldshiftx, camera.worldshifty);
 	// background
 	CP_Graphics_ClearBackground(bg);
-
 	// set volumes
+
 	CP_Sound_SetGroupVolume(CP_SOUND_GROUP_0, current_bgm_vol / 100.0f);
 
 	// getdt
@@ -386,8 +386,6 @@ void LSelect_Update(void)
 	CP_Font_DrawText("Level 5", level5.posx + level5.width / 2.0f - camera.worldshiftx, level5.height * 5.0f - camera.worldshifty);
 
 
-
-
 	// Text transition (when player is touching the platform before entering each level)
 	// display stats when standing on each level platform
 	char highScore[20] = { 0 };
@@ -515,6 +513,31 @@ void LSelect_Update(void)
 
 	CP_Settings_Stroke(black);
 
+	//Guide for InPlat
+#pragma region InPlatGuide
+	if (player.y + 15 > Tutorial.posy) {
+		float goalpointspritex = (player.anim < 10.0f) ? 0.0f : 32.0f;
+		float goalpointspritey = 96.0f;
+		if (player.x >= Tutorial.posx && player.x <= Tutorial.posx + Tutorial.width) {
+			CP_Image_DrawSubImage(goal_pointer, Tutorial.posx + Tutorial.width / 4 - camera.worldshiftx, Tutorial.posy - camera.worldshifty + Tutorial.height + 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 190);
+		}
+		if (player.x >= level1.posx && player.x <= level1.posx + level1.width) {
+			CP_Image_DrawSubImage(goal_pointer, level1.posx + level1.width / 4 - camera.worldshiftx, level1.posy - camera.worldshifty + level1.height + 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 190);
+		}
+		if (player.x >= level2.posx && player.x <= level2.posx + level2.width) {
+			CP_Image_DrawSubImage(goal_pointer, level2.posx + level2.width / 4 - camera.worldshiftx, level2.posy - camera.worldshifty + level2.height + 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 190);
+		}
+		if (player.x >= level3.posx && player.x <= level3.posx + level3.width) {
+			CP_Image_DrawSubImage(goal_pointer, level3.posx + level3.width / 4 - camera.worldshiftx, level3.posy - camera.worldshifty + level3.height + 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 190);
+		}
+		if (player.x >= level4.posx && player.x <= level4.posx + level4.width) {
+			CP_Image_DrawSubImage(goal_pointer, level4.posx + level4.width / 4 - camera.worldshiftx, level4.posy - camera.worldshifty + level4.height + 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 190);
+		}
+		if (player.x >= level5.posx && player.x <= level5.posx + level5.width) {
+			CP_Image_DrawSubImage(goal_pointer, level5.posx + level5.width / 4 - camera.worldshiftx, level5.posy - camera.worldshifty + level5.height + 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 190);
+		}
+	}
+#pragma endregion
 
 
 	// Checkpoint

@@ -266,6 +266,7 @@ void L4_Update(void)
 	CP_Graphics_ClearBackground(bg);
 
 	// set volumes
+	AudioPitch();
 	CP_Sound_SetGroupVolume(CP_SOUND_GROUP_0, current_bgm_vol / 100.0f);
 	CP_Sound_SetGroupVolume(CP_SOUND_GROUP_1, current_se_vol / 100.0f);
 
