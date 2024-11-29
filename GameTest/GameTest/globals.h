@@ -344,7 +344,7 @@
 
 		CP_Image buff_sprite, buff_bg;
 
-		float jumpyalpha,jumpalpha, shieldalpha, jumpstatalpha, shieldstatalpha;
+		float jumpalpha, shieldalpha, jumpstatalpha, shieldstatalpha;
 	#pragma endregion VARIABLES
 	/*---------------------------------------------------------------------------------------------------------*/
 	

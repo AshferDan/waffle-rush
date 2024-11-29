@@ -82,17 +82,6 @@ void L2_Init(void)
 	Buff[jumpBuff].resetTimer = 3;
 	jumpalpha = 50;
 
-
-	Buff[JUMPYBuff].canPickup = 1; //if active,
-	Buff[JUMPYBuff].X = 300; //draw
-	Buff[JUMPYBuff].Y = 600; //draw
-	Buff[JUMPYBuff].width = 20; //draw
-	Buff[JUMPYBuff].height = 20; //draw
-	Buff[JUMPYBuff].buffduration = 0; //seconds?
-	Buff[JUMPYBuff].jumpIncrease = 800;
-	Buff[JUMPYBuff].resetTimer = 3;
-
-
 	Buff[invulBuff].canPickup = 1; //if active,
 	Buff[invulBuff].X = 390; //draw
 	Buff[invulBuff].Y = 0; //draw
@@ -414,12 +403,7 @@ void L2_Update(void)
 			Buff[invulBuff].canPickup = 0; //availability of the buff on the map
 			Buff[invulBuff].buffduration = 3;  //this resets the duration so that you can pick up the same buff while its still active
 		}
-		if (buff_pickup(Buff[JUMPYBuff].X, Buff[JUMPYBuff].Y, Buff[JUMPYBuff].height, Buff[JUMPYBuff].width) && Buff[JUMPYBuff].canPickup == 1) {
-			buffstate = buffstate | JUMPYBuff;
-			Buff[JUMPYBuff].canPickup = 0; //availability of the buff on the map
-			Buff[JUMPYBuff].buffduration = 3;  //this resets the duration so that you can pick up the same buff while its still active
 
-		}
 
 
 		//Reset the spawn of the buffs
@@ -431,14 +415,7 @@ void L2_Update(void)
 				Buff[jumpBuff].resetTimer = 3;
 			}
 		}
-		if (Buff[JUMPYBuff].canPickup == 0 && Buff[JUMPYBuff].resetTimer > 0) {
-			Buff[JUMPYBuff].resetTimer -= 1 * dt;
-			//printf("jump reset timer: %f\n", Buff[JUMPYBuff].resetTimer);
-			if (Buff[JUMPYBuff].resetTimer <= 0) {
-				Buff[JUMPYBuff].canPickup = 1;
-				Buff[JUMPYBuff].resetTimer = 3;
-			}
-		}
+
 
 
 
@@ -466,18 +443,6 @@ void L2_Update(void)
 			Buff[jumpBuff].buffduration = 3; //maybe can functionise these two to reset
 		}
 
-		jumpyalpha = 50;
-		if ((buffstate & 0b001) && Buff[JUMPYBuff].buffduration > 0.00f) { //here jumpbuff is active Buff[JUMPYBuff].buffduration > 0.00f
-			Buff[JUMPYBuff].buffduration -= 1 * dt;
-			jumpyalpha = 255;
-			printf("JUMP BUFF ACTIVE!\n");
-			//printf("buff: %d\n", buffstate); 
-			//printf("jump increase duration: %f\n", Buff[jumpBuff].buffduration);
-		}
-		else if ((buffstate & 0b001) && Buff[JUMPYBuff].buffduration <= 0.00f) {
-			buffstate &= ~0b001;
-			Buff[JUMPYBuff].buffduration = 3; //maybe can functionise these two to reset
-		}
 
 		//Set the stats for invulnerability below the first if statement
 

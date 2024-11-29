@@ -269,7 +269,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		}
 		if (player->onplatform) {
 			player->movey = -600;
-			if ((buffstate & jumpBuff) | (buffstate & JUMPYBuff)) {
+			if (buffstate & jumpBuff) {
 				player->movey -= Buff[jumpBuff].jumpIncrease;
 			}
 			else
