@@ -246,6 +246,10 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 			frameCounter++;
 		}
 	}
+	if (!wasSliding) {
+		walldir = 0;
+	}
+	printf("walldir %d\n", walldir);
 	if (CP_Input_KeyTriggered(KEY_SPACE) && movestate == OnPlat) {
 		if (((player->onplatform == 0) && player->state == Sliding && player->walljump == 1)) {
 			player->walljump = 0;
@@ -260,11 +264,11 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		else if (((player->onplatform == 0) && (wasSliding == true && frameCounter < coyotetime) && player->walljump == 1)) {
 			player->walljump = 0;
 			player->movey = -500;
-			if (player->direction == OnLeft) {
-				player->movex = -800;
-			}
-			else if (player->direction == OnRight) {
+			if (walldir == 1) {
 				player->movex = 800;
+			}
+			else if (walldir == 2) {
+				player->movex = -800;
 			}
 		}
 		if (player->onplatform) {
@@ -621,6 +625,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 				}
 				if (!(pply->onplatform) && pply->x == Platform[plat_index].onblocks[block_index].x2 && CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D))) {
 					pply->state = Sliding;
+					walldir = 1;
 					wasSliding = true;
 					frameCounter = 0;
 					if (pply->movey >= 400) {
@@ -630,6 +635,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 				}
 				else if (!(pply->onplatform) && pply->x + pply->width == Platform[plat_index].onblocks[block_index].x1 && CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A))) {
 					pply->state = Sliding;
+					walldir = 2;
 					wasSliding = true;
 					frameCounter = 0;
 					if (pply->movey >= 400) {
@@ -688,6 +694,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 					if (movestate == OnPlat) {
 						if (pply->x == walls[wall_index].x2 && CP_Input_KeyDown(KEY_A) && !(CP_Input_KeyDown(KEY_D))) {
 							pply->state = Sliding;
+							walldir = 1;
 							wasSliding = true;
 							frameCounter = 0;
 							if (pply->movey >= 400) {
@@ -697,6 +704,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 						}
 						else if (pply->x + pply->width == walls[wall_index].x1 && CP_Input_KeyDown(KEY_D) && !(CP_Input_KeyDown(KEY_A))) {
 							pply->state = Sliding;
+							walldir = 2;
 							wasSliding = true;
 							frameCounter = 0;
 							if (pply->movey >= 400) {
@@ -753,7 +761,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		player->direction = OnRight;
 
 		// initialize deaths
-		*deaths = 0;
+		deaths = 0;
 	}
 
 	void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths, int *buffstate) {

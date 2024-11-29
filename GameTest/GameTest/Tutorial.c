@@ -369,27 +369,27 @@ void Tutorial_Update(void)
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
 
-		spawnTimer += CP_System_GetDt();
-		if (spawnTimer >= spawnInterval) {
-			for (int i = 0; i < MAX_BULLETS; ++i) {
-				if (!bullets[i].active) {
-					bullets[i].x = bulletx; // Spawn at the defined starting point
-					bullets[i].y = bullety; // Align along the defined line
-					bullets[i].active = true;
-					break;
-				}
-			}
-			spawnTimer = 0.0f;
-		}
+		//spawnTimer += CP_System_GetDt();
+		//if (spawnTimer >= spawnInterval) {
+		//	for (int i = 0; i < MAX_BULLETS; ++i) {
+		//		if (!bullets[i].active) {
+		//			bullets[i].x = bulletx; // Spawn at the defined starting point
+		//			bullets[i].y = bullety; // Align along the defined line
+		//			bullets[i].active = true;
+		//			break;
+		//		}
+		//	}
+		//	spawnTimer = 0.0f;
+		//}
 
-		for (int i = 0; i < MAX_BULLETS; ++i) {
-			if (bullets[i].active) {
-				bullets[i].x -= BULLET_SPEED * CP_System_GetDt(); // Move square left
-				if (bullets[i].x + BULLET_SIZE < 0) {            // Deactivate square if off-screen
-					bullets[i].active = false;
-				}
-			}
-		}
+		//for (int i = 0; i < MAX_BULLETS; ++i) {
+		//	if (bullets[i].active) {
+		//		bullets[i].x -= BULLET_SPEED * CP_System_GetDt(); // Move square left
+		//		if (bullets[i].x + BULLET_SIZE < 0) {            // Deactivate square if off-screen
+		//			bullets[i].active = false;
+		//		}
+		//	}
+		//}
 
 		hazard_update();
 

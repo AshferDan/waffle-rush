@@ -73,8 +73,8 @@ void L1_Init(void)
 	// initialize powerups location
 	buffstate = 0b000;
 	Buff[jumpBuff].canPickup = 1; //if active,
-	Buff[jumpBuff].X = -500; //draw
-	Buff[jumpBuff].Y = -675; //draw
+	Buff[jumpBuff].X = 1400; //draw
+	Buff[jumpBuff].Y = 1325; //draw
 	Buff[jumpBuff].width = 20; //draw
 	Buff[jumpBuff].height = 20; //draw
 	Buff[jumpBuff].buffduration = 0; //seconds?
@@ -356,7 +356,7 @@ void L1_Update(void)
 			}
 
 			// Jump
-			jump(&player, movestate, Buff[jumpBuff].state);
+			jump(&player, movestate, buffstate);
 
 			// change movestate
 				/*
