@@ -519,11 +519,11 @@ void L5_Update(void)
 				CP_Settings_Fill(wall);
 				CP_Graphics_DrawRect(width / 2, height / 2, 1200, 700);
 				CP_Settings_Fill(black);
-				CP_Settings_TextSize(100);
+				CP_Settings_TextSize(70);
 				CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
 				CP_Font_DrawText("LEVEL COMPLETE", width / 2, 200);
 
-				CP_Settings_TextSize(50);
+				CP_Settings_TextSize(40);
 				CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
 
 				// Score labels (on the left side)
@@ -555,7 +555,7 @@ void L5_Update(void)
 				sprintf_s(score, 20, "%d", IncrementScore(0, levelScore, &timeElapsed, dt));
 				CP_Font_DrawText(score, 1200, 600);
 
-				CP_Settings_TextSize(50);
+				CP_Settings_TextSize(30);
 				// draw replay button
 				TextBoxCreate(800, 720, 250, 100, "REPLAY", red);
 				int ReplayClick = IsAreaClicked(800, 720, 250, 100, mouseX, mouseY); //if mouse is over button

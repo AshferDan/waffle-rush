@@ -378,7 +378,7 @@ void RENDER_ALL() {
 
 	// DEATHS DRAWING
 	CP_Settings_Fill(black);
-	CP_Settings_TextSize(50);
+	CP_Settings_TextSize(30);
 	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
 	CP_Image_Draw(skull, 50, 25, 50, 50, 255);
 	char deathcount[20] = { 0 };

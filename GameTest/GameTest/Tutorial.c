@@ -35,7 +35,7 @@ void Tutorial_Init(void)
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Assets
 	// load font
-	text				= CP_Font_Load("Assets/Exo2-Regular.ttf");
+	text				= CP_Font_Load("Assets/Better VCR 6.1.ttf");
 
 	// loads images (all original assets woooo lets goooo)
 	Load_Images();
@@ -412,7 +412,7 @@ void Tutorial_Update(void)
 #pragma region RENDER
 
 		// TOOLTIPS
-		CP_Settings_TextSize(25);
+		CP_Settings_TextSize(20);
 		CP_Settings_Fill(CP_Color_Create(50, 50, 50, 255));
 		CP_Font_DrawTextBox("Move your mouse to the edges of the screen to look around,\nR to reset the camera\n\nA and D keys to move left and right.\nSPACE to jump\n\nK to KILL the waffle", 50 - camera.worldshiftx, 50 - camera.worldshifty, 300);
 		CP_Font_DrawTextBox("E key to ENTER the side of syrup-covered platforms\n\nWASD to crawl around >:)\nNOTE: if you run out of stamina, you DIE", 650 - camera.worldshiftx, 250 - camera.worldshifty, 250);
@@ -432,7 +432,7 @@ void Tutorial_Update(void)
 			CP_Settings_Fill(wall);
 			CP_Graphics_DrawRect(width / 2, 2 * height / 5, 1200, 500);
 			CP_Settings_Fill(black);
-			CP_Settings_TextSize(100);
+			CP_Settings_TextSize(70);
 			CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
 			CP_Font_DrawText("TUTORIAL COMPLETE", width / 2, 200);
 
@@ -463,6 +463,7 @@ void Tutorial_Update(void)
 			}
 
 			CP_Settings_RectMode(CP_POSITION_CORNER);
+			CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
 		}
 	}
 

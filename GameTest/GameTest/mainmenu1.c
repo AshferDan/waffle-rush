@@ -31,7 +31,7 @@ void LSelect_Init(void)
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Assets
 	// load font
-	text				= CP_Font_Load("Assets/Exo2-Regular.ttf");
+	text				= CP_Font_Load("Assets/Better VCR 6.1.ttf");
 
 	// loads images (all original assets woooo lets goooo)
 	Load_Images();
@@ -360,15 +360,15 @@ void LSelect_Update(void)
 	CP_Settings_Fill(black);
 
 	//this will be replaced with an actual logo ideally
-	CP_Settings_TextSize(120);
+	CP_Settings_TextSize(100);
 	CP_Font_DrawText("WAFFLE RUSH WOOOOOOOO", -800.0f - camera.worldshiftx, 300.0f - camera.worldshifty);
 	CP_Font_DrawText("-->", -800.0f - camera.worldshiftx, 400.0f - camera.worldshifty);
 	CP_Settings_TextSize(50);
-	CP_Font_DrawText("WRONG WAY", -1750.0f - camera.worldshiftx, 800.0f - camera.worldshifty);
+	CP_Font_DrawText("WRONG WAY", -1750.0f - camera.worldshiftx, 1500.0f - camera.worldshifty);
 	CP_Settings_TextSize(30);
 	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
-	CP_Font_DrawText("INSTRUCTIONS:", -500.0f - camera.worldshiftx, 400.0f - camera.worldshifty);
-	CP_Font_DrawTextBox("WASD to move\nE to enter a level,\ncrawl all the way down to start!", -500.0f - camera.worldshiftx, 450.0f - camera.worldshifty, 500.0f);
+	CP_Font_DrawText("INSTRUCTIONS:", -600.0f - camera.worldshiftx, 400.0f - camera.worldshifty);
+	CP_Font_DrawTextBox("WASD to move\nE to enter a level,\ncrawl all the way down to start!", -600.0f - camera.worldshiftx, 450.0f - camera.worldshifty, 500.0f);
 
 	
 	float displaysprite_x = ((int)player.anim % 2 == 0) ? 36.0f : 54.0f;
@@ -376,7 +376,7 @@ void LSelect_Update(void)
 
 
 
-	CP_Settings_TextSize(70.0f);
+	CP_Settings_TextSize(50.0f);
 	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
 	CP_Font_DrawText("TUTORIAL", Tutorial.posx + Tutorial.width / 2.0f - camera.worldshiftx, Tutorial.height * 5.0f - camera.worldshifty);
 	CP_Font_DrawText("Level 1", level1.posx + level1.width / 2.0f - camera.worldshiftx, level1.height * 5.0f - camera.worldshifty);
@@ -568,11 +568,11 @@ void LSelect_Update(void)
 		CP_Settings_Fill(wall);
 		CP_Graphics_DrawRect(width / 2, height / 2, 1200, 600);
 		CP_Settings_Fill(black);
-		CP_Settings_TextSize(150);
+		CP_Settings_TextSize(100);
 		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
 		CP_Font_DrawText("PAUSED", width / 2, 300);
 
-		CP_Settings_TextSize(100);
+		CP_Settings_TextSize(70);
 		// draw resume button
 		TextBoxCreate(500, 2 * height / 3, 350, 200, "RESUME", red);
 		int ResumeClick = IsAreaClicked(500, 2 * height / 3, 350, 200, mouseX, mouseY); //if mouse is over button
