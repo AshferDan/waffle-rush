@@ -539,6 +539,7 @@
 	// Sound files
 	CP_Sound music;
 	CP_Sound sfx;
+	CP_Sound wafflemachine;
 #pragma endregion VARIABLES
 /*---------------------------------------------------------------------------------------------------------*/
 

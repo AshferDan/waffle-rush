@@ -22,11 +22,11 @@ void Tutorial_Init(void)
 	fclose(file);
 
 	// load music
-	music = CP_Sound_LoadMusic("Assets/TutorialMusic.wav");
+	music = CP_Sound_LoadMusic("Assets/Dumba.wav");
 	CP_Sound_PlayAdvanced(music, 1.0f, 1.0f, TRUE, CP_SOUND_GROUP_0);
 
 	// load sfx
-	sfx = CP_Sound_Load("Assets/PlayerSpawn.wav");
+	sfx = CP_Sound_Load("Assets/WaffleMachine.wav");
 	CP_Sound_PlayAdvanced(sfx, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 
 	CP_Sound_ResumeGroup(CP_SOUND_GROUP_1);
