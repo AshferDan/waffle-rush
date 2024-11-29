@@ -148,6 +148,11 @@ void L2_Init(void)
 	fscanf_s(HazardFile, "%d", &numberoftraps);
 	init_hazards(HazardFile, numberoftraps);
 	fclose(HazardFile);
+	spawnTimer = 0.0f;     // Timer to control spawning frequency
+	spawnInterval = 1.f;  // Spawn a square every 1 second
+	bulletx = 1050;
+	bullety = 1200;
+	firetimer = 0;
 
 #pragma endregion
 #pragma endregion
@@ -455,6 +460,7 @@ void L2_Update(void)
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
 
+		// SHOOTER LOGIC
 		spawnTimer += CP_System_GetDt();
 		if (spawnTimer >= spawnInterval) {
 			for (int i = 0; i < MAX_BULLETS; ++i) {
@@ -470,8 +476,11 @@ void L2_Update(void)
 
 		for (int i = 0; i < MAX_BULLETS; ++i) {
 			if (bullets[i].active) {
-				bullets[i].x -= BULLET_SPEED * CP_System_GetDt(); // Move square left
-				if (bullets[i].x + BULLET_SIZE < 0) {            // Deactivate square if off-screen
+				bullets[i].x -= BULLET_SPEED * CP_System_GetDt();     // Move square left
+				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, bullets[i].x, bullets[i].y, BULLET_SIZE, BULLET_SIZE)) {
+					Kill_Player(&player, Burn, &deaths);
+				}
+				if (bullets[i].x + BULLET_SIZE < 0) {   // Deactivate square if off-screen
 					bullets[i].active = false;
 				}
 			}
