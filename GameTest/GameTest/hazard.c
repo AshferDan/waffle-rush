@@ -224,7 +224,12 @@ void Draw_Hazards() {
 	CP_Settings_Fill(CP_Color_Create(255, 0, 0, 255)); // Red color
 	for (int i = 0; i < MAX_BULLETS; ++i) {
 		if (bullets[i].active) {
-			CP_Graphics_DrawRect(bullets[i].x - camera.worldshiftx, bullets[i].y - camera.worldshifty, BULLET_SIZE, BULLET_SIZE);
+			//CP_Graphics_DrawRect(bullets[i].x - camera.worldshiftx, bullets[i].y - camera.worldshifty, BULLET_SIZE, BULLET_SIZE);
+			float draw_posx = bullets[i].x - 5 - camera.worldshiftx;
+			float draw_posy = bullets[i].y - 25 - camera.worldshifty;
+			float displaysprite_x2 = ((int)player.anim % 3 == 0) ? 0.0f : 7.0f;
+			float displaysprite_x3 = ((int)player.anim % 3 == 0) ? 7.0f : 14.0f;
+			CP_Image_DrawSubImageAdvanced(effects, draw_posx, draw_posy + 20, player.width + 20, player.height + 5, displaysprite_x2, 11, displaysprite_x3, 16, 255, 0);
 		}
 	}
 

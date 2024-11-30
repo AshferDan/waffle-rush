@@ -67,6 +67,7 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 		// OnPlat movement
 		if (movestate == OnPlat) {
 			tempdirH = Null;
+			canWallJump = ply->walljump;
 			// Gravity and terminal velocity
 			if (ply->movey < 1000.0f && ply->onplatform == 0) {
 				ply->movey += 1800.0f * dt;
@@ -105,10 +106,6 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			}
 			else {
 				ply->movex = CP_Math_ClampFloat(ply->movex, -1.5f * speed, 1.5f * speed);
-				//draw sweat effect
-				float draw_posx = player.x - 20 - camera.worldshiftx;
-				float draw_posy = player.y - 30 - camera.worldshifty;
-				CP_Image_DrawSubImageAdvanced(effects, draw_posx, draw_posy, player.width + 30, player.height, 0, 0, 15, 5, 255, 0);
 			}
 			// anim state
 			if (tempdirH != Null) {
@@ -752,7 +749,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		// movement
 		player->movex = 0;
 		player->movey = 0;
-		player->walljump = 0;
+		player->walljump = 1;
 		// anim timers
 		player->transition_time = 15;
 		player->death_time = 17;
@@ -786,6 +783,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		player->y = spawn.y;
 		player->movex = 0;
 		player->movey = 0;
+		player->walljump = 1;
 		player->state = Spawning;
 		// Camera changes
 		camera->prespawnX = camera->limitleftx;
@@ -964,6 +962,13 @@ void Draw_Player(Player player, MoveState movestate) {
 			if ((buffstate & 0b010) && Buff[jumpBuff].buffduration > 0.00f) {
 				CP_Image_DrawSubImageAdvanced(boot_sprite, draw_posx, draw_posy, player.width + 30, player.height + 30, sprite_x + 1, sprite_y + 1, sprite_x + 17, sprite_y + 17, 180, rot);
 
+			}
+			if (canWallJump == 0) {
+				//draw sweat effect
+				float draw_posx = player.x - 20 - camera.worldshiftx;
+				float draw_posy = player.y - 30 - camera.worldshifty;
+				CP_Image_DrawSubImageAdvanced(effects, draw_posx, draw_posy + 20, player.width + 40, player.height, 0, 0, 15, 5, 255, 0);
+				CP_Image_DrawSubImageAdvanced(effects, draw_posx + 10, draw_posy - 20, player.width + 10, player.height, 0, 5, 5, 10, 255, 0);
 			}
 		}
 		else

@@ -419,4 +419,5 @@ void RENDER_ALL() {
 		CP_Settings_TextSize(50);
 	}
 	CP_Font_DrawText(time, 1250, 50);
+	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
 }

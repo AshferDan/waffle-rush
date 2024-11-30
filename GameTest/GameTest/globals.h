@@ -139,6 +139,7 @@
 		int frameCounter;  //counts frames between last touch of wall while sliding
 		int walldir;		// direction for coyote time walljump
 		bool wasSliding;  //checks is player was sliding
+		bool canWallJump;
 		int lastDir;  //saves last direction player was facing before wall jumping (for coyote time)
 		int coyotetime;
 		float timeElapsed;

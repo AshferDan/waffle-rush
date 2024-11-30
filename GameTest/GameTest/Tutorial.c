@@ -400,9 +400,11 @@ void Tutorial_Update(void)
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Camera
 
-		CamShift(&camera, mouseX, mouseY, width, height);
-		if (!(player.state == Dead)) {
-			playerCamColl(&player, &camera);
+		if (levelEnded == reset) {
+			CamShift(&camera, mouseX, mouseY, width, height);
+			if (!(player.state == Dead)) {
+				playerCamColl(&player, &camera);
+			}
 		}
 	}
 

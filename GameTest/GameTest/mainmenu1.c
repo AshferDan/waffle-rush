@@ -355,24 +355,37 @@ void LSelect_Update(void)
 	// RENDER
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region RENDER
-
+	
 	//Drawing Level Text
 	CP_Settings_Fill(black);
+	float goalpointspritex = (player.anim < 10.0f) ? 0.0f : 32.0f;
+	float goalpointspritey = 0.0f;
 
 	//this will be replaced with an actual logo ideally
 	CP_Settings_TextSize(100);
 	CP_Font_DrawText("WAFFLE RUSH WOOOOOOOO", -800.0f - camera.worldshiftx, 300.0f - camera.worldshifty);
-	CP_Font_DrawText("-->", -800.0f - camera.worldshiftx, 400.0f - camera.worldshifty);
+	//CP_Font_DrawText("-->", -800.0f - camera.worldshiftx, 400.0f - camera.worldshifty);
+	CP_Settings_ImageMode(CP_POSITION_CENTER);
+	CP_Image_DrawSubImage(goal_pointer, -800.0f - camera.worldshiftx, 400.0f - camera.worldshifty, 150, 150, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 255);
+	CP_Image_DrawSubImage(goal_pointer, -850.0f - camera.worldshiftx, 400.0f - camera.worldshifty, 125, 125, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 255);
+	CP_Image_DrawSubImage(goal_pointer, -900.0f - camera.worldshiftx, 400.0f - camera.worldshifty, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 255);
+	CP_Settings_ImageMode(CP_POSITION_CORNER);
 	CP_Settings_TextSize(50);
 	CP_Font_DrawText("WRONG WAY", -1750.0f - camera.worldshiftx, 1500.0f - camera.worldshifty);
 	CP_Settings_TextSize(30);
 	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
 	CP_Font_DrawText("INSTRUCTIONS:", -600.0f - camera.worldshiftx, 400.0f - camera.worldshifty);
 	CP_Font_DrawTextBox("WASD to move\nE to enter a level,\ncrawl all the way down to start!", -600.0f - camera.worldshiftx, 450.0f - camera.worldshifty, 500.0f);
+	CP_Settings_Fill(green);
+	CP_Font_DrawTextBox("WASD", -601.0f - camera.worldshiftx, 449.0f - camera.worldshifty, 500.0f);
+	CP_Settings_Fill(black);
 
 	
 	float displaysprite_x = ((int)player.anim % 2 == 0) ? 36.0f : 54.0f;
-	CP_Image_DrawSubImage(player_sprite, 20.0f - camera.worldshiftx, 300.0f - camera.worldshifty, 100.0f, 100.0f, displaysprite_x, 18.0f, displaysprite_x+18.0f, 36.0f, 255);
+	CP_Image_DrawSubImage(player_sprite, -15.0f - camera.worldshiftx, 250.0f - camera.worldshifty, 100.0f, 100.0f, displaysprite_x, 18.0f, displaysprite_x+18.0f, 36.0f, 255);
+	CP_Image_DrawSubImage(player_sprite, -320.0f - camera.worldshiftx, 435.0f - camera.worldshifty, 30.0f, 30.0f, displaysprite_x, 18.0f, displaysprite_x + 18.0f, 36.0f, 255);
+	CP_Image_DrawSubImage(player_sprite, -610.0f - camera.worldshiftx, 435.0f - camera.worldshifty, -30.0f, 30.0f, displaysprite_x, 18.0f, displaysprite_x + 18.0f, 36.0f, 255);
+	CP_Image_DrawSubImageAdvanced(player_sprite, -1500.0f - camera.worldshiftx, 1000.0f - camera.worldshifty, 30.0f, 30.0f, displaysprite_x, 18.0f, displaysprite_x + 18.0f, 36.0f, 255, 180);
 
 
 
@@ -516,25 +529,25 @@ void LSelect_Update(void)
 	//Guide for InPlat
 #pragma region InPlatGuide
 	if (player.y + 15 > Tutorial.posy) {
-		float goalpointspritex = (player.anim < 10.0f) ? 0.0f : 32.0f;
-		float goalpointspritey = 96.0f;
+		float goalpointspritex1 = (player.anim < 10.0f) ? 0.0f : 32.0f;
+		float goalpointspritey1 = 96.0f;
 		if (player.x >= Tutorial.posx && player.x <= Tutorial.posx + Tutorial.width) {
-			CP_Image_DrawSubImage(goal_pointer, Tutorial.posx + Tutorial.width / 4 - camera.worldshiftx, Tutorial.posy - camera.worldshifty + Tutorial.height + 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 190);
+			CP_Image_DrawSubImage(goal_pointer, Tutorial.posx + Tutorial.width / 4 - camera.worldshiftx, Tutorial.posy - camera.worldshifty + Tutorial.height + 50, 100, 100, goalpointspritex1, goalpointspritey1, goalpointspritex1 + 32, goalpointspritey1 + 32, 190);
 		}
 		if (player.x >= level1.posx && player.x <= level1.posx + level1.width) {
-			CP_Image_DrawSubImage(goal_pointer, level1.posx + level1.width / 4 - camera.worldshiftx, level1.posy - camera.worldshifty + level1.height + 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 190);
+			CP_Image_DrawSubImage(goal_pointer, level1.posx + level1.width / 4 - camera.worldshiftx, level1.posy - camera.worldshifty + level1.height + 50, 100, 100, goalpointspritex1, goalpointspritey1, goalpointspritex1 + 32, goalpointspritey1 + 32, 190);
 		}
 		if (player.x >= level2.posx && player.x <= level2.posx + level2.width) {
-			CP_Image_DrawSubImage(goal_pointer, level2.posx + level2.width / 4 - camera.worldshiftx, level2.posy - camera.worldshifty + level2.height + 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 190);
+			CP_Image_DrawSubImage(goal_pointer, level2.posx + level2.width / 4 - camera.worldshiftx, level2.posy - camera.worldshifty + level2.height + 50, 100, 100, goalpointspritex1, goalpointspritey1, goalpointspritex1 + 32, goalpointspritey1 + 32, 190);
 		}
 		if (player.x >= level3.posx && player.x <= level3.posx + level3.width) {
-			CP_Image_DrawSubImage(goal_pointer, level3.posx + level3.width / 4 - camera.worldshiftx, level3.posy - camera.worldshifty + level3.height + 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 190);
+			CP_Image_DrawSubImage(goal_pointer, level3.posx + level3.width / 4 - camera.worldshiftx, level3.posy - camera.worldshifty + level3.height + 50, 100, 100, goalpointspritex1, goalpointspritey1, goalpointspritex1 + 32, goalpointspritey1 + 32, 190);
 		}
 		if (player.x >= level4.posx && player.x <= level4.posx + level4.width) {
-			CP_Image_DrawSubImage(goal_pointer, level4.posx + level4.width / 4 - camera.worldshiftx, level4.posy - camera.worldshifty + level4.height + 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 190);
+			CP_Image_DrawSubImage(goal_pointer, level4.posx + level4.width / 4 - camera.worldshiftx, level4.posy - camera.worldshifty + level4.height + 50, 100, 100, goalpointspritex1, goalpointspritey1, goalpointspritex1 + 32, goalpointspritey1 + 32, 190);
 		}
 		if (player.x >= level5.posx && player.x <= level5.posx + level5.width) {
-			CP_Image_DrawSubImage(goal_pointer, level5.posx + level5.width / 4 - camera.worldshiftx, level5.posy - camera.worldshifty + level5.height + 50, 100, 100, goalpointspritex, goalpointspritey, goalpointspritex + 32, goalpointspritey + 32, 190);
+			CP_Image_DrawSubImage(goal_pointer, level5.posx + level5.width / 4 - camera.worldshiftx, level5.posy - camera.worldshifty + level5.height + 50, 100, 100, goalpointspritex1, goalpointspritey1, goalpointspritex1 + 32, goalpointspritey1 + 32, 190);
 		}
 	}
 #pragma endregion
