@@ -28,6 +28,7 @@ void Tutorial_Init(void)
 	// load sfx
 	sfx = CP_Sound_Load("Assets/WaffleMachine.wav");
 	CP_Sound_PlayAdvanced(sfx, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
+	jumpsound = CP_Sound_Load("Assets/jump.wav");
 
 	CP_Sound_ResumeGroup(CP_SOUND_GROUP_1);
 
@@ -335,7 +336,7 @@ void Tutorial_Update(void)
 			}
 
 			// Jump
-			jump(&player, movestate, Buff[jumpBuff].state);
+			jump(&player, movestate, Buff[jumpBuff].state, &jumpsound);
 
 			// window clamps (eventually World Clamps)
 			/*player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);

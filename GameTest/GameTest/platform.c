@@ -237,9 +237,9 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	}
 }
 
-void jump(Player* player, MoveState movestate, int buffstate) {
+void jump(Player* player, MoveState movestate, int buffstate, CP_Sound *jumpsound) {
 
-
+	CP_Sound_LoadMusic("Assets/jump.wav");
 	if (!(player->onplatform) && frameCounter < coyotetime) {
 		//pply.state = Jumping;
 		if (wasSliding) {
@@ -250,7 +250,8 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 		walldir = 0;
 	}
 	if (CP_Input_KeyTriggered(KEY_SPACE) && movestate == OnPlat) {
-		if (((player->onplatform == 0) && player->state == Sliding && player->walljump == 1)) {
+		if (((player->onplatform == 0) && player->state == Sliding && player->walljump == 1)) {	
+			CP_Sound_PlayAdvanced(*jumpsound, 0.2f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			player->walljump = 0;
 			player->movey = -500;
 			if (player->direction == OnLeft) {
@@ -260,6 +261,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 				player->movex = -800;
 			}
 		}
+
 		else if (((player->onplatform == 0) && (wasSliding == true && frameCounter < coyotetime) && player->walljump == 1)) {
 			player->walljump = 0;
 			player->movey = -500;
@@ -271,6 +273,7 @@ void jump(Player* player, MoveState movestate, int buffstate) {
 			}
 		}
 		if (player->onplatform) {
+			CP_Sound_PlayAdvanced(*jumpsound, 0.2f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			player->movey = -600;
 			if (buffstate & jumpBuff) {
 				player->movey -= Buff[jumpBuff].jumpIncrease;

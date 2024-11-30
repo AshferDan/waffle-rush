@@ -535,6 +535,10 @@
 	CP_Sound music;
 	CP_Sound sfx;
 	CP_Sound wafflemachine;
+	CP_Sound jumpsound;
+	CP_Sound buttonclick;
+	CP_Sound LevelLoadsound;
+	CP_Sound clink;
 
 	// Reset pointers
 	FunctionPtr reset_init, reset_update, reset_exit;
@@ -590,7 +594,7 @@
 			// platformer and in platform movements
 			void movement(Player* p, MoveState movestate, float speed, float dt);
 			// jump >:)
-			void jump(Player* player, MoveState movestate, int buffstate);
+			void jump(Player* player, MoveState movestate, int buffstate, CP_Sound *jumpsound);
 #pragma endregion Movement and movestate
 
 		// - PLAYER

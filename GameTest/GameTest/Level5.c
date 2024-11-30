@@ -25,6 +25,8 @@ void L5_Init(void)
 	// load music
 	music = CP_Sound_LoadMusic("Assets/retrostuff.wav");
 	CP_Sound_PlayAdvanced(music, 1.0f, 1.0f, TRUE, CP_SOUND_GROUP_0);
+	jumpsound = CP_Sound_LoadMusic("Assets/jump.wav");
+
 
 	// load sfx
 	sfx = CP_Sound_Load("Assets/WaffleMachine.wav");
@@ -359,7 +361,7 @@ void L5_Update(void)
 			}
 
 			// Jump
-			jump(&player, movestate, buffstate);
+			jump(&player, movestate, buffstate, &jumpsound);
 
 
 			// change movestate
@@ -609,7 +611,7 @@ void L5_Exit(void)
 {
 	// Frees images :D say no to memory leak
 	Free_Images();
-
+	CP_Sound_Free(&jumpsound);
 	CP_Sound_Free(&music);
 	CP_Sound_Free(&sfx);
 }
