@@ -718,11 +718,11 @@
 
 		// Updates:
 		/*-------------------------------------------------------------------------------------------------*/
-			bool is_point_in_square(Point p, Point squareTopLeft, float width, float height);
+			/*bool is_point_in_square(Point p, Point squareTopLeft, float width, float height);
 			int orientation(Point a, Point b, Point c);
 			bool lines_intersect(Point p1, Point q1, Point p2, Point q2);
 			bool check_square_triangle_collision(Point squareTopLeft, float width, float height,
-				Point A, Point B, Point C);
+				Point A, Point B, Point C);*/
 
 			int crusher_direction(hazard crusher, Player p);
 
