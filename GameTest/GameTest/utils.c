@@ -226,11 +226,11 @@ void Free_Images() {
 
 void AudioPitch() {
 	if (levelstate == Paused || levelstate == Cleared) {
-		CP_Sound_SetGroupPitch(CP_SOUND_GROUP_0, 0.85);
+		CP_Sound_SetGroupPitch(CP_SOUND_GROUP_0, 0.85f);
 	}
 	else
 	{
-		CP_Sound_SetGroupPitch(CP_SOUND_GROUP_0, 1);
+		CP_Sound_SetGroupPitch(CP_SOUND_GROUP_0, 1.0f);
 	}
 }
 
@@ -407,7 +407,7 @@ void RENDER_ALL() {
 
 	// TIMER DRAWING
 	char time[16] = { 0 };
-	int textsize = 55;
+	float textsize = 55.0f;
 	CP_Settings_TextAlignment(CP_TEXT_ALIGN_V_MIDDLE, CP_TEXT_ALIGN_V_MIDDLE);
 	sprintf_s(time, 16, "%02d:%02d:%02d", (int)timer.minutes, (int)timer.seconds, (int)timer.millis);
 	if ((int)timer.millis > 95) {

@@ -602,7 +602,7 @@
 #pragma region 
 		// Player States
 			void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths, int *buffstate);
-			void Spawn_Player(Player* player, coords spawn, Camera* camera);
+			void Spawn_Player(Player* player, coords spawn, Camera* camera, CP_Sound machinesound);
 			void Reset_Player(Player* player, MoveState* movestate);
 			void Transition_Player(Player* player, MoveState* movestate);
 

@@ -794,7 +794,7 @@ void jump(Player* player, MoveState movestate, int buffstate, CP_Sound *jumpsoun
 		camera->prespawnY = camera->limittop;
 		camera->respawnX = spawn.x - camera->width / 2;
 		camera->respawnY = spawn.y - 3 * camera->height / 4;
-		CP_Sound_Free(machinesound);
+		CP_Sound_Free(&machinesound);
 	}
 
 	void Reset_Player(Player* player, MoveState* movestate) {

@@ -50,8 +50,8 @@ void Main_Menu_Init(void)
 void Main_Menu_Update(void)
 {
 	//assign window width and height
-	int width = CP_System_GetWindowWidth();
-	int height = CP_System_GetWindowHeight();
+	float width = (float)CP_System_GetWindowWidth();
+	float height = (float)CP_System_GetWindowHeight();
 
 	//track pointer
 	mouseX = CP_Input_GetMouseX();
@@ -103,13 +103,13 @@ void Main_Menu_Update(void)
 
 	if (inStart == 1) {
 		CP_Graphics_ClearBackground(CP_Color_Create(0, 0, 0, 255));
-		CP_Image_Draw(logo, width / 2, height / 2, CP_Image_GetWidth(logo), CP_Image_GetHeight(logo), logo_alpha);
+		CP_Image_Draw(logo, width / 2.0f, height / 2.0f, (float)CP_Image_GetWidth(logo), (float)CP_Image_GetHeight(logo), (int)logo_alpha);
 
-		CP_Settings_Fill(CP_Color_Create(255, 255, 255, logo_alpha));
+		CP_Settings_Fill(CP_Color_Create(255, 255, 255, (int)logo_alpha));
 		CP_Settings_TextSize(20);
 		CP_Font_DrawText("All content \xC2\xA9 2024 DigiPen Institute of Technology Singapore. All Rights Reserved.", width / 2, height - 50);
 
-		CP_Image_Draw(splashscreen, width / 2, height / 2, width, height, logo2_alpha);
+		CP_Image_Draw(splashscreen, width / 2.0f, height / 2.0f, width, height, (int)logo2_alpha);
 	}
 	else if (inStart == 0) {
 		// load music
@@ -131,18 +131,18 @@ void Main_Menu_Update(void)
 		// game title
 		CP_Settings_TextSize(150);
 		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
-		CP_Font_DrawText("WAFFLE RUSH", width / 2, 100);
+		CP_Font_DrawText("WAFFLE RUSH", width / 2.0f, 100);
 
 
 		// set text size
-		CP_Settings_TextSize(80);
+		CP_Settings_TextSize(80.0f);
 
 		//draw play button
-		TextBoxCreate(width / 2, height / 3, 500, 150, "PLAY", button_color);
-		int PlayClick = IsAreaClicked(width / 2, height / 3, 500, 150, mouseX, mouseY); //if mouse is over button
+		TextBoxCreate(width / 2.0f, height / 3.0f, 500.0f, 150.0f, "PLAY", button_color);
+		int PlayClick = IsAreaClicked(width / 2.0f, height / 3.0f, 500.0f, 150.0f, mouseX, mouseY); //if mouse is over button
 		if (PlayClick) {
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-			CP_Graphics_DrawRect(width / 2, height / 3, 500, 150);
+			CP_Graphics_DrawRect(width / 2.0f, height / 3.0f, 500.0f, 150.0f);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
 				CP_Sound_PlayAdvanced(clink, 1.0, 1.0, FALSE, CP_SOUND_GROUP_1);
 				CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit); //go to game
@@ -153,11 +153,11 @@ void Main_Menu_Update(void)
 		}
 
 		//options button
-		TextBoxCreate(2 * width / 3, 5 * height / 9, 500, 150, "OPTIONS", button_color);
-		int OptionsClick = IsAreaClicked(2 * width / 3, 5 * height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
+		TextBoxCreate(2 * width / 3.0f, 5.0f * height / 9.0f, 500.0f, 150.0f, "OPTIONS", button_color);
+		int OptionsClick = IsAreaClicked(2.0f * width / 3.0f, 5.0f * height / 9.0f, 500.0f, 150.0f, mouseX, mouseY); //if mouse is over button
 		if (OptionsClick) {
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-			CP_Graphics_DrawRect(2 * width / 3, 5 * height / 9, 500, 150);
+			CP_Graphics_DrawRect(2.0f * width / 3.0f, 5.0f * height / 9.0f, 500.0f, 150.0f);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
 				CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_0);
 				CP_Engine_SetNextGameState(Options_Init, Options_Update, Options_Exit); //go to test stage
@@ -165,11 +165,11 @@ void Main_Menu_Update(void)
 		}
 
 		//credits button
-		TextBoxCreate(width / 3, 5 * height / 9, 500, 150, "CREDITS", button_color);
-		int CreditsClick = IsAreaClicked(width / 3, 5 * height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
+		TextBoxCreate(width / 3.0f, 5.0f * height / 9.0f, 500.0f, 150.0f, "CREDITS", button_color);
+		int CreditsClick = IsAreaClicked(width / 3.0f, 5.0f * height / 9.0f, 500.0f, 150.0f, mouseX, mouseY); //if mouse is over button
 		if (CreditsClick) {
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-			CP_Graphics_DrawRect(width / 3, 5 * height / 9, 500, 150);
+			CP_Graphics_DrawRect(width / 3.0f, 5.0f * height / 9.0f, 500.0f, 150.0f);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
 				CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_0);
 				CP_Engine_SetNextGameState(Credits_Init, Credits_Update, Credits_Exit); //go to test stage
@@ -177,11 +177,11 @@ void Main_Menu_Update(void)
 		}
 
 		//draw exit button
-		TextBoxCreate(width / 2, 7 * height / 9, 500, 150, "EXIT", button_color);
-		int ExitClick = IsAreaClicked(width / 2, 7 * height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
+		TextBoxCreate(width / 2.0f, 7.0f * height / 9.0f, 500.0f, 150.0f, "EXIT", button_color);
+		int ExitClick = IsAreaClicked(width / 2.0f, 7.0f * height / 9.0f, 500.0f, 150.0f, mouseX, mouseY); //if mouse is over button
 		if (ExitClick) {
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-			CP_Graphics_DrawRect(width / 2, 7 * height / 9, 500, 150);
+			CP_Graphics_DrawRect(width / 2.0f, 7.0f * height / 9.0f, 500.0f, 150.0f);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
 				CP_Engine_Terminate(); //end game
 			}
