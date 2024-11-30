@@ -35,10 +35,10 @@ void Options_Init(void) {
 	printf("---------------------------------------------------------------\n");
 	fclose(file);
 
-	// set max volumes for BGM and sound effects
+	// set max volumes for BGM and sound effects and sounds for saving 
+	//buttonclick = CP_Sound_LoadMusic("Assets/buttonselect.wav");
 	max_bgm_vol = 100.0f;
 	max_se_vol = 100.0f;
-
 	// set size for icons
 	icon1_width = 10.0f;
 	icon1_height = 10.0f;
@@ -246,7 +246,7 @@ void Options_Update(void) {
 }
 
 void Options_Exit(void) {
-
+	//CP_Sound_Free(&buttonclick);
 }
 
 // ------------------------------------------------------------------------------------------------------------------

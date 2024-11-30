@@ -26,6 +26,7 @@ void LSelect_Init(void)
 	// load music
 	music = CP_Sound_LoadMusic("Assets/Levelselectthemeig.wav");
 	CP_Sound_PlayAdvanced(music, 0.5f, 1.0f, TRUE, CP_SOUND_GROUP_0);
+	jumpsound = CP_Sound_LoadMusic("Assets/jump.wav");
 
 	// ASSET LOADS
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -312,7 +313,7 @@ void LSelect_Update(void)
 			}
 
 			// Jump
-			jump(&player, movestate, Buff[jumpBuff].state);
+			jump(&player, movestate, Buff[jumpBuff].state, &jumpsound);
 
 			// change movestate
 				/*
@@ -685,6 +686,7 @@ void LSelect_Exit(void)
 {
 	// Frees images :D say no to memory leak
 	Free_Images();
-
+	CP_Sound_Free(&clink);
 	CP_Sound_Free(&music);
+	CP_Sound_Free(&jumpsound);
 }

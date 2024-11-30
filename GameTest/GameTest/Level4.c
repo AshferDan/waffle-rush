@@ -25,6 +25,7 @@ void L4_Init(void)
 	// load music
 	music = CP_Sound_LoadMusic("Assets/mudamuda.wav");
 	CP_Sound_PlayAdvanced(music, 1.0f, 1.0f, TRUE, CP_SOUND_GROUP_0);
+	jumpsound = CP_Sound_LoadMusic("Assets/jump.wav");
 
 	// load sfx
 	sfx = CP_Sound_Load("Assets/WaffleMachine.wav");
@@ -359,7 +360,7 @@ void L4_Update(void)
 			}
 
 			// Jump
-			jump(&player, movestate, buffstate);
+			jump(&player, movestate, buffstate, &jumpsound);
 
 
 			if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {
@@ -612,7 +613,7 @@ void L4_Exit(void)
 {
 	// Frees images :D say no to memory leak
 	Free_Images();
-
+	CP_Sound_Free(&jumpsound);
 	CP_Sound_Free(&music);
 	CP_Sound_Free(&sfx);
 }

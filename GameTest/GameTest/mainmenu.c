@@ -152,9 +152,12 @@ void Main_Menu_Update(void)
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 			CP_Graphics_DrawRect(width / 2, height / 3, 500, 150);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				clink = CP_Sound_LoadMusic("Assets/clinkforbutton.wav");
+				CP_Sound_PlayAdvanced(clink, 1.0, 1.0, FALSE, CP_SOUND_GROUP_1);
 				CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit); //go to game
 				inMenu = 0;
 				CP_Sound_Free(&music);
+				
 			}
 		}
 
@@ -208,5 +211,5 @@ void Main_Menu_Update(void)
 
 void Main_Menu_Exit(void)
 {
-	//CP_Sound_Free(&music);
+	//CP_Sound_Free(&clink);
 }
