@@ -150,7 +150,7 @@ void L2_Init(void)
 	spawnTimer = 0.0f;     // Timer to control spawning frequency
 	spawnInterval = 1.f;  // Spawn a square every 1 second
 	bulletx = 1050;
-	bullety = 1200;
+	bullety = 1150;
 	firetimer = 0;
 
 #pragma endregion
