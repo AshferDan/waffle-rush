@@ -401,6 +401,18 @@ void RENDER_ALL() {
 
 	// TIMER DRAWING
 	char time[16] = { 0 };
-	sprintf_s(time, 16, "TIME: %02d:%02d:%02d", (int)timer.minutes, (int)timer.seconds, (int)timer.millis);
-	CP_Font_DrawText(time, 1200, 50);
+	int textsize = 55;
+	CP_Settings_TextAlignment(CP_TEXT_ALIGN_V_MIDDLE, CP_TEXT_ALIGN_V_MIDDLE);
+	sprintf_s(time, 16, "%02d:%02d:%02d", (int)timer.minutes, (int)timer.seconds, (int)timer.millis);
+	if ((int)timer.millis > 95) {
+		CP_Settings_TextSize(52);
+	}
+	if ((int)timer.millis < 5) {
+		CP_Settings_TextSize(textsize - (int)timer.millis);
+	}
+	else
+	{
+		CP_Settings_TextSize(50);
+	}
+	CP_Font_DrawText(time, 1250, 50);
 }
