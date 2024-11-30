@@ -105,6 +105,10 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 			}
 			else {
 				ply->movex = CP_Math_ClampFloat(ply->movex, -1.5f * speed, 1.5f * speed);
+				//draw sweat effect
+				float draw_posx = player.x - 20 - camera.worldshiftx;
+				float draw_posy = player.y - 30 - camera.worldshifty;
+				CP_Image_DrawSubImageAdvanced(effects, draw_posx, draw_posy, player.width + 30, player.height, 0, 0, 15, 5, 255, 0);
 			}
 			// anim state
 			if (tempdirH != Null) {

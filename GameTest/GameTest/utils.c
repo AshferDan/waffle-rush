@@ -191,6 +191,9 @@ void Load_Images() {
 	// skull
 	skull				= CP_Image_Load("Assets/Skull.png");			// skull icon for death counter
 
+	// visual effects
+	effects				= CP_Image_Load("Assets/Effects.png");			// Contains visual effect sprites (16x16 res)
+
 	// buffs stuff
 	buff_sprite			= CP_Image_Load("Assets/Buff_Icon.png");		// buff icons
 	buff_bg				= CP_Image_Load("Assets/Buff_Background.png");	// background for buff UI
@@ -213,6 +216,7 @@ void Free_Images() {
 	CP_Image_Free(&goal_pointer);
 
 	CP_Image_Free(&skull);
+	CP_Image_Free(&effects);
 
 	CP_Image_Free(&buff_sprite);
 	CP_Image_Free(&buff_bg);
