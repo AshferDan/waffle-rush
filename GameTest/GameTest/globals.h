@@ -540,6 +540,7 @@
 	// Sound files
 	CP_Sound music;
 	CP_Sound sfx;
+	CP_Sound wafflemachine;
 
 	// Reset pointers
 	FunctionPtr reset_init, reset_update, reset_exit;
