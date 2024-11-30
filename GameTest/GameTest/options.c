@@ -227,7 +227,7 @@ void Options_Update(void) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 		CP_Graphics_DrawRect(3 * width / 8, height - 100, 300, 150);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
-			CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_0);
+			CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			SaveOptions(current_bgm_vol, current_se_vol);
 			display_timer += 3.0f;
 			timer_alpha += 255.0f;
@@ -241,7 +241,7 @@ void Options_Update(void) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 		CP_Graphics_DrawRect(5 * width / 8, height - 100, 300, 150);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
-			CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_0);
+			CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit); //return to main menu
 		}
 	}
@@ -251,7 +251,8 @@ void Options_Update(void) {
 }
 
 void Options_Exit(void) {
-	CP_Sound_Free(&buttonclick);
+	
+	//CP_Sound_Free(&buttonclick);
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -279,9 +280,8 @@ void PauseMenu() {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 		CP_Graphics_DrawRect(600, height / 2, 300, 120);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
-			//CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_0);
+			CP_Sound_PlayAdvanced(clink, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			levelstate = NotPaused;
-			CP_Sound_ResumeGroup(CP_SOUND_GROUP_1);
 		}
 	}
 
@@ -292,7 +292,7 @@ void PauseMenu() {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 		CP_Graphics_DrawRect(1000, height / 2, 300, 120);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
-			CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_0);
+			CP_Sound_PlayAdvanced(clink, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			levelstate = InOptions;
 			prev_bgm_vol = current_bgm_vol;
 			prev_se_vol = current_se_vol;
@@ -306,6 +306,7 @@ void PauseMenu() {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 		CP_Graphics_DrawRect(600, 2 * height / 3, 300, 120);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
+			CP_Sound_PlayAdvanced(clink, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			CP_Engine_SetNextGameStateForced(reset_init, reset_update, reset_exit);
 		}
 	}
@@ -317,6 +318,7 @@ void PauseMenu() {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 		CP_Graphics_DrawRect(1000, 2 * height / 3, 300, 120);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
+			CP_Sound_PlayAdvanced(clink, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			levelstate = InQuit;
 		}
 	}
@@ -463,7 +465,7 @@ void OptionsMenu() {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 		CP_Graphics_DrawRect(3 * width / 8, height - 250, 200, 100);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
-			CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_0);
+			CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			SaveOptionsInGame(current_bgm_vol, current_se_vol, &prev_bgm_vol, &prev_se_vol);
 			isOptionsSaved = 1;
 		}
@@ -476,7 +478,7 @@ void OptionsMenu() {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 		CP_Graphics_DrawRect(5 * width / 8, height - 250, 200, 100);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
-			CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_0);
+			CP_Sound_PlayAdvanced(clink, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			levelstate = Paused;
 			current_bgm_vol = prev_bgm_vol;
 			current_se_vol = prev_se_vol;
@@ -509,6 +511,7 @@ void QuitMenu() {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 		CP_Graphics_DrawRect(500, 2 * height / 3, 300, 150);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
+			CP_Sound_PlayAdvanced(clink, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			levelstate = Paused;
 		}
 	}
@@ -519,6 +522,8 @@ void QuitMenu() {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 		CP_Graphics_DrawRect(1100, 2 * height / 3, 300, 150);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
+			CP_Sound_PlayAdvanced(clink, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
+			levelstate = EndLevel;
 			CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit);
 		}
 	}

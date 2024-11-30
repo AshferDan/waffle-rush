@@ -46,6 +46,7 @@ void Credits_Init(void) {
 
 	// load sfx
 	sfx = CP_Sound_Load("Assets/PlayerSpawn.wav");
+	buttonclick = CP_Sound_Load("Assets/buttonselect.wav");
 
 	// set first screen when opening credits
 	screen_num = FIRST;
@@ -96,7 +97,7 @@ void Credits_Update(void) {
 	}
 
 	if (screen_num == FIRST) {
-		CP_Settings_TextSize(70);
+		CP_Settings_TextSize(50);
 		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
 		CP_Font_DrawText("THE TEAM", (float)width / 4.0f, (float)200.0f);
 		CP_Settings_TextSize(30);
@@ -110,7 +111,7 @@ void Credits_Update(void) {
 			CP_Font_DrawText(credits, (float)width / 4.0f, (float)(300 + (i * 75)));
 			CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
 		}
-		CP_Settings_TextSize(70);
+		CP_Settings_TextSize(50);
 		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
 		CP_Font_DrawText("INSTRUCTORS", (float)2 * width / 3.0f, (float)200.0f);
 		CP_Settings_TextSize(30);
@@ -118,7 +119,7 @@ void Credits_Update(void) {
 		CP_Font_DrawText("Ding Xiang Cheng", (float)2 * width / 3.0f, (float)300.0f);
 		CP_Font_DrawText("Gerald Wong", (float)2 * width / 3.0f, (float)375.0f);
 		CP_Font_DrawText("Soroor Malekmohmmadi Faradounbeh", (float)2 * width / 3.0f, (float)450.0f);
-		CP_Settings_TextSize(70);
+		CP_Settings_TextSize(50);
 		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
 		CP_Font_DrawText("CREATED AT", (float)2 * width / 3.0f, (float)525.0f);
 		CP_Settings_TextSize(30);
@@ -130,13 +131,13 @@ void Credits_Update(void) {
 		CP_Settings_TextSize(100);
 	}
 	else if (screen_num == SECOND) {
-		CP_Settings_TextSize(70);
+		CP_Settings_TextSize(50);
 		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
 		CP_Font_DrawText("PRESIDENT", (float)width / 2.0f, (float)200.0f);
 		CP_Settings_TextSize(30);
 		CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
 		CP_Font_DrawText("Claude COMAIR", (float)width / 2.0f, (float)275.0f);
-		CP_Settings_TextSize(70);
+		CP_Settings_TextSize(50);
 		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
 		CP_Font_DrawText("EXECUTIVES", (float)width / 2.0f, (float)375.0f);
 		CP_Settings_TextSize(30);
@@ -156,7 +157,6 @@ void Credits_Update(void) {
 		CP_Settings_TextSize(100);
 	}
 	else if (screen_num == THIRD) {
-		CP_Settings_TextSize(50);
 		CP_Settings_TextSize(70);
 		CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
 		CP_Font_DrawText("INSERT REFERENCES HERE", (float)width / 2.0f, (float)height / 2.0f);
@@ -176,6 +176,7 @@ void Credits_Update(void) {
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 			CP_Graphics_DrawRect((float)(width / 4), (float)(height - 100), 100.0f, 100.0f);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 				screen_num -= 1;
 			}
 		}
@@ -184,13 +185,14 @@ void Credits_Update(void) {
 		TextBoxCreate((float)(width / 4), (float)(height - 100), 100.0f, 100.0f, "<", disabled_color);
 	}
 
-	if (screen_num != THIRD) {
+	if (screen_num != SECOND) {
 		TextBoxCreate((float)(3 * width / 4), (float)(height - 100), 100.0f, 100.0f, ">", button_color);
 		int NextClick = IsAreaClicked((float)(3 * width / 4), (float)(height - 100), 100.0f, 100.0f, mouseX, mouseY); //if mouse is over button
 		if (NextClick) {
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 			CP_Graphics_DrawRect((float)(3 * width / 4), (float)(height - 100), 100.0f, 100.0f);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 				screen_num += 1;
 			}
 		}
@@ -206,6 +208,7 @@ void Credits_Update(void) {
 		CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 		CP_Graphics_DrawRect((float)(width / 2), (float)(height - 100), 400.0f, 120.0f);
 		if (CP_Input_MouseClicked()) { //if LMB1 pressed
+			CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			CP_Engine_SetNextGameState(Main_Menu_Init, Main_Menu_Update, Main_Menu_Exit); //return to main menu
 		}
 	}

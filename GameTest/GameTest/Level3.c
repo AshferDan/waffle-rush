@@ -26,6 +26,8 @@ void L3_Init(void)
 	music = CP_Sound_LoadMusic("Assets/platforming.wav");
 	CP_Sound_PlayAdvanced(music, 1.0f, 1.0f, TRUE, CP_SOUND_GROUP_0);
 	jumpsound = CP_Sound_LoadMusic("Assets/jump.wav");
+	buttonclick = CP_Sound_Load("Assets/buttonselect.wav");
+	clink = CP_Sound_Load("Assets/clinkforbutton.wav");
 
 	// load sfx
 	sfx = CP_Sound_Load("Assets/WaffleMachine.wav");
@@ -286,11 +288,11 @@ void L3_Update(void)
 	// pause/resume game with Esc
 	if (CP_Input_KeyTriggered(KEY_ESCAPE) && levelstate == NotPaused) {
 		levelstate = Paused;
-		CP_Sound_PauseGroup(CP_SOUND_GROUP_1);
+		CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 	}
 	else if (CP_Input_KeyTriggered(KEY_ESCAPE) && levelstate == Paused) {
 		levelstate = NotPaused;
-		CP_Sound_ResumeGroup(CP_SOUND_GROUP_1);
+		CP_Sound_PlayAdvanced(clink, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 	}
 
 	// Timer updates
@@ -571,6 +573,7 @@ void L3_Update(void)
 					CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 					CP_Graphics_DrawRect(500, 720, 250, 100);
 					if (CP_Input_MouseClicked()) { //if LMB1 pressed
+						CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 						SetNext(L4_Init, L4_Update, L4_Exit);
 					}
 				}
@@ -582,6 +585,7 @@ void L3_Update(void)
 					CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 					CP_Graphics_DrawRect(800, 720, 250, 100);
 					if (CP_Input_MouseClicked()) { //if LMB1 pressed
+						CP_Sound_PlayAdvanced(clink, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 						CP_Engine_SetNextGameStateForced(L3_Init, L3_Update, L3_Exit);
 					}
 				}
@@ -593,6 +597,7 @@ void L3_Update(void)
 					CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); // highlight button
 					CP_Graphics_DrawRect(1100, 720, 250, 100);
 					if (CP_Input_MouseClicked()) { //if LMB1 pressed
+						CP_Sound_PlayAdvanced(clink, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 						SetNext(LSelect_Init, LSelect_Update, LSelect_Exit);
 					}
 				}

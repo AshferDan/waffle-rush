@@ -17,7 +17,8 @@ CP_Sound music;
 CP_Color button_color;
 bool inMenu = 0;
 bool inStart = 1;
-float start_timer, logo_alpha, logo2_alpha = 0.0f;
+bool inExit = 0;
+float start_timer, exit_timer, logo_alpha, logo2_alpha = 0.0f;
 
 void Main_Menu_Init(void)
 {
@@ -37,7 +38,7 @@ void Main_Menu_Init(void)
 
 	// load options file (music volume)
 	buttonclick = CP_Sound_Load("Assets/buttonselect.wav");
-	clink = CP_Sound_LoadMusic("Assets/clinkforbutton.wav");
+	clink = CP_Sound_Load("Assets/clinkforbutton.wav");
 	FILE* file = fopen("Assets/Options.txt", "r");
 	fscanf_s(file, "%f %f", &current_bgm_vol, &current_se_vol);
 	printf("BGM Volume: %lf\nSFX Volume: %lf\n", current_bgm_vol, current_se_vol);
@@ -126,6 +127,7 @@ void Main_Menu_Update(void)
 		// set volumes
 		AudioPitch();
 		CP_Sound_SetGroupVolume(CP_SOUND_GROUP_0, current_bgm_vol / 100.0f);
+		CP_Sound_SetGroupVolume(CP_SOUND_GROUP_1, current_se_vol / 100.0f);
 
 		// set text size
 		// game title
@@ -159,7 +161,7 @@ void Main_Menu_Update(void)
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 			CP_Graphics_DrawRect(2.0f * width / 3.0f, 5.0f * height / 9.0f, 500.0f, 150.0f);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
-				CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_0);
+				CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 				CP_Engine_SetNextGameState(Options_Init, Options_Update, Options_Exit); //go to test stage
 			}
 		}
@@ -171,7 +173,7 @@ void Main_Menu_Update(void)
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 			CP_Graphics_DrawRect(width / 3.0f, 5.0f * height / 9.0f, 500.0f, 150.0f);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
-				CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_0);
+				CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 				CP_Engine_SetNextGameState(Credits_Init, Credits_Update, Credits_Exit); //go to test stage
 			}
 		}
@@ -183,17 +185,25 @@ void Main_Menu_Update(void)
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 			CP_Graphics_DrawRect(width / 2.0f, 7.0f * height / 9.0f, 500.0f, 150.0f);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
-				CP_Engine_Terminate(); //end game
+				CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
+				inExit = 1;
 			}
 		}
 		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
+
+		// exit the game after button click sound
+		if (inExit == 1) {
+			exit_timer += dt;
+			if (exit_timer >= 1.0f) {
+				CP_Engine_Terminate(); //end game
+			}
+		}
 	}
 
 }
 
 void Main_Menu_Exit(void)
 {
-	//CP_Sound_Free(&music);
 	CP_Image_Free(&logo);
 	CP_Image_Free(&splashscreen);
 }

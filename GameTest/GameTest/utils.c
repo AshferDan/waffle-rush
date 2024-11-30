@@ -225,7 +225,7 @@ void Free_Images() {
 }
 
 void AudioPitch() {
-	if (levelstate == Paused || levelstate == Cleared) {
+	if (levelstate == Paused || levelstate == Cleared || levelstate == InOptions || levelstate == InQuit) {
 		CP_Sound_SetGroupPitch(CP_SOUND_GROUP_0, 0.85f);
 	}
 	else
