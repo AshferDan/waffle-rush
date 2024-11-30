@@ -11,6 +11,7 @@
 #include "mainmenu.h"
 
 CP_Image logo;
+CP_Image splashscreen;
 CP_Font exo;
 CP_Sound music;
 CP_Color button_color;
@@ -28,7 +29,7 @@ void Main_Menu_Init(void)
 	// load logo
 	logo = CP_Image_Load("Assets/DigiPen_Singapore_WEB_WHITE.png");
 	CP_Settings_ImageMode(CP_POSITION_CENTER);
-	player_sprite = CP_Image_Load("Assets/Player_Sprites.png");
+	splashscreen = CP_Image_Load("Assets/screen.png");
 
 
 	// load background color
@@ -106,7 +107,7 @@ void Main_Menu_Update(void)
 		CP_Settings_TextSize(20);
 		CP_Font_DrawText("All content \xC2\xA9 2024 DigiPen Institute of Technology Singapore. All Rights Reserved.", width / 2, height - 50);
 
-		CP_Image_Draw(player_sprite, width / 2, height / 2, 1000, 600, logo2_alpha);
+		CP_Image_Draw(splashscreen, width / 2, height / 2, width, height, logo2_alpha);
 	}
 	else if (inStart == 0) {
 		// load music
@@ -134,17 +135,6 @@ void Main_Menu_Update(void)
 		// set text size
 		CP_Settings_TextSize(80);
 
-
-		////draw test play button (FOR ASH)
-		//TextBoxCreate(width / 2, height / 9, 500, 150, "ASH", button_color);
-		//int AshClick = IsAreaClicked(width / 2, height / 9, 500, 150, mouseX, mouseY); //if mouse is over button
-		//if (AshClick) {
-		//	CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-		//	CP_Graphics_DrawRect(width / 2, height / 9, 500, 150);
-		//	if (CP_Input_MouseClicked()) { //if LMB1 pressed
-		//		CP_Engine_SetNextGameState(MainMenu1_Init, MainMenu1_Update, MainMenu1_Exit); //go to game
-		//	}
-		//}
 		//draw play button
 		TextBoxCreate(width / 2, height / 3, 500, 150, "PLAY", button_color);
 		int PlayClick = IsAreaClicked(width / 2, height / 3, 500, 150, mouseX, mouseY); //if mouse is over button
@@ -157,17 +147,6 @@ void Main_Menu_Update(void)
 				CP_Sound_Free(&music);
 			}
 		}
-
-		////test level button
-		//TextBoxCreate(3 * width / 4, height / 3, 150, 150, "T", button_color);
-		//int TestClick = IsAreaClicked(3 * width / 4, height / 3, 150, 150, mouseX, mouseY); //if mouse is over button
-		//if (TestClick) {
-		//	CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
-		//	CP_Graphics_DrawRect(3 * width / 4, height / 3, 150, 150);
-		//	if (CP_Input_MouseClicked()) { //if LMB1 pressed
-		//		CP_Engine_SetNextGameState(Tutorial_Init, Tutorial_Update, Tutorial_Exit); //go to test stage
-		//	}
-		//}
 
 		//options button
 		TextBoxCreate(2 * width / 3, 5 * height / 9, 500, 150, "OPTIONS", button_color);
@@ -209,4 +188,6 @@ void Main_Menu_Update(void)
 void Main_Menu_Exit(void)
 {
 	//CP_Sound_Free(&music);
+	CP_Image_Free(&logo);
+	CP_Image_Free(&splashscreen);
 }
