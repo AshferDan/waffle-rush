@@ -139,6 +139,7 @@
 		int frameCounter;  //counts frames between last touch of wall while sliding
 		int walldir;		// direction for coyote time walljump
 		bool wasSliding;  //checks is player was sliding
+		bool canWallJump;
 		int lastDir;  //saves last direction player was facing before wall jumping (for coyote time)
 		int coyotetime;
 		float timeElapsed;
@@ -156,7 +157,7 @@
 		float tutorialDataY, level1DataY, level2DataY, level3DataY, level4DataY, level5DataY; //display high score and time for each level
 		float clear_timer;
 
-		CP_Image goal_pointer, skull;
+		CP_Image goal_pointer, skull, effects;
 
 		// Mouse position
 		float mouseX, mouseY;
