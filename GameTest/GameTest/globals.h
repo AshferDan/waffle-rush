@@ -536,7 +536,7 @@
 	CP_Sound sfx;
 	CP_Sound wafflemachine;
 	CP_Sound jumpsound;
-	//CP_Sound buttonclick;
+	CP_Sound buttonclick;
 	CP_Sound LevelLoadsound;
 	CP_Sound clink;
 

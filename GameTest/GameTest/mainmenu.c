@@ -35,6 +35,8 @@ void Main_Menu_Init(void)
 	bg = CP_Color_Create(135, 200, 220, 255);
 
 	// load options file (music volume)
+	buttonclick = CP_Sound_Load("Assets/buttonselect.wav");
+	clink = CP_Sound_LoadMusic("Assets/clinkforbutton.wav");
 	FILE* file = fopen("Assets/Options.txt", "r");
 	fscanf_s(file, "%f %f", &current_bgm_vol, &current_se_vol);
 	printf("BGM Volume: %lf\nSFX Volume: %lf\n", current_bgm_vol, current_se_vol);
@@ -152,7 +154,6 @@ void Main_Menu_Update(void)
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 			CP_Graphics_DrawRect(width / 2, height / 3, 500, 150);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
-				clink = CP_Sound_LoadMusic("Assets/clinkforbutton.wav");
 				CP_Sound_PlayAdvanced(clink, 1.0, 1.0, FALSE, CP_SOUND_GROUP_1);
 				CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit); //go to game
 				inMenu = 0;
@@ -179,6 +180,7 @@ void Main_Menu_Update(void)
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 			CP_Graphics_DrawRect(2 * width / 3, 5 * height / 9, 500, 150);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_0);
 				CP_Engine_SetNextGameState(Options_Init, Options_Update, Options_Exit); //go to test stage
 			}
 		}
@@ -190,6 +192,7 @@ void Main_Menu_Update(void)
 			CP_Settings_Fill(CP_Color_Create(255, 255, 255, 50)); //highlight button
 			CP_Graphics_DrawRect(width / 3, 5 * height / 9, 500, 150);
 			if (CP_Input_MouseClicked()) { //if LMB1 pressed
+				CP_Sound_PlayAdvanced(buttonclick, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_0);
 				CP_Engine_SetNextGameState(Credits_Init, Credits_Update, Credits_Exit); //go to test stage
 			}
 		}

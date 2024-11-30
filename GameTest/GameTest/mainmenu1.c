@@ -687,6 +687,7 @@ void LSelect_Exit(void)
 	// Frees images :D say no to memory leak
 	Free_Images();
 	CP_Sound_Free(&clink);
+	CP_Sound_Free(&buttonclick);
 	CP_Sound_Free(&music);
 	CP_Sound_Free(&jumpsound);
 }
