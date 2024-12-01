@@ -79,25 +79,25 @@ void hazard_update() {
 			
 			switch (traps[trap_index].direction) {
 			case 0: {
-				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], (traps[trap_index].y[0]+15.f), traps[trap_index].x[1] - traps[trap_index].x[0], traps[trap_index].y[2] - (traps[trap_index].y[0]+15.f)) && !(player.state == Dead || player.state == Spawning) && !((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f)) {
+				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], (traps[trap_index].y[0]+10.f), traps[trap_index].x[1] - traps[trap_index].x[0], traps[trap_index].y[2] - (traps[trap_index].y[0]+10.f)) && !(player.state == Dead || player.state == Spawning) && !((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f)) {
 					Kill_Player(&player, Burn, &deaths, &buffstate);
 				}
 				break;
 			}
 			case 1: {
-				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], traps[trap_index].y[0], (traps[trap_index].x[1]-15.f) - traps[trap_index].x[0], traps[trap_index].y[2] - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning) && !((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f)) {
+				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], traps[trap_index].y[0], (traps[trap_index].x[1]-10.f) - traps[trap_index].x[0], traps[trap_index].y[2] - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning) && !((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f)) {
 					Kill_Player(&player, Burn, &deaths, &buffstate);
 				}
 				break;
 			}
 			case 2: {
-				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], traps[trap_index].y[0], traps[trap_index].x[1] - traps[trap_index].x[0], (traps[trap_index].y[2]-15.f) - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning) && !((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f)) {
+				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, traps[trap_index].x[0], traps[trap_index].y[0], traps[trap_index].x[1] - traps[trap_index].x[0], (traps[trap_index].y[2]-10.f) - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning) && !((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f)) {
 					Kill_Player(&player, Burn, &deaths, &buffstate);
 				}
 				break;
 			}
 			case 3: {
-				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, (traps[trap_index].x[0]+15.f), traps[trap_index].y[0], traps[trap_index].x[1] - (traps[trap_index].x[0]+15.f), traps[trap_index].y[2] - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning) && !((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f)) {
+				if (AreSquaresIntersecting(player.x, player.y, player.width, player.height, (traps[trap_index].x[0]+10.f), traps[trap_index].y[0], traps[trap_index].x[1] - (traps[trap_index].x[0]+10.f), traps[trap_index].y[2] - traps[trap_index].y[0]) && !(player.state == Dead || player.state == Spawning) && !((buffstate & 0b100) && Buff[invulBuff].buffduration > 0.00f)) {
 					Kill_Player(&player, Burn, &deaths, &buffstate);
 				}
 				break;
