@@ -360,7 +360,7 @@ void L4_Update(void)
 			}
 
 			// Jump
-			jump(&player, movestate, buffstate, &jumpsound);
+			jump(&player, movestate, buffstate);
 
 
 			if (CP_Input_KeyTriggered(KEY_E) && (movestate == OnPlat || movestate == InPlat)) {

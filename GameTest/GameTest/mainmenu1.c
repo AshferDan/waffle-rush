@@ -321,7 +321,7 @@ void LSelect_Update(void)
 			}
 
 			// Jump
-			jump(&player, movestate, Buff[jumpBuff].state, &jumpsound);
+			jump(&player, movestate, Buff[jumpBuff].state);
 
 			// change movestate
 				/*

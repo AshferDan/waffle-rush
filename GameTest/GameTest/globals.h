@@ -594,7 +594,7 @@
 			// platformer and in platform movements
 			void movement(Player* p, MoveState movestate, float speed, float dt);
 			// jump >:)
-			void jump(Player* player, MoveState movestate, int buffstate, CP_Sound *jumpsound);
+			void jump(Player* player, MoveState movestate, int buffstate);
 #pragma endregion Movement and movestate
 
 		// - PLAYER
