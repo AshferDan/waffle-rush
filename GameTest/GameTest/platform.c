@@ -238,9 +238,8 @@ void movement(Player* ply, MoveState movestate, float speed, float dt) {
 	}
 }
 
-void jump(Player* player, MoveState movestate, int buffstate, CP_Sound *jumpsound) {
+void jump(Player* player, MoveState movestate, int buffstate) {
 
-	CP_Sound_LoadMusic("Assets/jump.wav");
 	if (!(player->onplatform) && frameCounter < coyotetime) {
 		//pply.state = Jumping;
 		if (wasSliding) {
@@ -252,7 +251,7 @@ void jump(Player* player, MoveState movestate, int buffstate, CP_Sound *jumpsoun
 	}
 	if (CP_Input_KeyTriggered(KEY_SPACE) && movestate == OnPlat) {
 		if (((player->onplatform == 0) && player->state == Sliding && player->walljump == 1)) {	
-			CP_Sound_PlayAdvanced(*jumpsound, 0.2f, 1.0f, FALSE, CP_SOUND_GROUP_1);
+			CP_Sound_PlayAdvanced(jumpsound, 0.2f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			player->walljump = 0;
 			player->movey = -500;
 			if (player->direction == OnLeft) {
@@ -274,7 +273,7 @@ void jump(Player* player, MoveState movestate, int buffstate, CP_Sound *jumpsoun
 			}
 		}
 		if (player->onplatform) {
-			CP_Sound_PlayAdvanced(*jumpsound, 0.2f, 1.0f, FALSE, CP_SOUND_GROUP_1);
+			CP_Sound_PlayAdvanced(jumpsound, 0.2f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 			player->movey = -600;
 			if (buffstate & jumpBuff) {
 				player->movey -= Buff[jumpBuff].jumpIncrease;
@@ -779,9 +778,8 @@ void jump(Player* player, MoveState movestate, int buffstate, CP_Sound *jumpsoun
 		}
 	}
 
-	void Spawn_Player(Player* player, coords spawn,  Camera* camera, CP_Sound machinesound) {
+	void Spawn_Player(Player* player, coords spawn,  Camera* camera) {
 		// Player changes
-		machinesound = CP_Sound_Load("Assets/WaffleMachine.wav");
 		CP_Sound_PlayAdvanced(machinesound, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 		player->x = spawn.x;
 		player->y = spawn.y;
@@ -794,7 +792,6 @@ void jump(Player* player, MoveState movestate, int buffstate, CP_Sound *jumpsoun
 		camera->prespawnY = camera->limittop;
 		camera->respawnX = spawn.x - camera->width / 2;
 		camera->respawnY = spawn.y - 3 * camera->height / 4;
-		CP_Sound_Free(&machinesound);
 	}
 
 	void Reset_Player(Player* player, MoveState* movestate) {
@@ -853,7 +850,7 @@ void jump(Player* player, MoveState movestate, int buffstate, CP_Sound *jumpsoun
 		}
 		if (player->death_time >= 17) {
 			if (player->state == Dead) {
-				Spawn_Player(player, spawn, camera, wafflemachine);
+				Spawn_Player(player, spawn, camera);
 				player->movex = 0;
 			}
 			player->death_time = 17;
