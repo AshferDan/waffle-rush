@@ -237,13 +237,6 @@ void AudioPitch() {
 // LEVEL TRANSITION EFFECTS
 void Level_Transition(FunctionPtr level_init, FunctionPtr level_update, FunctionPtr level_exit) {
 
-	if (CP_Input_KeyTriggered(KEY_P)) {
-		levelEnded = end;
-	}
-	if (CP_Input_KeyDown(KEY_O)) {
-		levelEnded = start;
-	}
-
 	playerLastX = player.x - camera.worldshiftx;
 	playerLastY = player.y - camera.worldshifty;
 
@@ -314,7 +307,7 @@ void RENDER_ALL() {
 		CP_Image_DrawSubImage(goal_sprite, goalx - camera.worldshiftx, goaly - camera.worldshifty, 100.0f, 100.0f, sprite_x, 0.0f, sprite_x + 32.0f, 32.0f, 255);
 	}
 
-	if (AreSquaresIntersecting(player.x, player.y, player.height, player.width, goalx, goaly + 70.0f, 100.0f, 30.0f)) {
+	if ((AreSquaresIntersecting(player.x, player.y, player.height, player.width, goalx, goaly + 70.0f, 100.0f, 30.0f) || CP_Input_KeyTriggered(KEY_P)) && levelEnded != start) {
 		// calculate score and mark the level as cleared
 		AddScore(&levelScore, 10000 + (10000 - ((int)timer.seconds * 50) - ((int)timer.minutes * 3000)) - deaths * 100, &levelstate);
 		if (levelstate != EndLevel) {
