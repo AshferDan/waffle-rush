@@ -70,6 +70,29 @@ void Tutorial_Init(void)
 	goalx = 2400;
 	goaly = 700;
 
+	// initialize powerups location
+	buffstate = 0b000;
+	Buff[jumpBuff].canPickup = 1; //if active,
+	Buff[jumpBuff].X = 500; //draw
+	Buff[jumpBuff].Y = -1400; //draw
+	Buff[jumpBuff].width = 20; //draw
+	Buff[jumpBuff].height = 20; //draw
+	Buff[jumpBuff].buffduration = 0; //seconds?
+	Buff[jumpBuff].jumpIncrease = 800;
+	Buff[jumpBuff].resetTimer = 3;
+	jumpalpha = 50;
+
+
+	Buff[invulBuff].canPickup = 1; //if active,
+	Buff[invulBuff].X = 750; //draw
+	Buff[invulBuff].Y = -1400; //draw
+	Buff[invulBuff].width = 20; //draw
+	Buff[invulBuff].height = 20; //draw
+	Buff[invulBuff].buffduration = 0; //seconds?
+	Buff[invulBuff].invulActive = 0;
+	Buff[invulBuff].resetTimer = 3;
+	shieldalpha = 50;
+
 	// PLATFORMS INITIALIZATION
 	/*---------------------------------------------------------------------------------------------------------------------*/
 #pragma region Initialize Platform
@@ -338,13 +361,6 @@ void Tutorial_Update(void)
 			// Jump
 			jump(&player, movestate, Buff[jumpBuff].state);
 
-			// window clamps (eventually World Clamps)
-			/*player.x = CP_Math_ClampFloat(player.x, 0, width - player.width);
-			if (player.y + player.height > height || player.y < 0) {
-				player.movey = 0;
-			}
-			player.y = CP_Math_ClampFloat(player.y, 0, height + player.height);*/
-
 			// change movestate
 				/*
 				OnPlat	  - on platform
@@ -373,28 +389,6 @@ void Tutorial_Update(void)
 		// Hazard
 		/*---------------------------------------------------------------------------------------------------*/
 #pragma region Hazard stuff
-
-		//spawnTimer += CP_System_GetDt();
-		//if (spawnTimer >= spawnInterval) {
-		//	for (int i = 0; i < MAX_BULLETS; ++i) {
-		//		if (!bullets[i].active) {
-		//			bullets[i].x = bulletx; // Spawn at the defined starting point
-		//			bullets[i].y = bullety; // Align along the defined line
-		//			bullets[i].active = true;
-		//			break;
-		//		}
-		//	}
-		//	spawnTimer = 0.0f;
-		//}
-
-		//for (int i = 0; i < MAX_BULLETS; ++i) {
-		//	if (bullets[i].active) {
-		//		bullets[i].x -= BULLET_SPEED * CP_System_GetDt(); // Move square left
-		//		if (bullets[i].x + BULLET_SIZE < 0) {            // Deactivate square if off-screen
-		//			bullets[i].active = false;
-		//		}
-		//	}
-		//}
 
 		hazard_update();
 
