@@ -97,18 +97,6 @@ void Credits_Update(void) {
 	}
 
 	if (screen_num == FIRST) {
-		CP_Settings_TextSize(70);
-		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
-		CP_Font_DrawText("A Game By:", (float)width / 2.0f, (float)height / 3.0f);
-		CP_Settings_TextSize(100);
-		CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
-		CP_Font_DrawText("AVID WAFFLE ENJOYERS", (float)width / 2.0f, (float)height / 2.0f);
-
-		CP_Settings_TextSize(20);
-		CP_Font_DrawText("All content \xC2\xA9 2024 DigiPen Institute of Technology Singapore. All Rights Reserved.", (float)width / 2, (float)700.0f);
-		CP_Settings_TextSize(100);
-	}
-	else if (screen_num == SECOND) {
 		CP_Settings_TextSize(50);
 		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
 		CP_Font_DrawText("THE TEAM", (float)350.0F, (float)200.0f);
@@ -137,12 +125,8 @@ void Credits_Update(void) {
 		CP_Settings_TextSize(30);
 		CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
 		CP_Font_DrawText("DigiPen Institute of Technology Singapore", (float)2 * width / 3.0f, (float)600.0f);
-
-		CP_Settings_TextSize(20);
-		CP_Font_DrawText("All content \xC2\xA9 2024 DigiPen Institute of Technology Singapore. All Rights Reserved.", (float)width / 2, (float)700.0f);
-		CP_Settings_TextSize(100);
 	}
-	else if (screen_num == THIRD) {
+	else if (screen_num == SECOND) {
 		CP_Settings_TextSize(50);
 		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
 		CP_Font_DrawText("PRESIDENT", (float)width / 2.0f, (float)200.0f);
@@ -163,12 +147,59 @@ void Credits_Update(void) {
 		CP_Font_DrawText("Prasanna GHALI", (float)width / 4.0f, (float)600.0f);
 		CP_Font_DrawText("Mandy WONG", (float)width / 2.0f, (float)600.0f);
 		CP_Font_DrawText("Johnny DEEK", (float)3 * width / 4.0f, (float)600.0f);
-
-		CP_Settings_TextSize(20);
-		CP_Font_DrawText("All content \xC2\xA9 2024 DigiPen Institute of Technology Singapore. All Rights Reserved.", (float)width / 2, (float)700.0f);
-		CP_Settings_TextSize(100);
 	}
+	else if (screen_num == THIRD) {
+		CP_Settings_TextSize(50);
+		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
+		CP_Font_DrawText("MUSIC", (float)width / 2.0f, (float)200.0f);
+		CP_Settings_TextSize(25);
+		CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Font_DrawText("8 Bit Adventure", (float)400.0f, (float)275.0f);
+		CP_Font_DrawText("Boss Time", (float)400.0f, (float)350.0f);
+		CP_Font_DrawText("8 Bit Retro Funk", (float)400.0f, (float)425.0f);
+		CP_Font_DrawText("Retro Platforming", (float)400.0f, (float)500.0f);
+		CP_Font_DrawText("8 Bit Menu", (float)400.0f, (float)575.0f);
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Font_DrawText("David Renda", (float)1200.0f, (float)275.0f);
+		CP_Font_DrawText("David Renda", (float)1200.0f, (float)350.0f);
+		CP_Font_DrawText("David Renda", (float)1200.0f, (float)425.0f);
+		CP_Font_DrawText("David Fesliyan", (float)1200.0f, (float)500.0f);
+		CP_Font_DrawText("David Renda", (float)1200.0f, (float)575.0f);
+	}
+	else if (screen_num == FOURTH) {
+		CP_Settings_TextSize(50);
+		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
+		CP_Font_DrawText("SOUND EFFECTS", (float)width / 2.0f, (float)200.0f);
+		CP_Settings_TextSize(25);
+		CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Font_DrawText("8-bit game SFX Sound (21)", (float)400.0f, (float)275.0f);
+		CP_Font_DrawText("Arcade game - retro 8", (float)400.0f, (float)350.0f);
+		CP_Font_DrawText("bit - fast jump", (float)400.0f, (float)425.0f);
+		CP_Font_DrawText("Retro game - coin pickup", (float)400.0f, (float)500.0f);
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_MIDDLE);
+		CP_Font_DrawText("RasoolAsaad", (float)1200.0f, (float)275.0f);
+		CP_Font_DrawText("FascinatedSound", (float)1200.0f, (float)350.0f);
+		CP_Font_DrawText("Jam FX", (float)1200.0f, (float)500.0f);
+	}
+	else if (screen_num == LAST) {
+		CP_Settings_TextSize(50);
+		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
+		CP_Font_DrawText("LINKS - MUSIC", (float)width / 2.0f, (float)200.0f);
+		CP_Font_DrawText("LINKS - SOUND EFFECTS", (float)width / 2.0f, (float)425.0f);
+		CP_Settings_TextSize(25);
+		CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
+		CP_Font_DrawText("https://www.fesliyanstudios.com/royalty-free-music", (float)width / 2.0f, (float)275.0f);
+		CP_Font_DrawText("/downloads-c/8-bit-music/6", (float)width / 2.0f, (float)350.0f);
+		CP_Font_DrawText("https://pixabay.com/sound-effects/search/8-bit/", (float)width / 2.0f, (float)500.0f);
+		CP_Font_DrawText("https://uppbeat.io/sfx/tag/8-bit", (float)width / 2.0f, (float)575.0f);
 
+	}
+	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+	CP_Settings_TextSize(20);
+	CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
+	CP_Font_DrawText("All content \xC2\xA9 2024 DigiPen Institute of Technology Singapore. All Rights Reserved.", (float)width / 2, (float)700.0f);
 	CP_Settings_TextSize(70);
 
 	//toggle screen buttons
@@ -188,7 +219,7 @@ void Credits_Update(void) {
 		TextBoxCreate((float)(width / 4), (float)(height - 100), 100.0f, 100.0f, "<", disabled_color);
 	}
 
-	if (screen_num != THIRD) {
+	if (screen_num != LAST) {
 		TextBoxCreate((float)(3 * width / 4), (float)(height - 100), 100.0f, 100.0f, ">", button_color);
 		int NextClick = IsAreaClicked((float)(3 * width / 4), (float)(height - 100), 100.0f, 100.0f, mouseX, mouseY); //if mouse is over button
 		if (NextClick) {

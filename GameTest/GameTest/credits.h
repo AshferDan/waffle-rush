@@ -16,7 +16,9 @@
 typedef enum credit_screen {
 	FIRST,
 	SECOND,
-	THIRD
+	THIRD,
+	FOURTH,
+	LAST
 } credit_screen;
 
 typedef struct credits {
