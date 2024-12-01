@@ -27,13 +27,11 @@ void L2_Init(void)
 	CP_Sound_PlayAdvanced(music, 1.0f, 1.0f, TRUE, CP_SOUND_GROUP_0);
 
 	// load sfx
-	sfx = CP_Sound_Load("Assets/WaffleMachine.wav");
-	CP_Sound_PlayAdvanced(sfx, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
-	jumpsound = CP_Sound_LoadMusic("Assets/jump.wav");
+	machinesound = CP_Sound_Load("Assets/WaffleMachine.wav");
+	CP_Sound_PlayAdvanced(machinesound, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
+	jumpsound = CP_Sound_Load("Assets/jump.wav");
 	buttonclick = CP_Sound_Load("Assets/buttonselect.wav");
 	clink = CP_Sound_Load("Assets/clinkforbutton.wav");
-
-	CP_Sound_ResumeGroup(CP_SOUND_GROUP_1);
 
 	// ASSET LOADS
 	/*---------------------------------------------------------------------------------------------------------------------*/
@@ -635,7 +633,10 @@ void L2_Exit(void)
 {
 	// Frees images :D say no to memory leak
 	Free_Images();
-	CP_Sound_Free(&jumpsound);
+
 	CP_Sound_Free(&music);
-	CP_Sound_Free(&sfx);
+	CP_Sound_Free(&machinesound);
+	CP_Sound_Free(&jumpsound);
+	CP_Sound_Free(&buttonclick);
+	CP_Sound_Free(&clink);
 }

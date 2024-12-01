@@ -13,7 +13,6 @@
 #include "LevelSelect.h"
 
 CP_Font exo;
-CP_Sound music;
 
 float display_timer, timer_alpha;
 int isOptionsSaved;
@@ -39,7 +38,6 @@ void Options_Init(void) {
 	fclose(file);
 
 	// set max volumes for BGM and sound effects and sounds for saving 
-	//buttonclick = CP_Sound_LoadMusic("Assets/buttonselect.wav");
 	max_bgm_vol = 100.0f;
 	max_se_vol = 100.0f;
 	// set size for icons
@@ -251,8 +249,10 @@ void Options_Update(void) {
 }
 
 void Options_Exit(void) {
-	
-	//CP_Sound_Free(&buttonclick);
+
+	CP_Sound_Free(&music);
+	CP_Sound_Free(&buttonclick);
+	CP_Sound_Free(&clink);
 }
 
 // ------------------------------------------------------------------------------------------------------------------

@@ -534,8 +534,7 @@
 
 	// Sound files
 	CP_Sound music;
-	CP_Sound sfx;
-	CP_Sound wafflemachine;
+	CP_Sound machinesound;
 	CP_Sound jumpsound;
 	CP_Sound buttonclick;
 	CP_Sound LevelLoadsound;
@@ -602,7 +601,7 @@
 #pragma region 
 		// Player States
 			void Kill_Player(Player* player, CauseOfDeath deathcause, int* deaths, int *buffstate);
-			void Spawn_Player(Player* player, coords spawn, Camera* camera, CP_Sound machinesound);
+			void Spawn_Player(Player* player, coords spawn, Camera* camera);
 			void Reset_Player(Player* player, MoveState* movestate);
 			void Transition_Player(Player* player, MoveState* movestate);
 

@@ -15,7 +15,7 @@
 credits names[num_names];
 
 CP_Font exo;
-CP_Sound sfx;
+CP_Sound easteregg;
 
 credit_screen screen_num;
 
@@ -45,7 +45,7 @@ void Credits_Init(void) {
 	fclose(file2);
 
 	// load sfx
-	sfx = CP_Sound_Load("Assets/PlayerSpawn.wav");
+	easteregg = CP_Sound_Load("Assets/EasterEgg.wav");
 	buttonclick = CP_Sound_Load("Assets/buttonselect.wav");
 
 	// set first screen when opening credits
@@ -92,7 +92,7 @@ void Credits_Update(void) {
 	if (EasterEggClick) {
 		if (CP_Input_MouseClicked()) {
 			CP_Sound_StopGroup(CP_SOUND_GROUP_1);
-			CP_Sound_PlayAdvanced(sfx, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
+			CP_Sound_PlayAdvanced(easteregg, 1.0f, 1.0f, FALSE, CP_SOUND_GROUP_1);
 		}
 	}
 
@@ -222,6 +222,7 @@ void Credits_Update(void) {
 
 void Credits_Exit(void) {
 
-	CP_Sound_Free(&sfx);
+	CP_Sound_Free(&machinesound);
+	CP_Sound_Free(&buttonclick);
 }
 

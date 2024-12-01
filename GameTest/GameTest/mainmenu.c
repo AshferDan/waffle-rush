@@ -13,7 +13,6 @@
 CP_Image logo;
 CP_Image splashscreen;
 CP_Font exo;
-CP_Sound music;
 CP_Color button_color;
 bool inMenu = 0;
 bool inStart = 1;
@@ -37,8 +36,11 @@ void Main_Menu_Init(void)
 	bg = CP_Color_Create(135, 200, 220, 255);
 
 	// load options file (music volume)
+	music = CP_Sound_LoadMusic("Assets/Dumba.wav");
 	buttonclick = CP_Sound_Load("Assets/buttonselect.wav");
 	clink = CP_Sound_Load("Assets/clinkforbutton.wav");
+
+
 	FILE* file = fopen("Assets/Options.txt", "r");
 	fscanf_s(file, "%f %f", &current_bgm_vol, &current_se_vol);
 	printf("BGM Volume: %lf\nSFX Volume: %lf\n", current_bgm_vol, current_se_vol);
@@ -115,7 +117,6 @@ void Main_Menu_Update(void)
 	else if (inStart == 0) {
 		// load music
 		if (inMenu == 0) {
-			music = CP_Sound_LoadMusic("Assets/Dumba.wav");
 			CP_Sound_PlayAdvanced(music, 1.0f, 1.0f, TRUE, CP_SOUND_GROUP_0);
 			inMenu = 1;
 		}
@@ -149,7 +150,6 @@ void Main_Menu_Update(void)
 				CP_Sound_PlayAdvanced(clink, 1.0, 1.0, FALSE, CP_SOUND_GROUP_1);
 				CP_Engine_SetNextGameState(LSelect_Init, LSelect_Update, LSelect_Exit); //go to game
 				inMenu = 0;
-				CP_Sound_Free(&music);
 				
 			}
 		}
@@ -206,4 +206,8 @@ void Main_Menu_Exit(void)
 {
 	CP_Image_Free(&logo);
 	CP_Image_Free(&splashscreen);
+
+	CP_Sound_Free(&music);
+	CP_Sound_Free(&buttonclick);
+	CP_Sound_Free(&clink);
 }
