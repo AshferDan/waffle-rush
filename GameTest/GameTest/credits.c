@@ -97,9 +97,21 @@ void Credits_Update(void) {
 	}
 
 	if (screen_num == FIRST) {
+		CP_Settings_TextSize(70);
+		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
+		CP_Font_DrawText("A Game By:", (float)width / 2.0f, (float)height / 3.0f);
+		CP_Settings_TextSize(100);
+		CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
+		CP_Font_DrawText("AVID WAFFLE ENJOYERS", (float)width / 2.0f, (float)height / 2.0f);
+
+		CP_Settings_TextSize(20);
+		CP_Font_DrawText("All content \xC2\xA9 2024 DigiPen Institute of Technology Singapore. All Rights Reserved.", (float)width / 2, (float)700.0f);
+		CP_Settings_TextSize(100);
+	}
+	else if (screen_num == SECOND) {
 		CP_Settings_TextSize(50);
 		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
-		CP_Font_DrawText("THE TEAM", (float)width / 4.0f, (float)200.0f);
+		CP_Font_DrawText("THE TEAM", (float)350.0F, (float)200.0f);
 		CP_Settings_TextSize(30);
 		CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
 		for (int i = 0; i < num_names; i++) {
@@ -108,7 +120,7 @@ void Credits_Update(void) {
 			if (i == 3 && EasterEggClick) {
 				CP_Settings_Fill(CP_Color_Create(255, 255, 0, 255));
 			}
-			CP_Font_DrawText(credits, (float)width / 4.0f, (float)(300 + (i * 75)));
+			CP_Font_DrawText(credits, (float)350.0f, (float)(300 + (i * 75)));
 			CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
 		}
 		CP_Settings_TextSize(50);
@@ -130,7 +142,7 @@ void Credits_Update(void) {
 		CP_Font_DrawText("All content \xC2\xA9 2024 DigiPen Institute of Technology Singapore. All Rights Reserved.", (float)width / 2, (float)700.0f);
 		CP_Settings_TextSize(100);
 	}
-	else if (screen_num == SECOND) {
+	else if (screen_num == THIRD) {
 		CP_Settings_TextSize(50);
 		CP_Settings_Fill(CP_Color_Create(168, 122, 27, 255));
 		CP_Font_DrawText("PRESIDENT", (float)width / 2.0f, (float)200.0f);
@@ -156,15 +168,6 @@ void Credits_Update(void) {
 		CP_Font_DrawText("All content \xC2\xA9 2024 DigiPen Institute of Technology Singapore. All Rights Reserved.", (float)width / 2, (float)700.0f);
 		CP_Settings_TextSize(100);
 	}
-	else if (screen_num == THIRD) {
-		CP_Settings_TextSize(70);
-		CP_Settings_Fill(CP_Color_Create(204, 125, 71, 255));
-		CP_Font_DrawText("INSERT REFERENCES HERE", (float)width / 2.0f, (float)height / 2.0f);
-
-		CP_Settings_TextSize(20);
-		CP_Font_DrawText("All content \xC2\xA9 2024 DigiPen Institute of Technology Singapore. All Rights Reserved.", (float)width / 2, (float)700.0f);
-		CP_Settings_TextSize(100);
-	}
 
 	CP_Settings_TextSize(70);
 
@@ -185,7 +188,7 @@ void Credits_Update(void) {
 		TextBoxCreate((float)(width / 4), (float)(height - 100), 100.0f, 100.0f, "<", disabled_color);
 	}
 
-	if (screen_num != SECOND) {
+	if (screen_num != THIRD) {
 		TextBoxCreate((float)(3 * width / 4), (float)(height - 100), 100.0f, 100.0f, ">", button_color);
 		int NextClick = IsAreaClicked((float)(3 * width / 4), (float)(height - 100), 100.0f, 100.0f, mouseX, mouseY); //if mouse is over button
 		if (NextClick) {
