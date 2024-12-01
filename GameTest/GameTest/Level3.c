@@ -361,7 +361,7 @@ void L3_Update(void)
 			}
 
 			// Jump
-			jump(&player, movestate, buffstate, &jumpsound);
+			jump(&player, movestate, buffstate);
 
 
 			// change movestate
