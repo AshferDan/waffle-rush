@@ -175,31 +175,31 @@ void TransitionOutBoxEffect(float playerX, float playerY, float boxX1, float box
 
 void Load_Images() {
 	// player sprites
-	player_sprite		= CP_Image_Load("Assets/Player_Sprites.png");	// player
-	boot_sprite			= CP_Image_Load("Assets/Boot_Sprites.png");		// jump buff overlay
-	bubble_sprite		= CP_Image_Load("Assets/Bubble.png");			// shield overlay
-	transition_sprite	= CP_Image_Load("Assets/Transition.png");		// transition animation
-	spawn_sprite		= CP_Image_Load("Assets/Spawn_Sprite.png");		// checkpoint and spawning animation
-	burn_sprite			= CP_Image_Load("Assets/Burnt.png");			// burn death animation
-	fall_sprite			= CP_Image_Load("Assets/Fall_Sprite.png");		// fall death animation
-	crush_sprite		= CP_Image_Load("Assets/Crush_Sprite.png");		// crusher death animation
+	player_sprite		= CP_Image_Load("Assets/Images/Player_Sprites.png");	// player
+	boot_sprite			= CP_Image_Load("Assets/Images/Boot_Sprites.png");		// jump buff overlay
+	bubble_sprite		= CP_Image_Load("Assets/Images/Bubble.png");			// shield overlay
+	transition_sprite	= CP_Image_Load("Assets/Images/Transition.png");		// transition animation
+	spawn_sprite		= CP_Image_Load("Assets/Images/Spawn_Sprite.png");		// checkpoint and spawning animation
+	burn_sprite			= CP_Image_Load("Assets/Images/Burnt.png");			// burn death animation
+	fall_sprite			= CP_Image_Load("Assets/Images/Fall_Sprite.png");		// fall death animation
+	crush_sprite		= CP_Image_Load("Assets/Images/Crush_Sprite.png");		// crusher death animation
 
 	// goal stuff
-	goal_sprite			= CP_Image_Load("Assets/Plate.png");			// plate goal
-	goal_pointer		= CP_Image_Load("Assets/Arrow.png");			// goal pointer green arrow
+	goal_sprite			= CP_Image_Load("Assets/Images/Plate.png");			// plate goal
+	goal_pointer		= CP_Image_Load("Assets/Images/Arrow.png");			// goal pointer green arrow
 
 	// skull
-	skull				= CP_Image_Load("Assets/Skull.png");			// skull icon for death counter
+	skull				= CP_Image_Load("Assets/Images/Skull.png");			// skull icon for death counter
 
 	// visual effects
-	effects				= CP_Image_Load("Assets/Effects.png");			// Contains visual effect sprites (16x16 res)
+	effects				= CP_Image_Load("Assets/Images/Effects.png");			// Contains visual effect sprites (16x16 res)
 
 	// buffs stuff
-	buff_sprite			= CP_Image_Load("Assets/Buff_Icon.png");		// buff icons
-	buff_bg				= CP_Image_Load("Assets/Buff_Background.png");	// background for buff UI
+	buff_sprite			= CP_Image_Load("Assets/Images/Buff_Icon.png");		// buff icons
+	buff_bg				= CP_Image_Load("Assets/Images/Buff_Background.png");	// background for buff UI
 
 	// hazard stuff
-	fire_sprite			= CP_Image_Load("Assets/Fire_Sprite.png");		// fire animation
+	fire_sprite			= CP_Image_Load("Assets/Images/Fire_Sprite.png");		// fire animation
 }
 
 void Free_Images() {

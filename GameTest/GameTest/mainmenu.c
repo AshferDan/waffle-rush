@@ -27,9 +27,9 @@ void Main_Menu_Init(void)
 	CP_Settings_TextSize(150);
 
 	// load logo
-	logo = CP_Image_Load("Assets/DigiPen_Singapore_WEB_WHITE.png");
+	logo = CP_Image_Load("Assets/Images/DigiPen_Singapore_WEB_WHITE.png");
 	CP_Settings_ImageMode(CP_POSITION_CENTER);
-	splashscreen = CP_Image_Load("Assets/screen.png");
+	splashscreen = CP_Image_Load("Assets/Images/screen.png");
 
 
 	// load background color
