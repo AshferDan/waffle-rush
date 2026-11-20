@@ -76,7 +76,7 @@ As a first-year team still learning the ropes, all five of us helped each other 
 | Name | Main contributions |
 |---|---|
 | Tan Jun Quan | Team lead, platform crawling, wall jump, pixel art and animation |
-| Koe Yun Ji | Camera, power-ups, level design |
+| Koe Yun Ji | Camera, power-ups, level design, audio |
 | Manfred Sim | Menus, pause, scoring, serialization (saving and loading data) |
 | Muhammad Raziq | Hazards |
 | Muhammad Ashfer | Hub world (level select), level design, wall-jump coyote time |
