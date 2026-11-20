@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/35165419/README.md)
+
 # WAFFLE RUSH
 
 A 2D pixel-art platformer about a waffle on the run. As well as running and wall jumping, you can **crawl inside syrup platforms** to take routes a normal jump can't reach.
