@@ -24,7 +24,7 @@ A 2D pixel-art platformer about a waffle on the run. As well as running and wall
 
 **Team lead, gameplay programmer, and pixel artist**
 
-- **Led the 5-person team on our first university project.** Broke the game into tasks, drafted how each one should work (pseudocode and high-level overviews), and assigned them across the team. Wrote 153 of the team's 274 commits.
+- **Led the 5-person team on our first university project.** Broke the game into tasks, drafted how each one should work (pseudocode and high-level overviews), and assigned them across the team.
 - **Set up the project.** Created the Visual Studio solution, integrated CProcessing, and wrote the first versions of the core files (`main.c`, `game.c`, `platform.c`, `utils.c`).
 - **Built the platform-crawling mechanic.** The player can crawl *inside* syrup platforms. Each platform is built as a hollow outline of colliders instead of a solid box, with the player's hitbox sized slightly smaller than the inside. Pressing `E` moves the player through the wall, and the enter and exit animations make it look like crawling in.
 - **Built wall sliding and wall jumping.** Holding toward a wall slows your fall. Jumping while sliding launches you away from the wall. A teammate added coyote time (a short grace window after leaving the wall) to make it feel fair.
