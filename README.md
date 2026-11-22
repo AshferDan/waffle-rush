@@ -20,20 +20,13 @@ A 2D pixel-art platformer about a waffle on the run. As well as running and wall
 | **Timeline** | Sep–Dec 2024 (our first university project) |
 | **Scope** | 5 levels, 11 character and hazard animations, 3 playtest sessions |
 
-## My role: Tan Jun Quan
+## My role
 
-**Team lead, gameplay programmer, and pixel artist**
+**Gameplay Programmer + Designer, Level Designer**
 
-- **Led the 5-person team on our first university project.** Broke the game into tasks, drafted how each one should work (pseudocode and high-level overviews), and assigned them across the team.
-- **Set up the project.** Created the Visual Studio solution, integrated CProcessing, and wrote the first versions of the core files (`main.c`, `game.c`, `platform.c`, `utils.c`).
-- **Built the platform-crawling mechanic.** The player can crawl *inside* syrup platforms. Each platform is built as a hollow outline of colliders instead of a solid box, with the player's hitbox sized slightly smaller than the inside. Pressing `E` moves the player through the wall, and the enter and exit animations make it look like crawling in.
-- **Built wall sliding and wall jumping.** Holding toward a wall slows your fall. Jumping while sliding launches you away from the wall. A teammate added coyote time (a short grace window after leaving the wall) to make it feel fair.
-- **Created all the pixel art and animation:** idle, walk, jump, wall slide, crawl, enter platform, exit platform, respawn (waffle press), death by fire, death by falling, and the fire hazard.
-
-**Where to look in the code:**
-[`platform.c`](GameTest/GameTest/platform.c) / [`platform.h`](GameTest/GameTest/platform.h) (platforms, crawling and player movement) ·
-[`game.c`](GameTest/GameTest/game.c) (core game loop) ·
-[`Level1.c`](GameTest/GameTest/Level1.c) (first level, used as the template for the others)
+- Designed, implemented and fine tuned core gameplay mechanics such as player movement, level timer and more.
+- Integrated level selection from an interface to a level, adding to immersion and acting as a mini-introduction to new players before the tutorial.
+- Designed all levels, each with intended challenge/ gimmick for players to overcome, as well as allowing for more dynamic gameplay with multiple routes to clear a level.
 
 ## Development notes
 
