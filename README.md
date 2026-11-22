@@ -24,7 +24,7 @@ A 2D pixel-art platformer about a waffle on the run. As well as running and wall
 
 **Gameplay Programmer + Designer, Level Designer**
 
-- Designed, implemented and fine tuned core gameplay mechanics such as player movement, level timer and more.
+- Designed, implemented and fine tuned core gameplay mechanics such as advanced player movement (coyote timing, strafe speeds etc), level timer and more.
 - Integrated level selection from an interface to a level, adding to immersion and acting as a mini-introduction to new players before the tutorial.
 - Designed all levels, each with intended challenge/ gimmick for players to overcome, as well as allowing for more dynamic gameplay with multiple routes to clear a level.
 
